@@ -149,7 +149,7 @@ public class XMLParser {
 		beginTag = UNPROCESSED;
 		try {
 			String text ="";
-			char currentCharacter = (char)reader.read();
+			int currentCharacter = reader.read();
 			do {
 				//				if(currentCharacter == '\n' || currentCharacter == '\t' || currentCharacter == '\r')
 				//System.out.print("WARN ME");
