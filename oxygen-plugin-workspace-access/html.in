@@ -1,6 +1,11 @@
-<house>
+<neighbourhood COLOR="BLUE">
+	<house> 
+	<!-- Comment -->
+	<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>
+		<visitable ATTRIBUTE="EXISTING"> Som&lt;$gt;ething </visitable> 
+	<![CDATA[<greeting>Hello, ]]]]]]world!</greeting>]]> 
 	<!DOCTYPE greeting [
   		<!ELEMENT "<<<<<><><><>"  greeting (#PCDATA)>
 	]>
-	<greeting>Hello, world!</greeting>
-</house>
+	</house> 
+</neighbourhood>

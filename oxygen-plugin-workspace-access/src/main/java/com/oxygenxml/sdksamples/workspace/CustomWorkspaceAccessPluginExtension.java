@@ -11,7 +11,9 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-
+import java.awt.Desktop;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -21,6 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 
+import com.sun.corba.se.impl.orbutil.closure.Constant;
 
 import ro.sync.diff.api.DiffException;
 import ro.sync.diff.api.DiffOptions;
@@ -231,7 +234,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   	 * @param myDialog
   	 * @param pluginWorkspaceAccess
   	 */
-  	private void createCompareListener(PopUpDialogue myDialog, StandalonePluginWorkspace pluginWorkspaceAccess){
+  	private void createCompareListener(final PopUpDialogue myDialog, final StandalonePluginWorkspace pluginWorkspaceAccess){
   		ActionListener ac = new ActionListener() {
 			
 			@Override
@@ -240,9 +243,22 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 					saveData(myDialog);   // TODO remove it                                  //saves the paths of the files
 					if(Constants.getFirstFile() != null && Constants.getSecondFile() != null){
 						try {
+							
+							
 							List<Difference> performDiff = generateDifferences(myDialog, pluginWorkspaceAccess);
+							
 							generateHTMLFile(performDiff);
+							
+							if(Desktop.isDesktopSupported()){
+								URI myPage = new File(Constants.pathToFirstHTML).toURI();
+								Desktop.getDesktop().browse(myPage);
+							}
+							
+							
 						} catch (FileNotFoundException e1) {
+							e1.printStackTrace();
+						}catch (IOException e1) {
+							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					}

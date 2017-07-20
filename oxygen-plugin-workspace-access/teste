@@ -16,3 +16,10 @@
 	]>
 	<greeting>Hello, world!</greeting>
 </house>
+
+<neighbourhood COLOR="BLUE">
+	<house>
+	<!-- Comment -->
+	<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>
+	</house> 
+</neighbourhood>

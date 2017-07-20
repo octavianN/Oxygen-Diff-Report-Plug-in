@@ -8,6 +8,9 @@ import org.junit.Test;
 
 public class XMLParserTest {
 
+	/**
+	 * 
+	 */
 	@Test
 	public void testCheckSerialization() {
 		String str = "<block-list:block-list xmlns:block-list=\"http://openoffice.org/2001/block-list\">\n"+
@@ -23,7 +26,9 @@ public class XMLParserTest {
 				"</span><span class = \"CloseElement\">&lt;/block-list:block-list&gt</span>", parser.getResultedText());
 	}
 
-	
+	/**
+	 * 
+	 */
 	@Test
 	public void testCheckSerializationEntities() {
 		String str = "<root> <p> test &lt; other text </p></root>";
@@ -31,5 +36,33 @@ public class XMLParserTest {
 		XMLParser parser  = new XMLParser(new StringReader(str));
 		parser.parseInputIntoHTMLFormat();
 		assertEquals("<span class = \"Element\">&lt;root</span>&gt; <span class = \"Element\">&lt;p</span>&gt; test <span class = \"Element\">&lt; </span><span class = \"attributeName\">other text &lt;/p</span><span class = \"attributeValue\">gt;&lt;/root&gt</span><span class = \"textField\"></span>", parser.getResultedText());
+	}
+	
+	
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testName() throws Exception {
+        String str =
+        		"<neighbourhood COLOR=\"BLUE\">\n" + 
+        		"	<house> \n" + 
+        		"	<!-- Comment -->\n" + 
+        		"	<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>\n" + 
+        		"		<visitable ATTRIBUTE=\"EXISTING\"> Som&lt;$gt;ething </visitable> \n" + 
+        		"	<![CDATA[<greeting>Hello, ]]]]]]world!</greeting>]]> \n" + 
+        		"	<!DOCTYPE greeting [\n" + 
+        		"  		<!ELEMENT \"<<<<<><><><>\"  greeting (#PCDATA)>\n" + 
+        		"	]>\n" + 
+        		"	</house> \n" + 
+        		"</neighbourhood>";
+		
+		XMLParser parser  = new XMLParser(new StringReader(str));
+		parser.parseInputIntoHTMLFormat();
+		assertEquals("<span class = \"Element\">&lt;root</span>&gt; <span class = \"Element\">&lt;p</span>&gt; test "
+				+ "<span class = \"Element\">&lt; </span><span class = \"attributeName\">other text &lt;/p</span><span "
+				+ "class = \"attributeValue\">gt;&lt;/root&gt</span><span class = \"textField\"></span>", parser.getResultedText());
+
 	}
 }
