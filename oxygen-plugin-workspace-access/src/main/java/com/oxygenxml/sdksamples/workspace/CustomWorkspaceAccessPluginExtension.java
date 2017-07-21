@@ -430,7 +430,52 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			StringBuilder htmlBuilder = new StringBuilder();
 			//begins the html file
 			htmlBuilder.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-			htmlBuilder.append("<head><title>Diff Report</title></head>");
+			htmlBuilder.append("<head><title>Diff Report</title>");
+			htmlBuilder.append("<style>/*--------------------------------------------\n" + 
+					"    Source code in the instance, source or\n" + 
+					"    annotations.\n" + 
+					"--------------------------------------------*/\n" + 
+					"span.Element {\n" + 
+					"    color: #000096;\n" + 
+					"    background-color:inherit;\n" + 
+					"}\n" + 
+					"span.attributeName {\n" + 
+					"    color: #F5844C;\n" + 
+					"    background-color:inherit;\n" + 
+					"}\n" + 
+					"span.attributeValue {\n" + 
+					"    color: #993300;\n" + 
+					"    background-color:inherit;\n" + 
+					"}\n" + 
+					"span.tI {\n" + 
+					"    color: #000000;\n" + 
+					"    background-color:inherit;\n" + 
+					"}\n" + 
+					"span.textField {\n" + 
+					"    color: #000000;\n" + 
+					"    background-color:inherit;\n" + 
+					"}\n" + 
+					"span.Comment {\n" + 
+					"    color: #006400;\n" + 
+					"    background-color:inherit;\n" + 
+					"}\n" + 
+					"span.CDATA {\n" + 
+					"    color: #008C00;\n" + 
+					"    background-color:inherit;\n" + 
+					"}\n" + 
+					"span.PI {\n" + 
+					"    color: #8B26C9;\n" + 
+					"    background-color:inherit;\n" + 
+					"}\n" + 
+					"span.Doctype {\n" + 
+					"    color: #969600;\n" + 
+					"    background-color:inherit;\n" + 
+					"}\n" + 
+					"/* Title sections */\n" + 
+					"span.qname{\n" + 
+					"    color:black;\n" + 
+					"    background-color:inherit;\n" + 
+					"}</style></head>");
 			htmlBuilder.append("<body>");
 			htmlBuilder.append("<table>");
 			htmlBuilder.append("<tr>");

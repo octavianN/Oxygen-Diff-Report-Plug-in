@@ -157,8 +157,8 @@ public class PopUpDialogue {
 		secondLabelField = new JTextField(20);
 		JButton browseButton1 = createBrowseButton(firstLabelField);
 		JButton browseButton2 = createBrowseButton(secondLabelField);
-		firstLabelField.setText("C:/Users/intern5/Desktop/myFiles/diffSample/EngliGB.xml");
-		secondLabelField.setText("C:/Users/intern5/Desktop/myFiles/diffSample/EngliUS.xml");
+		firstLabelField.setText("C:/Users/intern3/Desktop/myFiles/diffSample/EngliGB.xml");
+		secondLabelField.setText("C:/Users/intern3/Desktop/myFiles/diffSample/EngliUS.xml");
 		
 		firstLabelField.setEditable(true);
 		firstLabelField.setBackground(Color.LIGHT_GRAY);

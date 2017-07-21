@@ -6,22 +6,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
-import de.schlichtherle.io.archive.zip.raes.ParanoidZip32RaesDriver;
+
 
 public class XMLParser {
 
 	private Reader reader;
-	private BufferedReader buff;
     private String resultedText;
     private String characterResidue;
-//    private String str = "<house> </house >"; 
-//    private String str2 = "<house color=\"green\">---i would like to say something here---</house>\n"
-//    						+"<house color=\"blue\">+++++++</house>";
-//	private String str1 = "<block-list:block-list xmlns:block-list=\"http://openoffice.org/2001/block-list\">\n"+
-//    "<block-list:block block-list:abbreviated-name=\"--\" block-list:name=\"&#x2013;\"/>\n"+
-//	"<block-list:block block-list:abbreviated-name=\"--\" block-list:name=\"bb\"/>\n"
-//+"</block-list:block-list>";
     
+    private short beginTag ;
 	private final short UNPROCESSED = 1;
 	private final short PROCESSING = 2;
 	private final short DEALTWITH = 3;
@@ -30,7 +23,6 @@ public class XMLParser {
 	private final short COMMENT = 6;
 	private final short CDATA = 7;
 	private final short PROCESSING_INSTRUCTION = 8;
-	private short beginTag ;
 	
 	
 //    public XMLParser(BufferedReader buff) {
@@ -68,7 +60,7 @@ public class XMLParser {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		//System.out.println(resultedString);
+
 		return null;
 	}
 	
@@ -79,26 +71,28 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private char setBeginTag(Reader reader, char currentCharacter){
+	private int setBeginTag(Reader reader, int currentCharacter){
 		try {
+			
 			characterResidue = null;
-			currentCharacter = (char)reader.read();
-			if(currentCharacter == '/'){
+			currentCharacter = reader.read();
+			
+			if((char)currentCharacter == '/'){
 				beginTag = CLOSINGTAG;
-				return currentCharacter;
-			}else if(currentCharacter != '!'){
+				return (char)currentCharacter;
+			}else if((char)currentCharacter != '!'){
 				
-				if(currentCharacter != '?'){
+				if((char)currentCharacter != '?'){
 					beginTag = PROCESSING;
-					return currentCharacter;
+					return (char)currentCharacter;
 					
 				}else{
 					beginTag = PROCESSING_INSTRUCTION;
 					
 				}
 			}else{
-				currentCharacter = (char)reader.read();
-				if(currentCharacter == 'D'){
+				currentCharacter = reader.read();
+				if((char)currentCharacter == 'D'){
 					
 					characterResidue = checkTwoWords(reader, "DOCTYPE");
 					
@@ -109,7 +103,7 @@ public class XMLParser {
 						characterResidue = "!D" + characterResidue;
 						beginTag = PROCESSING;
 					}
-				}else if(currentCharacter == '['){
+				}else if((char)currentCharacter == '['){
 					
 					characterResidue = checkTwoWords(reader, "[CDATA[");
 					if(characterResidue == null){
@@ -119,7 +113,7 @@ public class XMLParser {
 						beginTag = PROCESSING;
 					}
 					
-				}else if(currentCharacter == '-'){
+				}else if((char)currentCharacter == '-'){
 									
 					characterResidue = checkTwoWords(reader, "--");
 					
@@ -148,50 +142,57 @@ public class XMLParser {
 
 		beginTag = UNPROCESSED;
 		try {
-			String text ="";
+
 			int currentCharacter = reader.read();
 			do {
-				//				if(currentCharacter == '\n' || currentCharacter == '\t' || currentCharacter == '\r')
-				//System.out.print("WARN ME");
-				if (currentCharacter == '<'){
+				
+			//	System.out.print("before: " + beginTag);
+				if ((char)currentCharacter == '<'){
 
 					currentCharacter = setBeginTag(reader, currentCharacter);
 
-				} else if(currentCharacter == '>'){
-					beginTag = DEALTWITH;
-					//					resultedText+= "&gt;";
+				} else if((char)currentCharacter == '>'){
+					//if(beginTag != CLOSINGTAG)
+						beginTag = DEALTWITH;
 				}
 
+			//	System.out.print(" middle: " + beginTag);
+				
 				if (beginTag == PROCESSING){
 					currentCharacter = addElement(reader, currentCharacter);
 
 				} else if (beginTag == CLOSINGTAG){
 					currentCharacter = addClosingElement(reader, currentCharacter);
+					//System.out.println(beginTag);
 
 				} else if (beginTag == COMMENT){
-					currentCharacter = addComment(reader, currentCharacter);
+					currentCharacter = addComment(reader);
 
 				} else if (beginTag == PROCESSING_INSTRUCTION){
-					currentCharacter = addProcessingInformation(reader, currentCharacter);
+					currentCharacter = addProcessingInformation(reader);
 
 				} else if (beginTag == DOCTYPE){
-					currentCharacter = addDoctype(reader, currentCharacter);
+					currentCharacter = addDoctype(reader);
 
 				} else if (beginTag == CDATA){
-					currentCharacter = addCdata(reader, currentCharacter);
+					currentCharacter = addCdata(reader);
 
 				}
 
-
+		//		System.out.println(" after: " + beginTag);
+				
 				if (beginTag == PROCESSING){
 					currentCharacter = addAttribute(reader, currentCharacter);
-				} else if(beginTag == DEALTWITH){
-					currentCharacter = addText(reader, currentCharacter);
 				}
-
+				if(beginTag == DEALTWITH){
+//					System.out.println(beginTag);
+					currentCharacter = addText(reader);
+				}
+				
+				
 //				System.out.println("Ch: '" + (((int)currentCharacter)) +"'");
 //				System.out.println("final: " + resultedText);
-			} while(reader.ready() && ((int)currentCharacter != -1));
+			} while(reader.ready() && (currentCharacter != -1));
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -227,24 +228,24 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private char addClosingElement(Reader reader, char currentCharacter){
-		resultedText += "<span class = \"CloseElement\">&lt;";
-		int i=0;
+	private int addClosingElement(Reader reader, int currentCharacter){
+		resultedText += "<span class = \"Element\">&lt;";
+
 
 		try {
-			boolean firstInit = false;
+
 			do{
-				if(firstInit){
-					currentCharacter = (char)i;
-				}
-				firstInit = true;
-				if(checkEndTag(currentCharacter)){
-					beginTag = UNPROCESSED;
+				
+				if(checkEndTag((char)currentCharacter)){
+//					beginTag = UNPROCESSED;
 					break;
 				}
 				
-				resultedText += currentCharacter;
-			}while((i = reader.read()) != -1);
+				resultedText += (char)currentCharacter;
+				
+			}while((currentCharacter = reader.read()) != -1);
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -264,7 +265,7 @@ public class XMLParser {
 	 * @param index current position in the text
 	 * @return the updated position
 	 */
-	private char addElement(Reader reader, char currentCharacter){
+	private int addElement(Reader reader, int currentCharacter){
 		
 		resultedText += "<span class = \"Element\">&lt;";
 //		if(characterResidue != null){
@@ -275,7 +276,6 @@ public class XMLParser {
 		
 		
 		boolean condition = false;
-		int i=0;
 
 		/*
 		 * If I get a white space, new line or tab, I register it then
@@ -283,11 +283,10 @@ public class XMLParser {
 		 * so I can close the <span> tag */
 		try {
 			boolean firstInit = false;
+			
 			do{
-				
-				if(firstInit){
-					currentCharacter = (char)i;
-				}else{
+
+				if(!firstInit){
 					if(characterResidue != null){
 					//	System.out.println(characterResidue + " " + (char)reader.read());
 						currentCharacter = (char)reader.read();
@@ -295,25 +294,25 @@ public class XMLParser {
 					}
 				}
 				firstInit = true;
-				if(checkEndTag(currentCharacter)){
+				if(checkEndTag((char)currentCharacter)){
 					
 					break;
 				}
-				if(checkForTabsNewLinesOrWhiteSpaces(currentCharacter)){
+				if(checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter)){
 					
 					condition = true;
-				}else if(condition && !checkForTabsNewLinesOrWhiteSpaces(currentCharacter)){
+				}else if(condition && !checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter)){
 					
 					break;
 				}
-				resultedText += currentCharacter;
-			}while((i = reader.read()) != -1);
+				resultedText += (char)currentCharacter;
+			}while((currentCharacter = reader.read()) != -1);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		resultedText += "</span>";
-		//System.out.println("\n" + currentCharacter + "\n");
+//		System.out.println( (char)currentCharacter);
 		return currentCharacter;
 	}
 	
@@ -326,46 +325,46 @@ public class XMLParser {
 	 * @param index
 	 * @return
 	 */
-	private char addAttribute(Reader reader, char currentCharacter){
+	private int addAttribute(Reader reader, int currentCharacter){
 		resultedText += "<span class = \"attributeName\">";
-		//skipFirstWhiteSpaces(index);
+		
+
 		/*
 		 * If I get an EQUAL "=", if the next character is indeed a character
 		 * I can close the <span> tag */
-		int i = 0;
-		//System.out.println(currentCharacter);
+
 		try {
-			boolean firstInit = false;
 			do{
-				if(firstInit){
-					currentCharacter = (char)i;
-				}
-				firstInit = true;
-				if(checkEndTag(currentCharacter)){
+//				System.out.println((char)currentCharacter);
+				if(checkEndTag((char)currentCharacter)){
 					
 					break;
 				}
 				
-				if(currentCharacter == '='){
-					resultedText += currentCharacter;
+				if((char)currentCharacter == '='){
+					resultedText += (char)currentCharacter;
 					break;
 				}
-				resultedText += currentCharacter;
+				resultedText += (char)currentCharacter;
 				//System.out.println(currentCharacter);
-			}while((i = reader.read()) != -1);
+			}while((currentCharacter = reader.read()) != -1);
+			
 			resultedText += "</span>";
 			
 			
 			resultedText += "<span class = \"attributeValue\">";
-			while((i = reader.read()) != -1){
-				currentCharacter = (char)i;
-				if(checkEndTagWithNoWriting(currentCharacter)){
+			
+			do{
+
+				if(checkEndTagWithNoWriting((char)currentCharacter)){
 					break;
 				}
 				
-				resultedText += currentCharacter;
-			}
-			resultedText += "</span>&gt;";
+				resultedText += (char)currentCharacter;
+			}while((currentCharacter = reader.read()) != -1);
+			
+			
+			resultedText += "</span><span class = \"Element\">&gt;</span>";
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -385,35 +384,45 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private char addText(Reader reader, char currentCharacter){
+	private int addText(Reader reader){
+		
+		int currentCharacter  = 0;
 		try {
-			int i = 0;
 			
+			beginTag = UNPROCESSED;
+
 			String copyOfWhiteSpaces = "";
-			while((i = reader.read()) != -1){
-				currentCharacter = (char)i;
-				if(checkBeginTag(currentCharacter)){
+			while((currentCharacter = reader.read()) != -1){
+
+				if(checkBeginTag((char)currentCharacter)){
 					return currentCharacter;
 				}
-				if(checkForTabsNewLinesOrWhiteSpaces(currentCharacter)){
-					copyOfWhiteSpaces += currentCharacter;
+				if(checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter)){
+					beginTag = PROCESSING;
+					copyOfWhiteSpaces += (char)currentCharacter;
 				}else{
 					break;
 				}
 			}
-		
-		
+			
+			if(beginTag == UNPROCESSED || currentCharacter == -1){ /*This is used to check if white spaces are used 
+			 														or if we have tabs new lines at the end of a file*/
+				return -1;
+			}
+			
+			
 			resultedText += "<span class = \"textField\">";
 			resultedText += copyOfWhiteSpaces;
 		
 			do{
-				currentCharacter = (char)i;
-				if(checkBeginTag(currentCharacter)){
-					//System.out.println("    asf     " + currentCharacter);
+			//	System.out.println((char)currentCharacter);
+				if(checkBeginTag((char)currentCharacter)){
+					
 					break;
 				}
-				resultedText += currentCharacter;
-			}while((i = reader.read()) != -1);
+				resultedText += (char)currentCharacter;
+			}while((currentCharacter = reader.read()) != -1);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -433,19 +442,20 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private char addComment(Reader reader, char currentCharacter){
+	private int addComment(Reader reader){
 		
+		int currentCharacter  = 0;
 		resultedText += "<span class = \"Comment\">&lt;!--";
 		//skipFirstWhiteSpaces(index);
 		try{
-			int i=0;
-			while((i = reader.read()) != -1){
-				currentCharacter = (char)i;
-				if(checkEndTag(currentCharacter)){
+			
+			while((currentCharacter = reader.read()) != -1){
+				if(checkEndTag((char)currentCharacter)){
 					break;
 				}
-				resultedText += currentCharacter;
+				resultedText += (char)currentCharacter;
 			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -466,42 +476,43 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private char addProcessingInformation(Reader reader, char currentCharacter){
+	private int addProcessingInformation(Reader reader){
 		
-		resultedText += "<span class = \"Processing Information\">&lt;?";
+		resultedText += "<span class = \"PI\">&lt;?";
+		int currentCharacter  = 0;
 		
 		try{
 			boolean commasCounter = true; /*there is the possibility that a tag may appear 
 				inside parentheses, in which case it shall not be counted*/
-			int i=0;
-			while((i = reader.read()) != -1){
-				currentCharacter = (char)i;
-				if(currentCharacter == '(' || currentCharacter == '[' || currentCharacter == '{'){
+
+			while((currentCharacter = reader.read()) != -1){
+				if((char)currentCharacter == '(' || (char)currentCharacter == '[' || (char)currentCharacter == '{'){
 					commasCounter = !commasCounter;
 				}
-				if(currentCharacter == ')' || currentCharacter == ']' || currentCharacter == '}'){
+				if((char)currentCharacter == ')' || (char)currentCharacter == ']' || (char)currentCharacter == '}'){
 					commasCounter = !commasCounter;
 				}
 				
-				if(currentCharacter == '?'){
+				if((char)currentCharacter == '?'){
 					
 					if(commasCounter){
 					
 						char nextCharacter = (char) reader.read();
 						
 						if(checkEndTagWithNoWriting(nextCharacter)){
-							resultedText += "?&gt;";
+							resultedText += "?<span class = \"Element\">&gt;</span>";
 							break;
 						}else{
-							resultedText += currentCharacter + "" + nextCharacter;
+							resultedText += (char)currentCharacter + "" + nextCharacter;
 						}
 					}else{
-						resultedText += currentCharacter;
+						resultedText += (char)currentCharacter;
 					}
 				}else{
-					resultedText += currentCharacter;
+					resultedText += (char)currentCharacter;
 				}
 			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -523,10 +534,10 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private char addDoctype(Reader reader, char currentCharacter){
+	private int addDoctype(Reader reader){
 		
 		resultedText += "<span class = \"Doctype\">&lt;!DOCTYPE";
-		
+		int currentCharacter  = 0;
 		
 		try{
 			int closingTagCounter = 1 ; /* I am counting how many times I
@@ -535,27 +546,26 @@ public class XMLParser {
 			 						is the closing tag.*/
 			boolean commasCounter = true; /*there is the possibility that a tag may appear 
 			 						inside commas, in which case it shall not be counted*/
-			int i=0;
-			while((i = reader.read()) != -1){
+
+			while((currentCharacter = reader.read()) != -1){
 			
-				currentCharacter = (char)i;
 				
-				if(currentCharacter == '\"' || currentCharacter == '\"' ){
+				if((char)currentCharacter == '\"' || (char)currentCharacter == '\"' ){
 					commasCounter = !commasCounter;
 				}
 				
-				if(currentCharacter == '<' && commasCounter){
+				if((char)currentCharacter == '<' && commasCounter){
 					closingTagCounter++;
 				}
-				if(currentCharacter == '>' && commasCounter){
+				if((char)currentCharacter == '>' && commasCounter){
 					closingTagCounter--;
 				}
-				if(currentCharacter == '>' && closingTagCounter == 0 && commasCounter){
-					resultedText += "&gt;";
+				if((char)currentCharacter == '>' && closingTagCounter == 0 && commasCounter){
+					resultedText += "<span class = \"Element\">&gt;</span>";
 					break;
 				}
 				
-				resultedText += currentCharacter;
+				resultedText += (char)currentCharacter;
 				
 			}
 			
@@ -582,33 +592,36 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private char addCdata(Reader reader, char currentCharacter){
+	private int addCdata(Reader reader){
 		
 		resultedText += "<span class = \"CDATA\">&lt;![CDATA[";
+		int currentCharacter  = 0;
 		
 		try{
-			int i=0;
-			while((i = reader.read()) != -1){
+			
+			
+			while((currentCharacter = reader.read()) != -1){
 				
-				currentCharacter = (char)i;
-				if(currentCharacter == ']'){
+				if((char)currentCharacter == ']'){
 					char auxiliarCharacter1 = (char) reader.read();
 					if(auxiliarCharacter1 == ']'){
 						char auxiliarCharacter2 = (char) reader.read();
 						if(checkEndTagWithNoWriting(auxiliarCharacter2)){
-							resultedText += "]]&gt;";
+							resultedText += "]]<span class = \"Element\">&gt;</span>";
 							break;
 						}else{
-							resultedText += currentCharacter + ""+ auxiliarCharacter1 + ""+ auxiliarCharacter2 ;
+							resultedText += (char)currentCharacter + ""+ auxiliarCharacter1 + ""+ auxiliarCharacter2 ;
 						}
 					}else{
-						resultedText += currentCharacter + ""+ auxiliarCharacter1;
+						resultedText += (char)currentCharacter + ""+ auxiliarCharacter1;
 					}
 				}else{
 				
-					resultedText += currentCharacter;
+					resultedText += (char)currentCharacter;
 				}
 			}
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -644,7 +657,7 @@ public class XMLParser {
 	private boolean checkEndTag(char character){
 		if(character == '>'){
 			beginTag = DEALTWITH;
-			resultedText += "&gt;";
+			resultedText += "<span class = \"Element\">&gt;</span>";
 			return true;
 		}
 		return false;
@@ -686,60 +699,16 @@ public class XMLParser {
 	
 	
 	
-	
-	
-	
-	
-//	private void parseFormat(){
-//
-//		beginTag = UNPROCESSED;
+//	public void doMyDeed(){
 //		try {
-//			char currentCharacter = (char)buff.read();
-//			do{
-////				if(currentCharacter == '\n' || currentCharacter == '\t' || currentCharacter == '\r')
-//					//System.out.print("WARN ME");
-//				if(currentCharacter == '<'){
-//
-//					currentCharacter = setBeginTag(buff, currentCharacter);
-//		
-//				}else if(currentCharacter == '>'){
-//					beginTag = DEALTWITH;
-////					resultedText+= "&gt;";
-//				}
-//				
-//			if(beginTag == PROCESSING){
-//				currentCharacter = addElement(buff, currentCharacter);
-//				
-//			}else if(beginTag == CLOSINGTAG){
-//				currentCharacter = addClosingElement(buff, currentCharacter);
-//				
-//			}else if(beginTag == COMMENT){
-//				currentCharacter = addComment(buff, currentCharacter);
-//				
-//			}else if(beginTag == PROCESSING_INSTRUCTION){
-//				currentCharacter = addProcessingInformation(buff, currentCharacter);
-//				
-//			}else if(beginTag == DOCTYPE){
-//				currentCharacter = addDoctype(buff, currentCharacter);
-//				
-//			}else if(beginTag == CDATA){
-//				currentCharacter = addCdata(buff, currentCharacter);
-//				
+//			int i;
+//			while((i = reader.read()) != -1){
+//				System.out.print((char)i);
 //			}
-//			
-//			
-//			if(beginTag == PROCESSING){
-//				currentCharacter = addAttribute(buff, currentCharacter);
-//			}else if(beginTag == DEALTWITH){
-//				currentCharacter = addText(buff, currentCharacter);
-//			}
-//
-//			}while(buff.ready());
-//			
 //		} catch (IOException e) {
+//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-//
 //	}
 	
 	

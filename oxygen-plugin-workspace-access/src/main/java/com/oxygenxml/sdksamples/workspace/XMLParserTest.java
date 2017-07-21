@@ -13,17 +13,21 @@ public class XMLParserTest {
 	 */
 	@Test
 	public void testCheckSerialization() {
-		String str = "<block-list:block-list xmlns:block-list=\"http://openoffice.org/2001/block-list\">\n"+
-			    "<block-list:block block-list:abbreviated-name=\"--\" block-list:name=\"&#x2013;\"/>\n"+
-				"<block-list:block block-list:abbreviated-name=\"--\" block-list:name=\"bb\"/>\n"
-			+"</block-list:block-list>";
+		String str = "<neighbourhood COLOR=\"BLUE\">\n" + 
+				"	<house>\n" + 
+				"	<!-- Comment -->\n" + 
+				"	<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>\n" + 
+				"	</house> \n" + 
+				"</neighbourhood>\n";
 		
 		XMLParser parser  = new XMLParser(new StringReader(str));
 		parser.parseInputIntoHTMLFormat();
-		assertEquals("<span class = \"Element\">&lt;block-list:block-list </span><span class = \"attributeName\">xmlns:block-list</span><span class = \"attributeValue\">\"http://openoffice.org/2001/block-list\"</span><span class = \"textField\">&gt;\n" + 
-				"</span><span class = \"Element\">&lt;block-list:block </span><span class = \"attributeName\">block-list:abbreviated-name</span><span class = \"attributeValue\">\"--\" block-list:name</span><span class = \"textField\">=\"&#x2013;\"/&gt;\n" + 
-				"</span><span class = \"Element\">&lt;block-list:block </span><span class = \"attributeName\">block-list:abbreviated-name</span><span class = \"attributeValue\">\"--\" block-list:name</span><span class = \"textField\">=\"bb\"/&gt;\n" + 
-				"</span><span class = \"CloseElement\">&lt;/block-list:block-list&gt</span>", parser.getResultedText());
+		assertEquals("<span class = \"Element\">&lt;neighbourhood  </span><span class = \"attributeName\">COLOR=</span><span class = \"attributeValue\">=\"BLUE\"</span><span class = \"CurrentElementIsClosing\">&gt;</span>\n" + 
+				"	<span class = \"Element\">&lt;house<span class = \"CurrentElementIsClosing\">&gt;</span></span>\n" + 
+				"	<span class = \"Comment\">&lt;!-- Comment --<span class = \"CurrentElementIsClosing\">&gt;</span></span>\n" + 
+				"	<span class = \"Processing Information\">&lt;?' PITarget (S (Char* - (Char* '?>' Char*)))? '?<span class = \"CurrentElementIsClosing\">&gt;</span></span>\n" + 
+				"	<span class = \"CloseElement\">&lt;/house<span class = \"CurrentElementIsClosing\">&gt;</span></span> \n" + 
+				"<span class = \"CloseElement\">&lt;/neighbourhood<span class = \"CurrentElementIsClosing\">&gt;</span></span>\n", parser.getResultedText());
 	}
 
 	/**
@@ -31,11 +35,14 @@ public class XMLParserTest {
 	 */
 	@Test
 	public void testCheckSerializationEntities() {
-		String str = "<root> <p> test &lt; other text </p></root>";
+		String str = "<h>"
+				+ "</h>";
 		
 		XMLParser parser  = new XMLParser(new StringReader(str));
 		parser.parseInputIntoHTMLFormat();
-		assertEquals("<span class = \"Element\">&lt;root</span>&gt; <span class = \"Element\">&lt;p</span>&gt; test <span class = \"Element\">&lt; </span><span class = \"attributeName\">other text &lt;/p</span><span class = \"attributeValue\">gt;&lt;/root&gt</span><span class = \"textField\"></span>", parser.getResultedText());
+		//System.out.println(parser.getResultedText());
+//		parser.doMyDeed();
+		assertEquals("<span class = \"Element\">&lt;h<span class = \"CurrentElementIsClosing\">&gt;</span></span><span class = \"CloseElement\">&lt;/h<span class = \"CurrentElementIsClosing\">&gt;</span></span>", parser.getResultedText());
 	}
 	
 	
@@ -44,9 +51,8 @@ public class XMLParserTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testName() throws Exception {
-        String str =
-        		"<neighbourhood COLOR=\"BLUE\">\n" + 
+	public void testCornerCase() throws Exception {
+        String str = "<neighbourhood COLOR=\"BLUE\">\n" + 
         		"	<house> \n" + 
         		"	<!-- Comment -->\n" + 
         		"	<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>\n" + 
@@ -60,9 +66,75 @@ public class XMLParserTest {
 		
 		XMLParser parser  = new XMLParser(new StringReader(str));
 		parser.parseInputIntoHTMLFormat();
-		assertEquals("<span class = \"Element\">&lt;root</span>&gt; <span class = \"Element\">&lt;p</span>&gt; test "
-				+ "<span class = \"Element\">&lt; </span><span class = \"attributeName\">other text &lt;/p</span><span "
-				+ "class = \"attributeValue\">gt;&lt;/root&gt</span><span class = \"textField\"></span>", parser.getResultedText());
+		assertEquals("<span class = \"Element\">&lt;neighbourhood  </span><span class = \"attributeName\">COLOR=</span><span class = \"attributeValue\">=\"BLUE\"</span><span class = \"CurrentElementIsClosing\">&gt;</span>\n" + 
+				"	<span class = \"Element\">&lt;house<span class = \"CurrentElementIsClosing\">&gt;</span></span> \n" + 
+				"	<span class = \"Comment\">&lt;!-- Comment --<span class = \"CurrentElementIsClosing\">&gt;</span></span>\n" + 
+				"	<span class = \"Processing Information\">&lt;?' PITarget (S (Char* - (Char* '?>' Char*)))? '?<span class = \"CurrentElementIsClosing\">&gt;</span></span>\n" + 
+				"		<span class = \"Element\">&lt;visitable  </span><span class = \"attributeName\">ATTRIBUTE=</span><span class = \"attributeValue\">=\"EXISTING\"</span><span class = \"CurrentElementIsClosing\">&gt;</span> <span class = \"textField\"> Som&lt;$gt;ething </span><span class = \"CloseElement\">&lt;/visitable<span class = \"CurrentElementIsClosing\">&gt;</span></span> \n" + 
+				"	<span class = \"CDATA\">&lt;![CDATA[<greeting>Hello, ]]]]]]world!</greeting>]]<span class = \"CurrentElementIsClosing\">&gt;</span> \n" + 
+				"	<span class = \"Doctype\">&lt;!DOCTYPE greeting [\n" + 
+				"  		<!ELEMENT \"<<<<<><><><>\"  greeting (#PCDATA)>\n" + 
+				"	]<span class = \"CurrentElementIsClosing\">&gt;</span></span>\n" + 
+				"	<span class = \"CloseElement\">&lt;/house<span class = \"CurrentElementIsClosing\">&gt;</span></span> \n" + 
+				"<span class = \"CloseElement\">&lt;/neighbourhood<span class = \"CurrentElementIsClosing\">&gt;</span></span>", parser.getResultedText());
 
 	}
+	
+	@Test
+	public void testEnterAndTabs() {
+		String str = "<h></h>\n" + 
+				"\n" + 
+				"\n" + 
+				"\n" + 
+				"\n" + 
+				"	\n" + 
+				"		\n" + 
+				"			";
+		
+		XMLParser parser  = new XMLParser(new StringReader(str));
+		parser.parseInputIntoHTMLFormat();
+		//System.out.println(parser.getResultedText());
+//		parser.doMyDeed();
+		assertEquals("<span class = \"Element\">&lt;h<span class = \"CurrentElementIsClosing\">&gt;</span></span><span class = \"CloseElement\">&lt;/h<span class = \"CurrentElementIsClosing\">&gt;</span></span>\n" + 
+				"\n" + 
+				"\n" + 
+				"\n" + 
+				"\n" + 
+				"	\n" + 
+				"		\n" + 
+				"			", parser.getResultedText());
+	}
+	
+	
+	@Test
+	public void testPerson() {
+		String str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
+				"<!DOCTYPE personnel PUBLIC \"PERSONNEL\" \"personal.dtd\">\n" + 
+				"<?xml-stylesheet type=\"text/css\" href=\"personal.css\"?>\n" + 
+				"<personnel>\n" + 
+				"    <person id=\"harris.anderson\" photo=\"personal-images/harris.anderson.jpg\">                \n" + 
+				"        <name>\n" + 
+				"            <given>Harris</given>\n" + 
+				"            <family>Anderson</family>\n" + 
+				"        </name>\n" + 
+				"        <email>harris.anderson@example.com</email>\n" + 
+				"        <link subordinates=\"robert.taylor helen.jackson michelle.taylor jason.chen harris.anderson brian.carter\"/>\n" + 
+				"        <url href=\"http://www.example.com/na/harris-anderson.html\"/>\n" + 
+				"    </person>\n" + 
+				"</personnel>";
+		
+		XMLParser parser  = new XMLParser(new StringReader(str));
+		parser.parseInputIntoHTMLFormat();
+		//System.out.println(parser.getResultedText());
+//		parser.doMyDeed();
+		assertEquals("<span class = \"PI\">&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?<span class = \"Element\">&gt;</span></span>\n" + 
+				"<span class = \"Doctype\">&lt;!DOCTYPE personnel PUBLIC \"PERSONNEL\" \"personal.dtd\"<span class = \"Element\">&gt;</span></span>\n" + 
+				"<span class = \"PI\">&lt;?xml-stylesheet type=\"text/css\" href=\"personal.css\"?<span class = \"Element\">&gt;</span></span>\n" + 
+				"<span class = \"Element\">&lt;personnel<span class = \"Element\">&gt;</span></span>\n" + 
+				"    <span class = \"Element\">&lt;person  </span><span class = \"attributeName\">id=</span><span class = \"attributeValue\">=\"harris.anderson\" photo=\"personal-images/harris.anderson.jpg\"</span><span class = \"Element\">&gt;</span>                \n" + 
+				"        <span class = \"Element\">&lt;name<span class = \"Element\">&gt;</span></span>\n" + 
+				"            <span class = \"Element\">&lt;given<span class = \"Element\">&gt;</span></span>", parser.getResultedText());
+	}
+	
+	
 }
