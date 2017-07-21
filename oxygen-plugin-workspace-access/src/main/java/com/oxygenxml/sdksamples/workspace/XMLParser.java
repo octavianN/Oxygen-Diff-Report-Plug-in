@@ -401,12 +401,14 @@ public class XMLParser {
 					beginTag = PROCESSING;
 					copyOfWhiteSpaces += (char)currentCharacter;
 				}else{
+					beginTag = PROCESSING;
 					break;
 				}
 			}
 			
 			if(beginTag == UNPROCESSED || currentCharacter == -1){ /*This is used to check if white spaces are used 
 			 														or if we have tabs new lines at the end of a file*/
+//				System.out.println(beginTag);
 				return -1;
 			}
 			
