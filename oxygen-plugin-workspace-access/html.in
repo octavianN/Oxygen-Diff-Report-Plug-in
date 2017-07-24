@@ -1,13 +1,346 @@
-<!DOCTYPE personnel PUBLIC "PERSONNEL" "personal.dtd">
-<?xml-stylesheet type="text/css" href="personal.css"?>
-<personnel>
-    <person id="harris.anderson" photo="personal-images/harris.anderson.jpg">                
-        <name>
-            <given>Harris</given>
-            <family>Anderson</family>
-        </name>
-        <email>harris.anderson@example.com</email>
-        <link subordinates="robert.taylor helen.jackson michelle.taylor jason.chen harris.anderson brian.carter"/>
-        <url href="http://www.example.com/na/harris-anderson.html"/>
-    </person>
-</personnel>                    
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<?xml-stylesheet type="text/css" href="D:\workspace\day2\smartphones2.css"?>-->
+<?xml-stylesheet type="text/xsl" href="file:/D:/workspace/day3/smartphones.xsl"?>
+<!--<!DOCTYPE smartphones SYSTEM "smartphones.dtd">-->
+<smartphones>
+
+    <smartphone id="001">
+        <manufacturer>Apple</manufacturer>
+        <model>iPhone SE</model>
+        <cpu>
+            <name>A4</name>
+            <frequency unit="Ghz">1.3</frequency>
+            <numberOfCores>2</numberOfCores>
+        </cpu>
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">6</flash>
+        </memory>
+        <screen>
+            <type>retina display</type>
+            <diagonal unit="inch">4</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <camera>
+            <frontFacingCamera unit="Mpx">5</frontFacingCamera>
+            <rearCamera unit="Mpx">12</rearCamera>
+        </camera>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>false</_4g>
+        </conectivity>
+        <otherSpecs>barometer</otherSpecs>
+        <otherSpecs>gyroscope</otherSpecs>
+        <price unit="$">100</price>
+    </smartphone>
+
+    <smartphone id="002">
+        <manufacturer>LG</manufacturer>
+        <model>Pixel XL</model>
+        <cpu>
+            <name>snapdragon 428</name>
+            <frequency unit="Ghz">2.4</frequency>
+            <numberOfCores>2</numberOfCores>
+        </cpu>
+        <?ds dgshjdg sds hdgsj='dsds ?>' ?>
+        <?PITarget (S (Char* - (Char* '?>' Char*)))? '?>
+        
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">16</flash>
+        </memory>
+        <screen>
+            <type>AMOLED display</type>
+            <diagonal unit="inch">4.9</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <camera>
+            <frontFacingCamera unit="Mpx">7</frontFacingCamera>
+            <rearCamera unit="Mpx">16</rearCamera>
+        </camera>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>true</_4g>
+        </conectivity>
+        <price unit="$">150</price>
+    </smartphone>
+
+    <smartphone id="003">
+        <manufacturer>Blackberry</manufacturer>
+        <model>KeyOne</model>
+        <cpu>
+            <name>snapdragon 958</name>
+            <frequency unit="Ghz">2.8</frequency>
+            <numberOfCores>4</numberOfCores>
+        </cpu>
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">128</flash>
+        </memory>
+        <screen>
+            <type>AMOLED display</type>
+            <diagonal unit="inch">5.5</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <camera>
+            <frontFacingCamera unit="Mpx">12</frontFacingCamera>
+            <rearCamera unit="Mpx">20</rearCamera>
+        </camera>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>true</_4g>
+        </conectivity>
+        <price unit="$">550</price>
+    </smartphone>
+
+    <smartphone id="004">
+        <manufacturer>Samsung</manufacturer>
+        <model>Galaxy S7 Edge</model>
+        <cpu>
+            <name>snapdragon 958</name>
+            <frequency unit="Ghz">2.8</frequency>
+            <numberOfCores>4</numberOfCores>
+        </cpu>
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">128</flash>
+        </memory>
+        <screen>
+            <type>AMOLED display</type>
+            <diagonal unit="inch">5.5</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>true</_4g>
+        </conectivity>
+        <price unit="$">699</price>
+    </smartphone>
+
+    <smartphone id="005">
+        <manufacturer>OnePlus</manufacturer>
+        <model>Note 7</model>
+        <cpu>
+            <name>snapdragon 948</name>
+            <frequency unit="Ghz">2.6</frequency>
+            <numberOfCores>4</numberOfCores>
+        </cpu>
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">256</flash>
+        </memory>
+        <screen>
+            <type>AMOLED display</type>
+            <diagonal unit="inch">5.5</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>true</_4g>
+        </conectivity>
+        <price unit="$">575</price>
+    </smartphone>
+    <smartphone>
+        <manufacturer>Apple</manufacturer>
+        <model>iPhone SE</model>
+        <cpu>
+            <name>A4</name>
+            <frequency unit="Ghz">1.3</frequency>
+            <numberOfCores>2</numberOfCores>
+        </cpu>
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">6</flash>
+        </memory>
+        <screen>
+            <type>retina display</type>
+            <diagonal unit="inch">4</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <camera>
+            <frontFacingCamera unit="Mpx">5</frontFacingCamera>
+            <rearCamera unit="Mpx">12</rearCamera>
+        </camera>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>false</_4g>
+        </conectivity>
+        <otherSpecs>barometer</otherSpecs>
+        <otherSpecs>gyroscope</otherSpecs>
+        <price unit="$">100</price>
+    </smartphone>
+
+    <smartphone id="002">
+        <manufacturer>LG</manufacturer>
+        <model>Pixel XL</model>
+        <cpu>
+            <name>snapdragon 428</name>
+            <frequency unit="Ghz">2.4</frequency>
+            <numberOfCores>2</numberOfCores>
+        </cpu>
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">16</flash>
+        </memory>
+        <screen>
+            <type>AMOLED display</type>
+            <diagonal unit="inch">4.9</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <camera>
+            <frontFacingCamera unit="Mpx">7</frontFacingCamera>
+            <rearCamera unit="Mpx">16</rearCamera>
+        </camera>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>true</_4g>
+        </conectivity>
+        <price unit="$">150</price>
+    </smartphone>
+
+    <smartphone id="003">
+        <manufacturer>Blackberry</manufacturer>
+        <model>KeyOne</model>
+        <cpu>
+            <name>snapdragon 958</name>
+            <frequency unit="Ghz">2.8</frequency>
+            <numberOfCores>4</numberOfCores>
+        </cpu>
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">128</flash>
+        </memory>
+        <screen>
+            <type>AMOLED display</type>
+            <diagonal unit="inch">5.5</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <camera>
+            <frontFacingCamera unit="Mpx">12</frontFacingCamera>
+            <rearCamera unit="Mpx">20</rearCamera>
+        </camera>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>true</_4g>
+        </conectivity>
+        <price unit="$">550</price>
+    </smartphone>
+
+    <smartphone id="004">
+        <manufacturer>Samsung</manufacturer>
+        <model>Galaxy S7 Edge</model>
+        <cpu>
+            <name>snapdragon 958</name>
+            <frequency unit="Ghz">2.8</frequency>
+            <numberOfCores>4</numberOfCores>
+        </cpu>
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">128</flash>
+        </memory>
+        <screen>
+            <type>AMOLED display</type>
+            <diagonal unit="inch">5.5</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>true</_4g>
+        </conectivity>
+        <price unit="$">699</price>
+    </smartphone>
+
+    <smartphone id="005">
+        <manufacturer>OnePlus</manufacturer>
+        <model>Note 7</model>
+        <cpu>
+            <name>snapdragon 948</name>
+            <frequency unit="Ghz">2.6</frequency>
+            <numberOfCores>4</numberOfCores>
+        </cpu>
+        <memory>
+            <ram>
+                <storage unit="GB">1</storage>
+                <frequency unit="Mhz">800</frequency>
+            </ram>
+            <flash unit="GB">256</flash>
+        </memory>
+        <screen>
+            <type>AMOLED display</type>
+            <diagonal unit="inch">5.5</diagonal>
+            <resolution>
+                <length unit="px">1920</length>
+                <width unit="px">1080</width>
+            </resolution>
+        </screen>
+        <conectivity>
+            <bluetooth>true</bluetooth>
+            <wifi>true</wifi>
+            <_4g>true</_4g>
+        </conectivity>
+        <price unit="$">575</price>
+    </smartphone>
+</smartphones>

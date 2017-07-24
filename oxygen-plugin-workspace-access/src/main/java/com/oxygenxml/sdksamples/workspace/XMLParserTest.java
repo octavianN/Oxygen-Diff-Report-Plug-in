@@ -20,7 +20,7 @@ public class XMLParserTest {
 				"	</house> \n" + 
 				"</neighbourhood>\n";
 		
-		XMLParser parser  = new XMLParser(new StringReader(str));
+		XMLParser parser  = new XMLParser(new StringReader(str),null);
 		parser.parseInputIntoHTMLFormat();
 		assertEquals("<span class = \"Element\">&lt;neighbourhood  </span><span class = \"attributeName\">COLOR=</span><span class = \"attributeValue\">=\"BLUE\"</span><span class = \"CurrentElementIsClosing\">&gt;</span>\n" + 
 				"	<span class = \"Element\">&lt;house<span class = \"CurrentElementIsClosing\">&gt;</span></span>\n" + 
@@ -38,7 +38,7 @@ public class XMLParserTest {
 		String str = "<h>"
 				+ "</h>";
 		
-		XMLParser parser  = new XMLParser(new StringReader(str));
+		XMLParser parser  = new XMLParser(new StringReader(str),null);
 		parser.parseInputIntoHTMLFormat();
 		//System.out.println(parser.getResultedText());
 //		parser.doMyDeed();
@@ -64,7 +64,7 @@ public class XMLParserTest {
         		"	</house> \n" + 
         		"</neighbourhood>";
 		
-		XMLParser parser  = new XMLParser(new StringReader(str));
+		XMLParser parser  = new XMLParser(new StringReader(str),null);
 		parser.parseInputIntoHTMLFormat();
 		assertEquals("<span class = \"Element\">&lt;neighbourhood  </span><span class = \"attributeName\">COLOR=</span><span class = \"attributeValue\">=\"BLUE\"</span><span class = \"CurrentElementIsClosing\">&gt;</span>\n" + 
 				"	<span class = \"Element\">&lt;house<span class = \"CurrentElementIsClosing\">&gt;</span></span> \n" + 
@@ -91,7 +91,7 @@ public class XMLParserTest {
 				"		\n" + 
 				"			";
 		
-		XMLParser parser  = new XMLParser(new StringReader(str));
+		XMLParser parser  = new XMLParser(new StringReader(str),null);
 		parser.parseInputIntoHTMLFormat();
 		//System.out.println(parser.getResultedText());
 //		parser.doMyDeed();
@@ -123,7 +123,7 @@ public class XMLParserTest {
 				"    </person>\n" + 
 				"</personnel>";
 		
-		XMLParser parser  = new XMLParser(new StringReader(str));
+		XMLParser parser  = new XMLParser(new StringReader(str),null);
 		parser.parseInputIntoHTMLFormat();
 		//System.out.println(parser.getResultedText());
 //		parser.doMyDeed();

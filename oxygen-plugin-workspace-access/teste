@@ -23,3 +23,18 @@
 	<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>
 	</house> 
 </neighbourhood>
+
+
+<!DOCTYPE personnel PUBLIC "PERSONNEL" "personal.dtd">
+<?xml-stylesheet type="text/css" href="personal.css"?>
+<personnel>
+    <person id="harris.anderson" photo="personal-images/harris.anderson.jpg">                
+        <name>
+            <given>Harris</given>
+            <family>Anderson</family>
+        </name>
+        <email>harris.anderson@example.com</email>
+        <link subordinates="robert.taylor helen.jackson michelle.taylor jason.chen harris.anderson brian.carter"/>
+        <url href="http://www.example.com/na/harris-anderson.html"/>
+    </person>
+</personnel>      

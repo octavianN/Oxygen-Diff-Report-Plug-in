@@ -23,6 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 
+import com.ibm.icu.impl.Differ;
 import com.sun.corba.se.impl.orbutil.closure.Constant;
 
 import ro.sync.diff.api.DiffException;
@@ -247,6 +248,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 							
 							List<Difference> performDiff = generateDifferences(myDialog, pluginWorkspaceAccess);
 							
+							//generateDifferences(myDialog, pluginWorkspaceAccess);
 							generateHTMLFile(performDiff);
 							
 							if(Desktop.isDesktopSupported()){
@@ -306,7 +308,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			Reader reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 
 			List<Difference> performDiff = diffPerformer.performDiff(reader1, reader2, null, null, null, diffOptions, null);
-//			printTheDiferencesInTheConsole(performDiff, reader1, reader2, firstURL, secondURL);
+			printTheDiferencesInTheConsole(performDiff, reader1, reader2, firstURL, secondURL);
 			
 			reader1.close();
 			reader2.close();
@@ -336,16 +338,22 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   			URL firstURL, URL secondURL){
 		
   		try {
+  			
+  			System.out.println(performDiff.size());
   			for (Difference difference : performDiff) {
 				reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 				reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 
+				System.out.print("| " + difference.getLeftIntervalStart() + " " + difference.getLeftIntervalEnd() + " ");
+				
 				printTheDiferencesInTheConsoleCharacterParser(reader1, difference);
 
 				System.out.print(" ------ ");
 				
 				printTheDiferencesInTheConsoleCharacterParser(reader2, difference);
 
+				System.out.print("  " + difference.getRightIntervalStart() +"  " + difference.getRightIntervalEnd() + " |\n\n");
+				
 					
 				reader1.close();
 				reader2.close();
@@ -365,12 +373,12 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   	 */
 	private void printTheDiferencesInTheConsoleCharacterParser(Reader reader, Difference difference){
 		int i, contor = 0;
-		System.out.print("|");
+		
 		try {
 			while((i = reader.read()) != -1){
 				if (contor >= difference.getLeftIntervalStart() && contor < difference.getLeftIntervalEnd()) {
-
-					if (!((char)i == '\r'||(char)i == '\n')) {
+					
+					if (((char)i != '\r')) {
 						System.out.print((char)i);
 						
 					}
@@ -383,7 +391,8 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.print("|");
+		
+		
 	}
 	
 	
@@ -406,7 +415,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			Reader reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 			Reader reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 			
-			generateHTMLFile(htmlForFirstFile, reader1, reader2);
+			generateHTMLFile(htmlForFirstFile, reader1, reader2, performDiff);
 			
 		}catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -422,7 +431,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 	 * @param htmlFileToWrite
 	 * @param reader
 	 */
-	private void generateHTMLFile(File htmlFileToWrite, Reader doc1Reader, Reader doc2Reader){
+	private void generateHTMLFile(File htmlFileToWrite, Reader doc1Reader, Reader doc2Reader,List<Difference> performDiff){
 		PrintWriter printWriter = null; 
 		try {
 			printWriter = new PrintWriter(htmlFileToWrite);
@@ -483,8 +492,8 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			htmlBuilder.append("<pre>");
 			
 			
-			//changes the "< and >" with "&lt;" and "&gt;"
-			XMLParser parser = new XMLParser(doc1Reader);
+			
+			XMLParser parser = new XMLParser(doc1Reader,performDiff);
 			//adds the parsed String to the result
 			parser.parseInputIntoHTMLFormat();
 			htmlBuilder.append(parser.getResultedText());
@@ -493,8 +502,8 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			htmlBuilder.append("</td>");
 			htmlBuilder.append("<td>");
 			
-			//changes the "< and >" with "&lt;" and "&gt;"
-			parser = new XMLParser(doc2Reader);
+
+			parser = new XMLParser(doc2Reader,performDiff);
 			htmlBuilder.append("<pre>");
 			//adds the parsed String to the result
 			parser.parseInputIntoHTMLFormat();
