@@ -5,37 +5,54 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.List;
-
-import ro.sync.diff.api.Difference;
-
-
 
 
 public class XMLParser {
 
-	private Reader reader;
+	class ReaderWithIndex extends Reader{
+		private int index;
+		private Reader innerReader;
+
+		public int getIndex(){
+			return index;
+		}
+		
+		public ReaderWithIndex(Reader innerReader) {
+			this.innerReader = innerReader;
+			this.index = 0;
+		}
+		
+		
+		@Override
+		public int read(char[] cbuf, int off, int len) throws IOException {
+			index += len;
+			return innerReader.read(cbuf, off, len);
+		}
+
+		@Override
+		public void close() throws IOException {
+			innerReader.close();
+			
+		}
+		
+	}
+	
     private String characterResidue;
-    private List<Difference> performDiff;
-    private HTMLDiffGenerator htmlDiffGenerator;
-    
+    private ContentListener contentListener;
     private BeginTag currentTag ;
 
 	
 	
-//    public XMLParser(BufferedReader buff) {
+//    public XMLParser(BufferedReaderWithIndex buff) {
 ////    	this((Reader)buff);
 //    	this.buff = buff;
 //    	this.resultedText = "";
 //	}
-	XMLParser(Reader reader, List<Difference> performDiff){
-		this.reader = reader;
-		this.htmlDiffGenerator = new HTMLDiffGenerator();
-		this.performDiff = performDiff;
+	XMLParser(){
 	}
 	
-	public String getResultedText(){
-		return htmlDiffGenerator.getResultedText();
+	public void setContentListener(ContentListener contentListener) {
+		this.contentListener = contentListener;
 	}
 	
 	/**
@@ -45,7 +62,7 @@ public class XMLParser {
 	 * @param comparedToThis the string we compare it to
 	 * @return the common part of the string
 	 */
-	private String checkTwoWords(Reader reader, String comparedToThis) throws IOException{
+	private String checkTwoWords(ReaderWithIndex reader, String comparedToThis) throws IOException{
 		String resultedString = "";
 		
 			int index = 1;
@@ -68,11 +85,14 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private int setBeginTag(Reader reader, int currentCharacter){
+	private int setBeginTag(ReaderWithIndex reader, int currentCharacter){
 		try {
-			
+
+			contentListener.checkDiff(reader.getIndex(),"");
+
 			characterResidue = null;
 			currentCharacter = reader.read();
+			
 			
 			if((char)currentCharacter == '/'){
 				currentTag = BeginTag.CLOSINGTAG;
@@ -135,55 +155,57 @@ public class XMLParser {
 	 * The function summoned in the main class that parses through
 	 * the text and saves the result
 	 */
-	public void parseInputIntoHTMLFormat(){
+	public void parseInputIntoHTMLFormat(Reader reader){
 
-		currentTag =BeginTag.UNPROCESSED;
+		currentTag = BeginTag.UNPROCESSED;
 		try {
-
+			ReaderWithIndex ru = new ReaderWithIndex(reader);
 			int currentCharacter = reader.read();
 			do {
 				
-			//	System.out.print("before: " + beginTag);
 				if ((char)currentCharacter == '<'){
-
-					currentCharacter = setBeginTag(reader, currentCharacter);
+//					System.out.println(ru.getIndex()+"  Elem");
+					currentCharacter = setBeginTag(ru, currentCharacter);
 
 				} else if((char)currentCharacter == '>'){
-					//if(beginTag != CLOSINGTAG)
-						currentTag = BeginTag.DEALTWITH;
+
+					currentTag = BeginTag.DEALTWITH;
 				}
 
-			//	System.out.print(" middle: " + beginTag);
 				
 				if (currentTag == BeginTag.PROCESSING){
-					currentCharacter = addElement(reader, currentCharacter);
+					currentCharacter = addElement(ru, currentCharacter);
+//					System.out.println(ru.getIndex()+"  Elem");
 
 				} else if (currentTag == BeginTag.CLOSINGTAG){
-					currentCharacter = addClosingElement(reader, currentCharacter);
+					currentCharacter = addClosingElement(ru, currentCharacter);
+//					System.out.println(ru.getIndex()+"  CloseElem");
 					//System.out.println(beginTag);
 
 				} else if (currentTag == BeginTag.COMMENT){
-					currentCharacter = addComment(reader);
+					currentCharacter = addComment(ru);
 
 				} else if (currentTag == BeginTag.PROCESSING_INSTRUCTION){
-					currentCharacter = addProcessingInformation(reader);
+					currentCharacter = addProcessingInformation(ru);
 
 				} else if (currentTag == BeginTag.DOCTYPE){
-					currentCharacter = addDoctype(reader);
+					currentCharacter = addDoctype(ru);
 
 				} else if (currentTag == BeginTag.CDATA){
-					currentCharacter = addCdata(reader);
+					currentCharacter = addCdata(ru);
 
 				}
 
-		//		System.out.println(" after: " + beginTag);
+
 				
 				if (currentTag == BeginTag.PROCESSING){
-					currentCharacter = addAttribute(reader, currentCharacter);
+					currentCharacter = addAttribute(ru, currentCharacter);
+//					System.out.println(ru.getIndex()+"  Attribute");
 				}
 				if(currentTag == BeginTag.DEALTWITH){
 //					System.out.println(beginTag);
-					currentCharacter = addText(reader);
+					currentCharacter = addText(ru);
+//					System.out.println(ru.getIndex()+"  Text");
 				}
 				
 				
@@ -206,9 +228,14 @@ public class XMLParser {
 	 * @param character
 	 * @return
 	 */
-	private boolean checkForTabsNewLinesOrWhiteSpaces(char character){
+	private boolean checkForTabsNewLinesOrWhiteSpaces(char character, int index){
+		
+
+		
 		if(character == ' ' || character == '\n' || character == '\t' || character == '\r'){
-			htmlDiffGenerator.addSpaces(character);
+			if(currentTag != BeginTag.ELEMENT_WITH_PROBLEMS){
+				contentListener.endNode(NodeType.EmptyData, character + "");
+			}
 			return true;
 		}
 		return false;
@@ -225,17 +252,20 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private int addClosingElement(Reader reader, int currentCharacter){
-		htmlDiffGenerator.startSpan(HTMLTypes.Element, "&lt;");
+	private int addClosingElement(ReaderWithIndex reader, int currentCharacter){
+		contentListener.startNode(NodeType.Element, "&lt;");
 		
 		StringBuilder buffer = new StringBuilder();
 
 		try {
 
 			do{
-				
+				if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+
+					buffer = new StringBuilder();
+				}
 				if(checkEndTag((char)currentCharacter, buffer)){
-//					beginTag = UNPROCESSED;
+
 					break;
 				}
 				
@@ -251,7 +281,9 @@ public class XMLParser {
 		
 		buffer.append("</span>");
 		
-		htmlDiffGenerator.endSpan(HTMLTypes.Element, buffer.toString());
+		contentListener.endNode(NodeType.Element, buffer.toString());
+		
+		currentTag = BeginTag.POSSIBLY_ENDING_FILE;
 		
 		//System.out.println("\n" + currentCharacter + "\n");
 		return currentCharacter;
@@ -267,9 +299,11 @@ public class XMLParser {
 	 * @param index current position in the text
 	 * @return the updated position
 	 */
-	private int addElement(Reader reader, int currentCharacter){
+	private int addElement(ReaderWithIndex reader, int currentCharacter){
 		
-		htmlDiffGenerator.startSpan(HTMLTypes.Element, "&lt;");
+		BeginTag tag = currentTag;
+		currentTag = BeginTag.ELEMENT_WITH_PROBLEMS;
+		contentListener.startNode(NodeType.Element, "&lt;");
 		
 		StringBuilder buffer = new StringBuilder();
 		
@@ -283,10 +317,14 @@ public class XMLParser {
 			boolean firstInit = false;
 			
 			do{
+				if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+
+					buffer = new StringBuilder();
+				}
+				
 
 				if(!firstInit){
 					if(characterResidue != null){
-					//	System.out.println(characterResidue + " " + (char)reader.read());
 						currentCharacter = (char)reader.read();
 						buffer.append(characterResidue);
 					}
@@ -296,22 +334,30 @@ public class XMLParser {
 					
 					break;
 				}
-				if(checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter)){
+				if(checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter, reader.getIndex())){
 					
+					buffer.append((char)currentCharacter);
 					condition = true;
-				}else if(condition && !checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter)){
+				}else if(condition && !checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter, reader.getIndex())){
 					
 					break;
 				}
 				buffer.append((char)currentCharacter);
+				
 			}while((currentCharacter = reader.read()) != -1);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
 		buffer.append("</span>");
 		
-		htmlDiffGenerator.endSpan(HTMLTypes.Element, buffer.toString());
+		if(currentTag == BeginTag.ELEMENT_WITH_PROBLEMS)
+			currentTag = tag;
+		
+		
+		contentListener.endNode(NodeType.Element, buffer.toString());
 		return currentCharacter;
 	}
 	
@@ -320,8 +366,8 @@ public class XMLParser {
 	
 	
 	
-	private int addAtributeName(Reader reader, int currentCharacter){
-		htmlDiffGenerator.startSpan(HTMLTypes.attributeName, "");
+	private int addAtributeName(ReaderWithIndex reader, int currentCharacter){
+		contentListener.startNode(NodeType.attributeName, "");
 		
 		StringBuilder buffer = new StringBuilder();
 		/*
@@ -331,8 +377,15 @@ public class XMLParser {
 		try {
 			
 			
+			
+			
 			do{
-//				System.out.println((char)currentCharacter);
+				
+				if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+
+					buffer = new StringBuilder();
+				}
+				
 				if(checkEndTag((char)currentCharacter,buffer)){
 					
 					break;
@@ -343,8 +396,11 @@ public class XMLParser {
 					break;
 				}
 				buffer.append((char)currentCharacter);
-				//System.out.println(currentCharacter);
+
 			}while((currentCharacter = reader.read()) != -1);
+			
+			
+			
 			
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -353,15 +409,15 @@ public class XMLParser {
 		
 		buffer.append("</span>");
 		
-		htmlDiffGenerator.endSpan(HTMLTypes.attributeName, buffer.toString());
+		contentListener.endNode(NodeType.attributeName, buffer.toString());
 		return currentCharacter;
 	}
 	
 	
 	
 	
-	private int addAtributeValue(Reader reader, int currentCharacter){
-		htmlDiffGenerator.startSpan(HTMLTypes.attributeValue, "");
+	private int addAtributeValue(ReaderWithIndex reader, int currentCharacter){
+		contentListener.startNode(NodeType.attributeValue, "");
 		
 		StringBuilder buffer = new StringBuilder();
 		try {
@@ -369,6 +425,11 @@ public class XMLParser {
 			
 			do{
 
+				if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+					
+					buffer = new StringBuilder();
+				}
+				
 				if(checkEndTagWithNoWriting((char)currentCharacter)){
 					break;
 				}
@@ -377,13 +438,16 @@ public class XMLParser {
 			}while((currentCharacter = reader.read()) != -1);
 			
 			
+			
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		buffer.append("</span><span class = \"Element\">&gt;</span>");
 		
-		htmlDiffGenerator.endSpan(HTMLTypes.attributeValue, buffer.toString());
+		contentListener.endNode(NodeType.attributeValue, buffer.toString());
 		
 		return currentCharacter;
 	}
@@ -399,7 +463,7 @@ public class XMLParser {
 	 * @param index
 	 * @return
 	 */
-	private int addAttribute(Reader reader, int currentCharacter){
+	private int addAttribute(ReaderWithIndex reader, int currentCharacter){
 		
 		currentCharacter = addAtributeName(reader, currentCharacter);
 		currentCharacter = addAtributeValue(reader, currentCharacter);
@@ -420,7 +484,7 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private int addText(Reader reader){
+	private int addText(ReaderWithIndex reader){
 		
 		
 		StringBuilder buffer = new StringBuilder();
@@ -430,33 +494,46 @@ public class XMLParser {
 			currentTag = BeginTag.UNPROCESSED;
 
 			String copyOfWhiteSpaces = "";
+			
+			
+			
 			while((currentCharacter = reader.read()) != -1){
 
 				if(checkBeginTag((char)currentCharacter)){
 					return currentCharacter;
 				}
-				if(checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter)){
-					currentTag = BeginTag.PROCESSING;
+				if(checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter, reader.getIndex())){
+//					System.out.println(currentTag);
+					currentTag = BeginTag.POSSIBLY_ENDING_FILE;
 					copyOfWhiteSpaces += (char)currentCharacter;
 				}else{
-					currentTag = BeginTag.PROCESSING;
+					currentTag = BeginTag.POSSIBLY_ENDING_FILE;
 					break;
 				}
 			}
 			
 			if(currentTag == BeginTag.UNPROCESSED || currentCharacter == -1){ /*This is used to check if white spaces are used 
 			 														or if we have tabs new lines at the end of a file*/
-//				System.out.println(beginTag);
 				return -1;
 			}
 			
+			currentTag = BeginTag.PROCESSING;
 			
-			htmlDiffGenerator.startSpan(HTMLTypes.textField, copyOfWhiteSpaces);
-
+			contentListener.startNode(NodeType.textField, copyOfWhiteSpaces);
+			
 			
 			
 			
 			do{
+				
+				
+				if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+					System.out.println((char)currentCharacter +""+ reader.getIndex()+ " ");
+					
+					buffer = new StringBuilder();
+				}
+				
+				
 				if(checkBeginTag((char)currentCharacter)){
 					
 					break;
@@ -469,7 +546,7 @@ public class XMLParser {
 		}
 		buffer.append("</span>");
 		
-		htmlDiffGenerator.endSpan(HTMLTypes.Element, buffer.toString());
+		contentListener.endNode(NodeType.Element, buffer.toString());
 		
 		return currentCharacter;
 	}
@@ -484,10 +561,10 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private int addComment(Reader reader){
+	private int addComment(ReaderWithIndex reader){
 		
 		int currentCharacter  = 0;
-		htmlDiffGenerator.startSpan(HTMLTypes.Comment, "&lt;!--");
+		contentListener.startNode(NodeType.Comment, "&lt;!-");
 		
 		
 		StringBuilder buffer = new StringBuilder();
@@ -496,9 +573,16 @@ public class XMLParser {
 		try{
 			
 			while((currentCharacter = reader.read()) != -1){
+				
+				if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+
+					buffer = new StringBuilder();
+				}
+				
 				if(checkEndTag((char)currentCharacter,buffer)){
 					break;
 				}
+				
 				buffer.append((char)currentCharacter);
 			}
 			
@@ -508,7 +592,7 @@ public class XMLParser {
 		
 		buffer.append("</span>");
 		
-		htmlDiffGenerator.endSpan(HTMLTypes.Comment, buffer.toString());
+		contentListener.endNode(NodeType.Comment, buffer.toString());
 		
 		return currentCharacter;
 		
@@ -524,9 +608,9 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private int addProcessingInformation(Reader reader){
+	private int addProcessingInformation(ReaderWithIndex reader){
 		
-		htmlDiffGenerator.startSpan(HTMLTypes.PI, "&lt;?");
+		contentListener.startNode(NodeType.PI, "&lt;?");
 		
 		StringBuilder buffer = new StringBuilder();
 		
@@ -565,7 +649,7 @@ public class XMLParser {
 		
 		buffer.append("</span>");
 		
-		htmlDiffGenerator.endSpan(HTMLTypes.PI, buffer.toString());
+		contentListener.endNode(NodeType.PI, buffer.toString());
 		
 		return currentCharacter;
 		
@@ -582,9 +666,9 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private int addDoctype(Reader reader){
+	private int addDoctype(ReaderWithIndex reader){
 		
-		htmlDiffGenerator.startSpan(HTMLTypes.Doctype, "&lt;!DOCTYPE");
+		contentListener.startNode(NodeType.Doctype, "&lt;!D");
 		
 		StringBuilder buffer = new StringBuilder();
 		
@@ -630,7 +714,7 @@ public class XMLParser {
 		}
 		buffer.append("</span>");
 		
-		htmlDiffGenerator.endSpan(HTMLTypes.PI, buffer.toString());
+		contentListener.endNode(NodeType.PI, buffer.toString());
 		return currentCharacter;
 	}
 	
@@ -646,9 +730,9 @@ public class XMLParser {
 	 * @param currentCharacter
 	 * @return
 	 */
-	private int addCdata(Reader reader){
+	private int addCdata(ReaderWithIndex reader){
 		
-		htmlDiffGenerator.startSpan(HTMLTypes.CDATA, "&lt;![CDATA[");
+		contentListener.startNode(NodeType.CDATA, "&lt;![");
 		
 		StringBuilder buffer = new StringBuilder();
 		
@@ -684,7 +768,7 @@ public class XMLParser {
 		}
 		
 		
-		htmlDiffGenerator.endSpan(HTMLTypes.PI, buffer.toString());
+		contentListener.endNode(NodeType.PI, buffer.toString());
 		
 		return currentCharacter;
 	}
@@ -747,10 +831,14 @@ public class XMLParser {
 	public static void main(String... args) {
 		try {
 			FileReader in = new FileReader("html.in");
-			BufferedReader buff = new BufferedReader(in);
-			XMLParser parser = new XMLParser((Reader) buff, null);
-			parser.parseInputIntoHTMLFormat();
-			System.out.println(parser.getResultedText());
+			Reader buf = (Reader)(new BufferedReader(in));
+			XMLParser parser = new XMLParser();
+			HTMLContentGenerator contentGenerator = new HTMLContentGenerator(null, false);
+			parser.setContentListener(contentGenerator);
+			parser.parseInputIntoHTMLFormat(buf);
+			
+			
+			System.out.println(contentGenerator.getResultedText());
 	
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

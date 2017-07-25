@@ -1,6 +1,7 @@
 package com.oxygenxml.sdksamples.workspace;
 
-public enum HTMLTypes {
+public enum NodeType {
+	EmptyData,
 	Element,
 	textField,
 	attributeName,
@@ -8,5 +9,6 @@ public enum HTMLTypes {
 	PI,
 	Doctype,
 	CDATA,
-	Comment
+	Comment,
+	diffEntry
 }

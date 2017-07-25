@@ -248,7 +248,6 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 							
 							List<Difference> performDiff = generateDifferences(myDialog, pluginWorkspaceAccess);
 							
-							//generateDifferences(myDialog, pluginWorkspaceAccess);
 							generateHTMLFile(performDiff);
 							
 							if(Desktop.isDesktopSupported()){
@@ -346,11 +345,11 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 
 				System.out.print("| " + difference.getLeftIntervalStart() + " " + difference.getLeftIntervalEnd() + " ");
 				
-				printTheDiferencesInTheConsoleCharacterParser(reader1, difference);
+//				printTheDiferencesInTheConsoleCharacterParser(reader1, difference);
 
 				System.out.print(" ------ ");
 				
-				printTheDiferencesInTheConsoleCharacterParser(reader2, difference);
+//				printTheDiferencesInTheConsoleCharacterParser(reader2, difference);
 
 				System.out.print("  " + difference.getRightIntervalStart() +"  " + difference.getRightIntervalEnd() + " |\n\n");
 				
@@ -456,10 +455,6 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 					"    color: #993300;\n" + 
 					"    background-color:inherit;\n" + 
 					"}\n" + 
-					"span.tI {\n" + 
-					"    color: #000000;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" + 
 					"span.textField {\n" + 
 					"    color: #000000;\n" + 
 					"    background-color:inherit;\n" + 
@@ -479,35 +474,42 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 					"span.Doctype {\n" + 
 					"    color: #969600;\n" + 
 					"    background-color:inherit;\n" + 
-					"}\n" + 
+					"}\n" +
 					"/* Title sections */\n" + 
 					"span.qname{\n" + 
 					"    color:black;\n" + 
 					"    background-color:inherit;\n" + 
-					"}</style></head>");
+					"}"
+					+ "span.diffEntry {\n" + 
+					"    background-color:#FF1493;\n" + 
+					"}\n" + "</style></head>");
 			htmlBuilder.append("<body>");
 			htmlBuilder.append("<table>");
 			htmlBuilder.append("<tr>");
 			htmlBuilder.append("<td>");
 			htmlBuilder.append("<pre>");
 			
+			XMLParser parser = new XMLParser();
 			
+			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(performDiff, true);
 			
-			XMLParser parser = new XMLParser(doc1Reader,performDiff);
+			parser.setContentListener(htmlDiffGenerator);
+			
 			//adds the parsed String to the result
-			parser.parseInputIntoHTMLFormat();
-			htmlBuilder.append(parser.getResultedText());
+			parser.parseInputIntoHTMLFormat(doc1Reader);
+			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 
 			htmlBuilder.append("</pre>");
 			htmlBuilder.append("</td>");
 			htmlBuilder.append("<td>");
 			
 
-			parser = new XMLParser(doc2Reader,performDiff);
 			htmlBuilder.append("<pre>");
 			//adds the parsed String to the result
-			parser.parseInputIntoHTMLFormat();
-			htmlBuilder.append(parser.getResultedText());
+			htmlDiffGenerator = new HTMLContentGenerator(performDiff, false);
+			parser.setContentListener(htmlDiffGenerator);
+			parser.parseInputIntoHTMLFormat(doc2Reader);
+			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 			
 			htmlBuilder.append("</pre>");
 			htmlBuilder.append("</td>");
