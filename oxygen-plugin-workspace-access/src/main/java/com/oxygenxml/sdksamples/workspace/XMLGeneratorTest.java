@@ -39,11 +39,12 @@ public class XMLGeneratorTest {
 		
 		
 		List<Difference> diffs = new ArrayList<Difference>();
-		Position position1 = new OffsetPosition(6);
-		Position position2 = new OffsetPosition(14);
-		Position position3 = new OffsetPosition(6);
-		Position position4 = new OffsetPosition(6);
-		DiffEntry diff = new DiffEntry(position1, position2, position3, position4);
+		Position position1;
+		Position position2;
+		Position position3;
+		Position position4;
+		DiffEntry diff;
+//		createDiffEntry(); TODO 
 		
 		position1 = new OffsetPosition(23);
 		position2 = new OffsetPosition(31);
@@ -61,8 +62,73 @@ public class XMLGeneratorTest {
 		parser.setContentListener(htmlDiffGenerator);
 		parser.parseInputIntoHTMLFormat(new StringReader(str2));
 		
-		assertEquals("",htmlDiffGenerator.getResultedText());
+		assertEquals("<span class = \"Element\">&lt;neighbourhood<span class = \"Element\">&gt;</span></span>\n" + 
+				"<span class = \"Element\">&lt;/neigh<span class=\"diffEntry\" id=0 >bourhood</span><span class = \"Element\">&gt;</span></span>",htmlDiffGenerator.getResultedText());
 	}
+	
+	
+	@Test
+	public void testDiffMarkerForElementSimple1() {
+		String str1 = "<haleluha  color = \"LALA\">\n" + 
+				"<bla>     <gf>                        </gf>    </bla>\n" + 
+				"</haleluha>";
+		
+		//		7 Diff Entries
+		//		| 0 9  ------   0  9 |
+		//
+		//		| 18 24  ------   18  24 |
+		//
+		//		| 26 31  ------   26  31 |
+		//
+		//		| 36 40  ------   36  40 |
+		//
+		//		| 64 69  ------   64  69 |
+		//
+		//		| 73 79  ------   73  79 |
+		//
+		//		| 80 91  ------   80  91 |
+		
+		List<Difference> diffs = new ArrayList<Difference>();
+		diffs.add(createDiffEntry(0, 9, 0, 9));
+		diffs.add(createDiffEntry(18, 24, 0, 9));
+		diffs.add(createDiffEntry(26, 31, 0, 9));
+		diffs.add(createDiffEntry(36, 40, 0, 9));
+		diffs.add(createDiffEntry(64, 69, 0, 9));
+		diffs.add(createDiffEntry(73, 79, 0, 9));
+		diffs.add(createDiffEntry(80, 91, 0, 9));
+		
+		XMLParser parser = new XMLParser();
+		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
+		parser.setContentListener(htmlDiffGenerator);
+		parser.parseInputIntoHTMLFormat(new StringReader(str1));
+		
+		assertEquals("<span class = \"Element\">&lt;"
+				+ "<span class=\"diffEntry\" id=0 >haleluha  </span>  </span>"
+				+ "<span class = \"attributeName\">color =</span>"
+				+ "<span class = \"attributeValue\"> "
+				+ "<span class=\"diffEntry\" id=0 >\"LALA\"</span>"
+				+ "</span>"
+				+ "<span class = \"Element\">&gt;</span>\n" + 
+				"<span class=\"diffEntry\" id=1 ><span class = \"Element\">&lt;bla"
+				+ "<span class = \"Element\">&gt;</span></span>     "
+				+ "<span class=\"diffEntry\" id=2 ><span class = \"Element\">&lt;gf<span class = \"Element\">&gt;</span></span>                        "
+				+ "<span class=\"diffEntry\" id=3 ><span class = \"Element\">&lt;/gf<span class = \"Element\">&gt;</span></span>    "
+				+ "<span class=\"diffEntry\" id=4 ><span class = \"Element\">&lt;/bla<span class = \"Element\">&gt;</span></span>\n" + 
+				"<span class=\"diffEntry\" id=5 ><span class = \"Element\">&lt;/haleluha<span class = \"Element\">&gt;</span></span>",htmlDiffGenerator.getResultedText());
+	}
+
+
+	private DiffEntry createDiffEntry(int lStart, int lEnd, int rStart, int rEnd) {
+		Position position1 = new OffsetPosition(lStart);
+		Position position2 = new OffsetPosition(lEnd);
+		Position position3 = new OffsetPosition(rStart);
+		Position position4 = new OffsetPosition(rEnd);
+		DiffEntry diff = new DiffEntry(position1, position2, position3, position4);
+		
+		return diff;
+	}
+	
+	
 	
 	/**
 	 * Testing if the ELEMENT differences hilights correctly

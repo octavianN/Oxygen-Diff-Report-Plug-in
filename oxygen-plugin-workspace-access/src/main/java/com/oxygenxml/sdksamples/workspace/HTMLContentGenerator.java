@@ -29,6 +29,7 @@ public class HTMLContentGenerator implements ContentListener {
 	
 	
 	public String getResultedText() {
+		System.out.println("local: " + local);
 		return resultedText.toString();
 	}
 
@@ -45,6 +46,7 @@ public class HTMLContentGenerator implements ContentListener {
 
 	@Override
 	public void startNode(NodeType type, String content) {
+//		System.out.println("Start node: " + type +" content ='" + content +"'");
 		
 		switch(type){
 		case Element:
@@ -81,16 +83,22 @@ public class HTMLContentGenerator implements ContentListener {
 
 	@Override
 	public void endNode(NodeType type, String content) {
+		//System.out.println("End node: " + type +" content ='" + content +"'");
 		resultedText.append(content);
 	}
 
-
+	int local = 0;
 
 
 	@Override
 	public boolean checkDiff(int currentOffs, String buffer) {
 		
 		boolean foundDiff = false;
+		
+//		if( buffer.length() > 0)
+//			System.out.println(currentOffs + "  " +buffer.charAt(buffer.length()-1));
+//		else
+//			System.out.println(currentOffs);
 		
 		if(differences != null){
 			
@@ -103,15 +111,21 @@ public class HTMLContentGenerator implements ContentListener {
 				int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 				int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
 					
-				if (currentOffs == start) {
-					System.out.print("Offset START: " + currentOffs+ " ");
+				if (currentOffs == start + 1) {
+					local++;
+				//	System.out.println("Offset START: " + currentOffs+ " ");
+					if( buffer.length() > 0)
+						System.out.println("InStartOffset: " + currentOffs + "  " +buffer);
+					else
+						System.out.println(currentOffs);
 					endNode(NodeType.EmptyData, buffer);
 					resultedText.append("<span class=\"diffEntry\" id=" + lastIdx +" >");
 					lastIdx = i;
 					foundDiff = true;
 					break;
-				} else if (currentOffs == end) {
-					System.out.print("Offset END: " + currentOffs + " ");
+				} else if (currentOffs == end + 1) {
+					local--;
+			//		System.out.println("Offset END: " + currentOffs + " ");
 					endNode(NodeType.EmptyData, buffer);
 					resultedText.append("</span>");
 					foundDiff = true;

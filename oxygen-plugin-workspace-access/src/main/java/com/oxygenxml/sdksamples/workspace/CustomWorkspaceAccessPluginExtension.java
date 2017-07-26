@@ -26,6 +26,7 @@ import javax.swing.text.BadLocationException;
 import com.ibm.icu.impl.Differ;
 import com.sun.corba.se.impl.orbutil.closure.Constant;
 
+import ro.sync.diff.api.DiffContentTypes;
 import ro.sync.diff.api.DiffException;
 import ro.sync.diff.api.DiffOptions;
 import ro.sync.diff.api.Difference;
@@ -246,9 +247,9 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 						try {
 							
 							
-							List<Difference> performDiff = generateDifferences(myDialog, pluginWorkspaceAccess);
+							List<Difference> diffs = generateDifferences(myDialog, pluginWorkspaceAccess);
 							
-							generateHTMLFile(performDiff);
+							generateHTMLFile(diffs);
 							
 							if(Desktop.isDesktopSupported()){
 								URI myPage = new File(Constants.pathToFirstHTML).toURI();
@@ -295,7 +296,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   		try {
 			DifferencePerformer diffPerformer = pluginWorkspaceAccess.getCompareUtilAccess().createDiffPerformer();
 			DiffOptions diffOptions = new DiffOptions();
-			String contentType = "test/xml";
+			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
 			String firstFile = Constants.getFirstFile();
 			String secondFile = Constants.getSecondFile();
 			
@@ -306,7 +307,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			Reader reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 			Reader reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 
-			List<Difference> performDiff = diffPerformer.performDiff(reader1, reader2, null, null, null, diffOptions, null);
+			List<Difference> performDiff = diffPerformer.performDiff(reader1, reader2, null, null, contentType, diffOptions, null);
 			printTheDiferencesInTheConsole(performDiff, reader1, reader2, firstURL, secondURL);
 			
 			reader1.close();
@@ -399,9 +400,9 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 	/**
 	 * Generates the two HTML files
 	 * Uses the helpGenerateHTML method
-	 * @param performDiff
+	 * @param diffs
 	 */
-	private void generateHTMLFile(List<Difference> performDiff){
+	private void generateHTMLFile(List<Difference> diffs){
 		
 		File htmlForFirstFile= new File(Constants.pathToFirstHTML);
 	//	File htmlForSecondFile = new File(Constants.pathToSecondHTML);
@@ -414,7 +415,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			Reader reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 			Reader reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 			
-			generateHTMLFile(htmlForFirstFile, reader1, reader2, performDiff);
+			generateHTMLFile(htmlForFirstFile, reader1, reader2, diffs);
 			
 		}catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -430,7 +431,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 	 * @param htmlFileToWrite
 	 * @param reader
 	 */
-	private void generateHTMLFile(File htmlFileToWrite, Reader doc1Reader, Reader doc2Reader,List<Difference> performDiff){
+	private void generateHTMLFile(File htmlFileToWrite, Reader doc1Reader, Reader doc2Reader,List<Difference> diffs){
 		PrintWriter printWriter = null; 
 		try {
 			printWriter = new PrintWriter(htmlFileToWrite);
@@ -491,7 +492,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			
 			XMLParser parser = new XMLParser();
 			
-			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(performDiff, true);
+			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
 			
 			parser.setContentListener(htmlDiffGenerator);
 			
@@ -506,7 +507,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 
 			htmlBuilder.append("<pre>");
 			//adds the parsed String to the result
-			htmlDiffGenerator = new HTMLContentGenerator(performDiff, false);
+			htmlDiffGenerator = new HTMLContentGenerator(diffs, false);
 			parser.setContentListener(htmlDiffGenerator);
 			parser.parseInputIntoHTMLFormat(doc2Reader);
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());

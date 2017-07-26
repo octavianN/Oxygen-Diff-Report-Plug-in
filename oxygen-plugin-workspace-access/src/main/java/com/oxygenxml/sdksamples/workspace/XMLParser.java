@@ -63,15 +63,19 @@ public class XMLParser {
 	 * @return the common part of the string
 	 */
 	private String checkTwoWords(ReaderWithIndex reader, String comparedToThis) throws IOException{
-		String resultedString = "";
+		StringBuilder buffer = new StringBuilder();
 		
 			int index = 1;
 			while(reader.ready() && index < comparedToThis.length()){
 				char currentCharacter = (char) reader.read();
-				if(currentCharacter != comparedToThis.charAt(index++)){
-					return (resultedString + currentCharacter);
+				
+				if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+					buffer = new StringBuilder();
 				}
-				resultedString += currentCharacter;
+				if(currentCharacter != comparedToThis.charAt(index++)){
+					return (buffer.toString() + currentCharacter);
+				}
+				buffer.append(currentCharacter);
 			}
 		
 
@@ -88,7 +92,7 @@ public class XMLParser {
 	private int setBeginTag(ReaderWithIndex reader, int currentCharacter){
 		try {
 
-			contentListener.checkDiff(reader.getIndex(),"");
+//			contentListener.checkDiff(reader.getIndex(),"patru");
 
 			characterResidue = null;
 			currentCharacter = reader.read();
@@ -164,7 +168,7 @@ public class XMLParser {
 			do {
 				
 				if ((char)currentCharacter == '<'){
-//					System.out.println(ru.getIndex()+"  Elem");
+
 					currentCharacter = setBeginTag(ru, currentCharacter);
 
 				} else if((char)currentCharacter == '>'){
@@ -212,7 +216,7 @@ public class XMLParser {
 //				System.out.println("Ch: '" + (((int)currentCharacter)) +"'");
 //				System.out.println("final: " + resultedText);
 			} while((currentCharacter != -1));
-			
+//			System.out.println(contentListener.);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -307,7 +311,7 @@ public class XMLParser {
 		
 		StringBuilder buffer = new StringBuilder();
 		
-		boolean condition = false;
+		boolean whereSpacesBefore = false;
 
 		/*
 		 * If I get a white space, new line or tab, I register it then
@@ -316,35 +320,39 @@ public class XMLParser {
 		try {
 			boolean firstInit = false;
 			
+			if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+				
+				buffer = new StringBuilder();
+			}
 			do{
-				if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
-
-					buffer = new StringBuilder();
-				}
 				
 
-				if(!firstInit){
+				if (!firstInit){
 					if(characterResidue != null){
 						currentCharacter = (char)reader.read();
 						buffer.append(characterResidue);
+						if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+							buffer = new StringBuilder();
+						}
+
+					}
+					firstInit = true;
+				} else {
+					if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+						buffer = new StringBuilder();
 					}
 				}
-				firstInit = true;
-				if(checkEndTag((char)currentCharacter,buffer)){
-					
+				if (checkEndTag((char)currentCharacter,buffer)){
 					break;
 				}
-				if(checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter, reader.getIndex())){
-					
+				if (checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter, reader.getIndex())){
 					buffer.append((char)currentCharacter);
-					condition = true;
-				}else if(condition && !checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter, reader.getIndex())){
-					
+					whereSpacesBefore = true;
+				} else if( whereSpacesBefore && !checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter, reader.getIndex())){
 					break;
 				}
 				buffer.append((char)currentCharacter);
-				
-			}while((currentCharacter = reader.read()) != -1);
+			} while((currentCharacter = reader.read()) != -1);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -421,9 +429,11 @@ public class XMLParser {
 		
 		StringBuilder buffer = new StringBuilder();
 		try {
+			contentListener.checkDiff(reader.getIndex(),"");  //TODO : I just added this
+//			contentListener.checkDiff(reader.getIndex(),"trei");
 			
 			
-			do{
+			while((currentCharacter = reader.read()) != -1){
 
 				if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
 					
@@ -435,7 +445,7 @@ public class XMLParser {
 				}
 				
 				buffer.append((char)currentCharacter);
-			}while((currentCharacter = reader.read()) != -1);
+			};
 			
 			
 			
@@ -494,11 +504,15 @@ public class XMLParser {
 			currentTag = BeginTag.UNPROCESSED;
 
 			String copyOfWhiteSpaces = "";
-			
-			
+
+			contentListener.checkDiff(reader.getIndex(),"");    //TODO : I just added this
+//			contentListener.checkDiff(reader.getIndex(),"Unu"); 
 			
 			while((currentCharacter = reader.read()) != -1){
 
+				contentListener.checkDiff(reader.getIndex(),"");    //TODO : I just added this
+//				contentListener.checkDiff(reader.getIndex(),"Doi");
+				
 				if(checkBeginTag((char)currentCharacter)){
 					return currentCharacter;
 				}
@@ -535,7 +549,11 @@ public class XMLParser {
 				
 				
 				if(checkBeginTag((char)currentCharacter)){
-					
+					if(contentListener.checkDiff(reader.getIndex(),buffer.toString())){
+						System.out.println((char)currentCharacter +""+ reader.getIndex()+ " ");
+						
+						buffer = new StringBuilder();
+					}
 					break;
 				}
 				buffer.append((char)currentCharacter);
