@@ -1,14 +1,15 @@
 package com.oxygenxml.sdksamples.workspace;
 
 public enum NodeType {
-	EmptyData,
-	Element,
-	textField,
-	attributeName,
-	attributeValue,
+	EMPTYDATA,
+	ELEMENT,
+	ELEMENT_CLOSE,
+	TEXTFIELD,
+	ATTRIBUTENAME,
+	ATTRIBUTEVALUE,
 	PI,
-	Doctype,
+	DOCTYPE,
 	CDATA,
-	Comment,
-	diffEntry
+	COMMENT,
+	DIFFENTRY
 }

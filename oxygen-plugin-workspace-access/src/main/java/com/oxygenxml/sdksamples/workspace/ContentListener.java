@@ -13,7 +13,7 @@ public interface ContentListener {
 	 * @param content
 	 * @param offset
 	 */
-	void startNode(NodeType type, String content);
+	void startNode(NodeType type);
 	
 	/**
 	 * 
@@ -22,7 +22,9 @@ public interface ContentListener {
 	 * @param offset
 	 */
 	
-	void endNode(NodeType type, String content);
+	void endNode(String content);
+	
+	public void copyContent(String content);
 
 	boolean checkDiff(int i, String buffer);
 }

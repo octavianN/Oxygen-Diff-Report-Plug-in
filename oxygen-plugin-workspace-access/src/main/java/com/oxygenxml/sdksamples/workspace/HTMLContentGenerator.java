@@ -1,12 +1,10 @@
 package com.oxygenxml.sdksamples.workspace;
 
+import java.util.Comparator;
 import java.util.List;
-
-import com.ibm.icu.impl.Differ;
+import java.util.TreeSet;
 
 import ro.sync.diff.api.Difference;
-import ro.sync.diff.text.DiffEntry;
-import ro.sync.diff.xml.DiffEntryType;
 
 public class HTMLContentGenerator implements ContentListener {
 
@@ -17,19 +15,29 @@ public class HTMLContentGenerator implements ContentListener {
 	private int lastIdx = 0;
 	
 	
+	private TreeSet<Integer> noDuplicates;
 	
+	Comparator<Integer> comparator = new Comparator<Integer>() {
+        @Override
+        public int compare(Integer a, Integer b) {
+            return b-a;
+        }
+    };
 	
 	public HTMLContentGenerator(List<Difference> differences, boolean isLeft) {
 		this.differences = differences;
 		
 		this.isLeft = isLeft;
 		resultedText = new StringBuilder();
+		
+		noDuplicates = new TreeSet<Integer>(comparator);
+		noDuplicates.add(Integer.MAX_VALUE);
 	}
 	
 	
 	
 	public String getResultedText() {
-		System.out.println("local: " + local);
+		System.out.println("local: " + local + "\n");
 		return resultedText.toString();
 	}
 
@@ -45,46 +53,51 @@ public class HTMLContentGenerator implements ContentListener {
 
 
 	@Override
-	public void startNode(NodeType type, String content) {
+	public void startNode(NodeType type) {
 //		System.out.println("Start node: " + type +" content ='" + content +"'");
 		
 		switch(type){
-		case Element:
+		case ELEMENT:
 			resultedText.append( "<span class = \"Element\">" );
 			break;
-		case textField:
+		case ELEMENT_CLOSE:
+			resultedText.append( "<span class = \"Element\">" );
+			break;
+		case TEXTFIELD:
 			resultedText.append("<span class = \"textField\">");;
 			break;
-		case attributeName:
+		case ATTRIBUTENAME:
 			resultedText.append( "<span class = \"attributeName\">");
 			break;
-		case attributeValue:
+		case ATTRIBUTEVALUE:
 			resultedText.append("<span class = \"attributeValue\">");
 			break;
 		case PI:
 			resultedText.append("<span class = \"PI\">");
 			break;
-		case Doctype:
+		case DOCTYPE:
 			resultedText.append("<span class = \"Doctype\">");
 			break;
 		case CDATA:
 			resultedText.append("<span class = \"CDATA\">");
 			break;
-		case Comment:
+		case COMMENT:
 			resultedText.append("<span class = \"Comment\">");
 			
 		}
 		
-		resultedText.append(content);
 		
 		
 	}
 
-
 	@Override
-	public void endNode(NodeType type, String content) {
-		//System.out.println("End node: " + type +" content ='" + content +"'");
+	public void copyContent(String content){
 		resultedText.append(content);
+	}
+	
+	@Override
+	public void endNode(String content) {
+		resultedText.append(content + "</span>");
 	}
 
 	int local = 0;
@@ -93,45 +106,46 @@ public class HTMLContentGenerator implements ContentListener {
 	@Override
 	public boolean checkDiff(int currentOffs, String buffer) {
 		
+//		System.out.println("Current offset:" + currentOffs + " buffer: " + buffer);
+		
 		boolean foundDiff = false;
+		//System.out.println("noDupl:  " + noDuplicates);
+		if(!noDuplicates.contains(new Integer(currentOffs))){
+			noDuplicates.add(new Integer(currentOffs));
 		
-//		if( buffer.length() > 0)
-//			System.out.println(currentOffs + "  " +buffer.charAt(buffer.length()-1));
-//		else
-//			System.out.println(currentOffs);
-		
-		if(differences != null){
-			
-			
-			for (int i = 0; i < differences.size(); i++) {
-				Difference difference = differences.get(i);
-					
-//				System.out.println("Offset: " + currentOffs);
+			if(differences != null){
 				
-				int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
-				int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
+				
+				for (int i = 0; i < differences.size(); i++) {
+					Difference difference = differences.get(i);
+											
+					int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
+					int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
+						
+					if (currentOffs == start) {
+						local++;
+						
+						copyContent(buffer);
+						resultedText.append("<span class=\"diffEntry\" id=\"" + lastIdx +"\">");
+//						resultedText.append("<span class=\"diffEntry\" id=\"" + lastIdx +"\"> I AM BEGINING -- diffEntry --" + currentOffs);
+						lastIdx = i;
+						foundDiff = true;
+						
+//						System.out.println("StartOffset: " + currentOffs + "  " +buffer + "  ");
+						break;
+					} else if (currentOffs == end - 1) {
+						local--;
+						
+						copyContent(buffer);
+						resultedText.append("</span   >");
+//						resultedText.append("</span> I AM ENDING -- diffEntry --");
+						foundDiff = true;
+
+//						System.out.println("EndOffset: " + currentOffs + "  " +buffer + "  ");
+						break;
+					}
 					
-				if (currentOffs == start + 1) {
-					local++;
-				//	System.out.println("Offset START: " + currentOffs+ " ");
-					if( buffer.length() > 0)
-						System.out.println("InStartOffset: " + currentOffs + "  " +buffer);
-					else
-						System.out.println(currentOffs);
-					endNode(NodeType.EmptyData, buffer);
-					resultedText.append("<span class=\"diffEntry\" id=" + lastIdx +" >");
-					lastIdx = i;
-					foundDiff = true;
-					break;
-				} else if (currentOffs == end + 1) {
-					local--;
-			//		System.out.println("Offset END: " + currentOffs + " ");
-					endNode(NodeType.EmptyData, buffer);
-					resultedText.append("</span>");
-					foundDiff = true;
-					break;
 				}
-				
 			}
 		}
 		return foundDiff;

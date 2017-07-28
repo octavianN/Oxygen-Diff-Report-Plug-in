@@ -307,6 +307,21 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			Reader reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 			Reader reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 
+			char[] content =  new char[50];
+			reader1.read(content, 0, 30);
+			System.out.println("Reader content before diff:\n");
+			for(int i = 0; i<30;i++){
+				if(content[i] == '\r')
+					System.out.print("\\r");
+				else if(content[i] == '\n')
+					System.out.print("\\n");
+				else if(content[i] == '\t')
+					System.out.print("\\t");
+				else
+					System.out.print(content[i]);
+			}
+			reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
+			
 			List<Difference> performDiff = diffPerformer.performDiff(reader1, reader2, null, null, contentType, diffOptions, null);
 			printTheDiferencesInTheConsole(performDiff, reader1, reader2, firstURL, secondURL);
 			
@@ -490,16 +505,17 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			htmlBuilder.append("<td>");
 			htmlBuilder.append("<pre>");
 			
-			XMLParser parser = new XMLParser();
-			
+			XMLMainParser parser = new XMLMainParser();
 			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
-			
 			parser.setContentListener(htmlDiffGenerator);
+
 			
 			//adds the parsed String to the result
 			parser.parseInputIntoHTMLFormat(doc1Reader);
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
-
+			
+			System.out.println(parser.resultToCheckIfItReadsCorrectly);
+			
 			htmlBuilder.append("</pre>");
 			htmlBuilder.append("</td>");
 			htmlBuilder.append("<td>");
