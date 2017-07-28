@@ -55,9 +55,8 @@ public class XMLGeneratorTest {
 				
 	   
 		
-		XMLParser parser = new XMLParser();
-		
-		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
+		XMLMainParser parser = new XMLMainParser();
+		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(null, true);
 		
 		parser.setContentListener(htmlDiffGenerator);
 		parser.parseInputIntoHTMLFormat(new StringReader(str2));
@@ -97,8 +96,9 @@ public class XMLGeneratorTest {
 		diffs.add(createDiffEntry(73, 79, 0, 9));
 		diffs.add(createDiffEntry(80, 91, 0, 9));
 		
-		XMLParser parser = new XMLParser();
-		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
+		XMLMainParser parser = new XMLMainParser();
+		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(null, true);
+		
 		parser.setContentListener(htmlDiffGenerator);
 		parser.parseInputIntoHTMLFormat(new StringReader(str1));
 		
@@ -160,9 +160,8 @@ public class XMLGeneratorTest {
 				
 	   
 		
-		XMLParser parser = new XMLParser();
-		
-		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
+		XMLMainParser parser = new XMLMainParser();
+		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(null, true);
 		
 		parser.setContentListener(htmlDiffGenerator);
 		parser.parseInputIntoHTMLFormat(new StringReader(str1));

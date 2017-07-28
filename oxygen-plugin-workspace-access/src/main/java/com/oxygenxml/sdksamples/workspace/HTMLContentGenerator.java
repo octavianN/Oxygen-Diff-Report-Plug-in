@@ -6,6 +6,15 @@ import java.util.TreeSet;
 
 import ro.sync.diff.api.Difference;
 
+
+
+/**
+ * Lister
+ * It listens to the content given by the parsers and
+ * adds spans accordingly
+ * @author intern3
+ *
+ */
 public class HTMLContentGenerator implements ContentListener {
 
 	
@@ -15,7 +24,7 @@ public class HTMLContentGenerator implements ContentListener {
 	private int lastIdx = 0;
 	
 	
-	private TreeSet<Integer> noDuplicates;
+	private TreeSet<Integer> noDuplicates; //checks index duplicates
 	
 	Comparator<Integer> comparator = new Comparator<Integer>() {
         @Override
@@ -37,24 +46,15 @@ public class HTMLContentGenerator implements ContentListener {
 	
 	
 	public String getResultedText() {
-		System.out.println("local: " + local + "\n");
+		System.out.println(resultedText.toString());
 		return resultedText.toString();
 	}
 
 	
-	
-//	public void startSpan(HTMLTypes type, String content){}
-//	
-//	public void endSpan(HTMLTypes type, String content){}
-//	
-//	public void addSpaces(char character){
-//		resultedText.append(character);
-//	}
 
 
 	@Override
 	public void startNode(NodeType type) {
-//		System.out.println("Start node: " + type +" content ='" + content +"'");
 		
 		switch(type){
 		case ELEMENT:
@@ -83,6 +83,8 @@ public class HTMLContentGenerator implements ContentListener {
 			break;
 		case COMMENT:
 			resultedText.append("<span class = \"Comment\">");
+		default:
+			break;
 			
 		}
 		
@@ -97,7 +99,8 @@ public class HTMLContentGenerator implements ContentListener {
 	
 	@Override
 	public void endNode(String content) {
-		resultedText.append(content + "</span>");
+		copyContent(content);
+		resultedText.append("</span>");
 	}
 
 	int local = 0;
@@ -106,10 +109,8 @@ public class HTMLContentGenerator implements ContentListener {
 	@Override
 	public boolean checkDiff(int currentOffs, String buffer) {
 		
-//		System.out.println("Current offset:" + currentOffs + " buffer: " + buffer);
-		
 		boolean foundDiff = false;
-		//System.out.println("noDupl:  " + noDuplicates);
+
 		if(!noDuplicates.contains(new Integer(currentOffs))){
 			noDuplicates.add(new Integer(currentOffs));
 		
@@ -127,21 +128,18 @@ public class HTMLContentGenerator implements ContentListener {
 						
 						copyContent(buffer);
 						resultedText.append("<span class=\"diffEntry\" id=\"" + lastIdx +"\">");
-//						resultedText.append("<span class=\"diffEntry\" id=\"" + lastIdx +"\"> I AM BEGINING -- diffEntry --" + currentOffs);
+					
 						lastIdx = i;
 						foundDiff = true;
-						
-//						System.out.println("StartOffset: " + currentOffs + "  " +buffer + "  ");
+
 						break;
 					} else if (currentOffs == end - 1) {
 						local--;
 						
 						copyContent(buffer);
-						resultedText.append("</span   >");
-//						resultedText.append("</span> I AM ENDING -- diffEntry --");
+						resultedText.append("</span>");
 						foundDiff = true;
-
-//						System.out.println("EndOffset: " + currentOffs + "  " +buffer + "  ");
+						
 						break;
 					}
 					

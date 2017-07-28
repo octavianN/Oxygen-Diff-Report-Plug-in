@@ -19,19 +19,17 @@ public class XMLParserTest {
 				"	<?' PITarget (S (Char* - (Char* '?>\n" + 
 				"	</house> \n" + 
 				"</neighbourhood>\n";
-		XMLParser parser = new XMLParser();
-		
+		XMLMainParser parser = new XMLMainParser();
 		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(null, true);
 		
 		parser.setContentListener(htmlDiffGenerator);
 		parser.parseInputIntoHTMLFormat(new StringReader(str));
-		assertEquals("<span class = \"Element\">&lt;neighbourhood  </span><span class = \"attributeName\">COLOR=</span><span class = \"attributeValue\">=\"BLUE\""
-				+ "</span><span class = \"Element\">&gt;</span>\n" + 
-				"	<span class = \"Element\">&lt;house<span class = \"Element\">&gt;</span></span>\n" + 
-				"	<span class = \"Comment\">&lt;!-- Comment --<span class = \"Element\">&gt;</span></span>\n" + 
+		assertEquals("<span class = \"Element\">&lt;neighbourhood </span><span class = \"attributeName\"> COLOR=</span><span class = \"attributeValue\">\"BLUE\"></span>\n" + 
+				"	<span class = \"Element\">&lt;house</span><span class = \"Element\">&gt;</span>\n" + 
+				"	<span class = \"Comment\">&lt;-- Comment --&gt;</span>\n" + 
 				"	<span class = \"PI\">&lt;?' PITarget (S (Char* - (Char* '?&gt;</span>\n" + 
-				"	<span class = \"Element\">&lt;/house<span class = \"Element\">&gt;</span></span> \n" + 
-				"<span class = \"Element\">&lt;/neighbourhood<span class = \"Element\">&gt;</span></span>\n", htmlDiffGenerator.getResultedText());
+				"	<span class = \"Element\">&lt;/house&gt;</span> \n" + 
+				"<span class = \"Element\">&lt;/neighbourhood&gt;</span>\n", htmlDiffGenerator.getResultedText());
 	}
 
 	/**
@@ -42,12 +40,12 @@ public class XMLParserTest {
 		String str = "<hala>"
 				+ "</hala>";
 		
-		XMLParser parser = new XMLParser();
+		XMLMainParser parser = new XMLMainParser();
 		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(null, true);
+		
 		parser.setContentListener(htmlDiffGenerator);
 		parser.parseInputIntoHTMLFormat(new StringReader(str));
-		assertEquals("<span class = \"Element\">&lt;hala<span class = \"Element\">&gt;</span></span><span class "
-				+ "= \"Element\">&lt;/hala<span class = \"Element\">&gt;</span></span>", htmlDiffGenerator.getResultedText());
+		assertEquals("<span class = \"Element\">&lt;hala</span><span class = \"Element\">&gt;</span><span class = \"Element\">&lt;/hala&gt;</span>", htmlDiffGenerator.getResultedText());
 	}
 	
 	
@@ -69,24 +67,22 @@ public class XMLParserTest {
         		"	</house> \n" + 
         		"</neighbourhood>";
 		
-        XMLParser parser = new XMLParser();
+        XMLMainParser parser = new XMLMainParser();
 		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(null, true);
+		
 		parser.setContentListener(htmlDiffGenerator);
 		parser.parseInputIntoHTMLFormat(new StringReader(str));
-		assertEquals("<span class = \"Element\">&lt;neighbourhood  </span><span class = \"attributeName\">COLOR=</span><span class = \"attributeValue\">=\"BLUE\"</span>"
-				+ "<span class = \"Element\">&gt;</span>\n" + 
-				"	<span class = \"Element\">&lt;house<span class = \"Element\">&gt;</span></span> \n" + 
-				"	<span class = \"Comment\">&lt;!-- Comment --<span class = \"Element\">&gt;</span></span>\n" + 
+		assertEquals("<span class = \"Element\">&lt;neighbourhood </span><span class = \"attributeName\"> COLOR=</span><span class = \"attributeValue\">\"BLUE\"></span>\n" + 
+				"	<span class = \"Element\">&lt;house</span><span class = \"Element\">&gt;</span> \n" + 
+				"	<span class = \"Comment\">&lt;-- Comment --&gt;</span>\n" + 
 				"	<span class = \"PI\">&lt;?' PITarget (S (Char* - (Char* '?&gt;</span>\n" + 
-				"		<span class = \"Element\">&lt;visitable  </span><span class = \"attributeName\">ATTRIBUTE=</span>"
-				+ "<span class = \"attributeValue\">=\"EXISTING\"</span><span class = \"Element\">&gt;</span> <span class = \"textField\"> Som&lt;$gt;ething </span>"
-				+ "<span class = \"Element\">&lt;/visitable<span class = \"Element\">&gt;</span></span> \n" + 
-				"	<span class = \"CDATA\">&lt;![CDATA[<greeting>Hello, ]]]]]]world!</greeting>]]<span class = \"Element\">&gt;</span> \n" + 
-				"	<span class = \"Doctype\">&lt;!DOCTYPE greeting [\n" + 
-				"  		<!ELEMENT \"bd\"  greeting (#PCDATA)>\n" + 
-				"	]<span class = \"Element\">&gt;</span></span>\n" + 
-				"	<span class = \"Element\">&lt;/house<span class = \"Element\">&gt;</span></span> \n" + 
-				"<span class = \"Element\">&lt;/neighbourhood<span class = \"Element\">&gt;</span></span>", htmlDiffGenerator.getResultedText());
+				"		<span class = \"Element\">&lt;visitable </span><span class = \"attributeName\"> ATTRIBUTE=</span><span class = \"attributeValue\">\"EXISTING\"></span><span class = \"textField\"> Som&lt;$gt;ething </span><span class = \"Element\">&lt;/visitable&gt;</span> \n" + 
+				"	<span class = \"CDATA\">&lt;[CDATA[&lt;greeting&gt;Hello, ]]]]]]world!&lt;/greeting&gt;]]&gt;</span> \n" + 
+				"	<span class = \"Doctype\">&lt;DOCTYPE greeting [\n" + 
+				"  		&lt;!ELEMENT \"bd\"  greeting (#PCDATA)&gt;</span><span class = \"textField\">\n" + 
+				"	]&gt;\n" + 
+				"	</span><span class = \"Element\">&lt;/house&gt;</span> \n" + 
+				"<span class = \"Element\">&lt;/neighbourhood&gt;</span>", htmlDiffGenerator.getResultedText());
 
 	}
 	
@@ -101,12 +97,12 @@ public class XMLParserTest {
 				"		\n" + 
 				"			";
 		
-		XMLParser parser = new XMLParser();
+		XMLMainParser parser = new XMLMainParser();
 		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(null, true);
+		
 		parser.setContentListener(htmlDiffGenerator);
 		parser.parseInputIntoHTMLFormat(new StringReader(str));
-		assertEquals("<span class = \"Element\">&lt;h<span class = \"Element\">&gt;</span>"
-				+ "</span><span class = \"Element\">&lt;/h<span class = \"Element\">&gt;</span></span>\n" + 
+		assertEquals("<span class = \"Element\">&lt;h</span><span class = \"Element\">&gt;</span><span class = \"Element\">&lt;/h&gt;</span>\n" + 
 				"\n" + 
 				"\n" + 
 				"\n" + 
