@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import ro.sync.diff.text.DiffEntry;
+
 
 /**
  * 
@@ -309,7 +311,8 @@ public class XMLMainParser {
 			if(currentCharacter == '<'){
 				break;
 			}
-
+			
+			
 			if(checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter)){
 				mayHaveAttribute = true;
 			}else if(mayHaveAttribute){

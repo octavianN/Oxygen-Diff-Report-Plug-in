@@ -83,6 +83,7 @@ public class XMLParserTest {
 				"	]&gt;\n" + 
 				"	</span><span class = \"Element\">&lt;/house&gt;</span> \n" + 
 				"<span class = \"Element\">&lt;/neighbourhood&gt;</span>", htmlDiffGenerator.getResultedText());
+		
 
 	}
 	
