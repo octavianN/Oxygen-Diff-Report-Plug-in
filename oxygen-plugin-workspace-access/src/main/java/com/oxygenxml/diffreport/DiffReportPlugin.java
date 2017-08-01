@@ -1,4 +1,8 @@
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
 package com.oxygenxml.diffreport;
+=======
+package com.oxygenxml.sdksamples.workspace;
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
 
 
 import java.awt.event.ActionEvent;
@@ -24,9 +28,12 @@ import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 
 import com.ibm.icu.impl.Differ;
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
 import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
 import com.oxygenxml.diffreport.parser.XMLMainParser;
 import com.oxygenxml.sdksamples.workspace.Constants;
+=======
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
 import com.sun.corba.se.impl.orbutil.closure.Constant;
 
 import ro.sync.diff.api.DiffContentTypes;
@@ -50,7 +57,11 @@ import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 /**
  * Plugin extension - workspace access extension.
  */
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
 public class DiffReportPlugin implements WorkspaceAccessPluginExtension {
+=======
+public class CustomWorkspaceAccessPluginExtension implements WorkspaceAccessPluginExtension {
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
   /**
    * The custom messages area. A sample component added to your custom view.
    */
@@ -83,6 +94,10 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 					// Add our custom action
 					popup.add(selectionSourceAction);
 				}
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
+=======
+
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
 				@Override
 				public void customizeTextPopUpMenu(JPopupMenu popup,
 						WSTextEditorPage textPage) {
@@ -179,7 +194,11 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 		   */
 		  public void customizeToolbar(ToolbarInfo toolbarInfo) {
 			  //The toolbar ID is defined in the "plugin.xml"
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
 			  if("DiffReportPluginToolbarID".equals(toolbarInfo.getToolbarID())) {
+=======
+			  if("SampleWorkspaceAccessToolbarID".equals(toolbarInfo.getToolbarID())) {
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
 				  List<JComponent> comps = new ArrayList<JComponent>(); 
 				  JComponent[] initialComponents = toolbarInfo.getComponents();
 				  boolean hasInitialComponents = initialComponents != null && initialComponents.length > 0; 
@@ -218,7 +237,11 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   			@Override
   			public void actionPerformed(ActionEvent e) {
   				if(e.getActionCommand() != null){
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
   					DiffReportFileChooserDialogue myDialog = new DiffReportFileChooserDialogue();
+=======
+  					PopUpDialogue myDialog = new PopUpDialogue();
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
   					myDialog.showDialogue();                                //loads the dialogue
   					createCompareListener(myDialog, pluginWorkspaceAccess); //if the paths are not null, Compares the files
   				}
@@ -238,7 +261,11 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   	 * @param myDialog
   	 * @param pluginWorkspaceAccess
   	 */
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
   	private void createCompareListener(final DiffReportFileChooserDialogue myDialog, final StandalonePluginWorkspace pluginWorkspaceAccess){
+=======
+  	private void createCompareListener(final PopUpDialogue myDialog, final StandalonePluginWorkspace pluginWorkspaceAccess){
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
   		ActionListener ac = new ActionListener() {
 			
 			@Override
@@ -277,7 +304,11 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   	 * Saves the paths in two constants
   	 * @param dialog
   	 */
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
   	public void saveData (DiffReportFileChooserDialogue dialog){
+=======
+  	public void saveData (PopUpDialogue dialog){
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
   		String file1 = dialog.getFirstLabelField().getText();
   		String file2 = dialog.getSecondLabelField().getText();
   		//System.out.println("First file: " + file1 + "\n" + "Second file: " + file2);
@@ -292,12 +323,20 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   	 * @param pluginWorkspaceAccess 
   	 * @throws FileNotFoundException 
   	 */
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
 	private List<Difference> generateDifferences(DiffReportFileChooserDialogue dialog, StandalonePluginWorkspace pluginWorkspaceAccess) throws FileNotFoundException{
+=======
+  	@SuppressWarnings({ "unused" })
+	private List<Difference> generateDifferences(PopUpDialogue dialog, StandalonePluginWorkspace pluginWorkspaceAccess) throws FileNotFoundException{
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
 
   		try {
 			DifferencePerformer diffPerformer = pluginWorkspaceAccess.getCompareUtilAccess().createDiffPerformer();
 			DiffOptions diffOptions = new DiffOptions();
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
 //			diffOptions.setEnableHierarchicalDiff(true);
+=======
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
 			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
 			String firstFile = Constants.getFirstFile();
 			String secondFile = Constants.getSecondFile();
@@ -520,12 +559,16 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 
 			
 			//adds the parsed String to the result
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
 			try {
 				parser.parseInputIntoHTMLFormat(doc1Reader);
 			} catch (IOException e) {
 				e.printStackTrace();
 				htmlBuilder.append("Cannot read first file content: " + e.getMessage());
 			}
+=======
+			parser.parseInputIntoHTMLFormat(doc1Reader);
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 			
 			System.out.println(parser.resultToCheckIfItReadsCorrectly);
@@ -539,12 +582,16 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			//adds the parsed String to the result
 			htmlDiffGenerator = new HTMLContentGenerator(diffs, false);
 			parser.setContentListener(htmlDiffGenerator);
+<<<<<<< HEAD:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/diffreport/DiffReportPlugin.java
 			try {
 				parser.parseInputIntoHTMLFormat(doc2Reader);
 			} catch (IOException e) {
 				e.printStackTrace();
 				htmlBuilder.append("Cannot read second file content: " + e.getMessage());
 			}
+=======
+			parser.parseInputIntoHTMLFormat(doc2Reader);
+>>>>>>> parent of d236bc4... Added the parent diffs:oxygen-plugin-workspace-access/src/main/java/com/oxygenxml/sdksamples/workspace/CustomWorkspaceAccessPluginExtension.java
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 			
 			htmlBuilder.append("</pre>");
