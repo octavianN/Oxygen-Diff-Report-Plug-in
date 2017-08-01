@@ -58,10 +58,12 @@ public class ParseElement {
 		
 		for(int i = 0 ; i < length ; i++){
 	
-			buffer.append(returnChangedCharacter(elementContent.charAt(i)));
+			char character = elementContent.charAt(i);
+			System.out.println("Copy empty data ='" + character + "' offs: " + i + beginOffset );
+			buffer.append(returnChangedCharacter(character));
 			
 			
-			if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
+			if(contentListener.checkDiff(i + beginOffset + 1, buffer.toString())){
 				buffer = new StringBuilder();
 			}
 			
@@ -85,8 +87,8 @@ public class ParseElement {
 		int beginOffset = currentElement.beginOffset;
 		StringBuilder buffer = new StringBuilder();
 		
-		
-		for(int i = 0 ; i < length ; i++){
+		int i = 0;
+		for( i = 0 ; i < length ; i++){
 			
 			
 			if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
@@ -96,6 +98,9 @@ public class ParseElement {
 			buffer.append(returnChangedCharacter(elementContent.charAt(i)));
 			
 			
+		}
+		if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
+			buffer = new StringBuilder();
 		}
 		contentListener.endNode(buffer.toString());
 	}
@@ -259,18 +264,22 @@ public class ParseElement {
 		//AtributeValue--------------------------------------------------------
 		contentListener.startNode(NodeType.ATTRIBUTEVALUE);
 		
-		for(int i = currentIndex+1 ; i < length ; i++){
-			
-			
-			buffer.append(returnChangedCharacter(elementContent.charAt(i)));
-			
-			if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
+		for (int i = currentIndex + 1; i < length; i++) {
+
+			if (elementContent.charAt(i) == '>') {
+
+			} else {
+				buffer.append(elementContent.charAt(i));
+			}
+
+			if (contentListener.checkDiff(i + beginOffset, buffer.toString())) {
 				buffer = new StringBuilder();
 			}
-			
+
 		}
-		
+
 		contentListener.endNode(buffer.toString());
+		contentListener.copyContent("<span class = \"Element\">&gt;</span>");
 		
 		//End AttributeValue----------------------------------------------------
 	}

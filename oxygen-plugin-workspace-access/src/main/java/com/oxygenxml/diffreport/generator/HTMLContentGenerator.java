@@ -183,7 +183,7 @@ public class HTMLContentGenerator implements ContentListener {
 	@Override
 	public void endNode(String content) {
 		copyContent(content);
-		resultedText.append("</span>");
+		resultedText.append("</span      >");
 	}
 
 	int local = 0;
@@ -224,6 +224,7 @@ public class HTMLContentGenerator implements ContentListener {
 		
 		boolean foundDiff = false;
 
+		System.out.println("currentOffs: " + currentOffs);
 		if(!noDuplicates.contains(new Integer(currentOffs))){
 			noDuplicates.add(new Integer(currentOffs));
 		
@@ -233,6 +234,7 @@ public class HTMLContentGenerator implements ContentListener {
 				
 				for (int i = 0; i < differences.size(); i++) {
 					Difference difference = differences.get(i);
+//					System.out.println("difference: " + difference);
 											
 					int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 					int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
@@ -251,7 +253,8 @@ public class HTMLContentGenerator implements ContentListener {
 						break;	
 					}
 					
-					if((currentOffs == start) && (start == end)){
+					
+					if((currentOffs == end - 1) && (start == end)){
 						copyContent(buffer);
 						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdx +"\"></span>");
 					
@@ -270,6 +273,9 @@ public class HTMLContentGenerator implements ContentListener {
 
 						break;
 					} else if (currentOffs == end - 1) {
+						
+						System.out.println("end " + end + " start: "+ start);
+						
 						local--;
 						
 						copyContent(buffer);

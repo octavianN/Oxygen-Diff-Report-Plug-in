@@ -29,6 +29,11 @@ public class XMLGeneratorTest {
 			return offs;
 		}
 		
+		@Override
+		public String toString() {
+			return offs + "";
+		}
+		
 	}
 	
 	
@@ -440,4 +445,72 @@ public class XMLGeneratorTest {
 	}
 	
 
+	@Test
+	public void test() throws IOException {
+		String str = "<!DOCTYPE personnel PUBLIC \"PERSONNEL\" \"personal.dtd\">\n" + 
+				"<?xml-stylesheet type=\"text/css\" href=\"personal.css\"?>\n" + 
+				"<personnel>\n" + 
+				"    <person id=\"harris.anderson\" photo=\"personal-images/harris.anderson.jpg\">                \n" + 
+				"        <name>\n" + 
+				"            <given>Harris</given>\n" + 
+				"            <family>Anderson</family>\n" + 
+				"        </name>\n" + 
+				"        <![CDATA[<greeting>Hello, ]]]]]]world!</greeting>]]> \n" + 
+				"        <!-- Comment -->\n" + 
+				"        <email>harris.anderson@example.com</email>\n" + 
+				"        <link subordinates=\"robert.taylor helen.jackson michelle.taylor jason.chen harris.anderson brian.carter\"/>\n" + 
+				"    </person>\n" + 
+				"</personnel>\n";
+		System.out.println(str);
+		
+//		| 0 54  ------   0  49 |
+//
+//		| 110 121  ------   105  111 |
+//
+//		| 133 136  ------   123  126 |
+//
+//		| 327 379  ------   317  346 |
+//
+//		| 393 402  ------   360  373 |
+//
+//		| 571 571  ------   542  611 |
+//
+//		| 586 598  ------   626  633 |
+//
+//		| 598 599  ------   633  635 |
+		
+		List<Difference> diffs = new ArrayList<Difference>();
+		diffs.add(createDiffEntry(0, 54, 0, 49));
+		diffs.add(createDiffEntry( 110, 121, 105, 111));
+		diffs.add(createDiffEntry(133, 136, 123, 126));
+		diffs.add(createDiffEntry(327, 379, 317, 346));
+		diffs.add(createDiffEntry(393, 402, 360, 373));
+		diffs.add(createDiffEntry(571, 571, 542, 611));
+		diffs.add(createDiffEntry(586, 598, 626, 633));
+		diffs.add(createDiffEntry(598, 599, 633, 634));
+		
+		XMLMainParser parser = new XMLMainParser();
+		HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
+		
+		parser.setContentListener(htmlDiffGenerator);
+		parser.parseInputIntoHTMLFormat(new StringReader(str));
+		assertEquals("<span class = \"Doctype\"><span class=\"diffEntry diffTypeConflict\" id=\"0\">&lt;DOCTYPE personnel PUBLIC \"PERSONNEL\" \"personal.dtd\"&gt;</span></span      >\n" + 
+				"        <span class = \"PI\">&lt;?xml-stylesheet type=\"text/css\" href=\"personal.css\"?&gt;</span      >\n" + 
+				"        <span class = \"Element\">&lt;<span class=\"diffEntry diffTypeConflict\" id=\"1\">personnel</span></span      ><span class = \"Element\">&gt;</span>\n" + 
+				"        <span class = \"Element\">&lt;person </span      > <span class=\"diffEntry diffTypeConflict\" id=\"2\"><span class = \"attributeName\">id</span>=</span      ><span class = \"attributeValue\">\"harris.anderson\" photo=\"personal-images/harris.anderson.jpg\"</span      ><span class = \"Element\">&gt;</span>                \n" + 
+				"        <span class = \"Element\">&lt;name</span      ><span class = \"Element\">&gt;</span>\n" + 
+				"        <span class = \"Element\">&lt;given</span      ><span class = \"Element\">&gt;</span>Harris<span class = \"Element\">&lt;/given&gt;</span      >\n" + 
+				"        <span class = \"Element\">&lt;family</span      ><span class = \"Element\">&gt;</span>Anderson<span class = \"Element\">&lt;/family&gt;</span      >\n" + 
+				"        <span class = \"Element\">&lt;/name&gt;</span      >\n" + 
+				"        <span class = \"CDATA\"><span class=\"diffEntry diffTypeConflict\" id=\"3\">&lt;[CDATA[&lt;greeting&gt;Hello, ]]]]]]world!&lt;/greeting&gt;]]&gt;</span></span      > \n" + 
+				"        <span class = \"Comment\">&lt;-- <span class=\"diffEntry diffTypeConflict\" id=\"4\">Comment </span>--&gt;</span      >\n" + 
+				"        <span class = \"Element\">&lt;email</span      ><span class = \"Element\">&gt;</span>harris.anderson@example.com<span class = \"Element\">&lt;/email&gt;</span      >\n" + 
+				"        <span class = \"Element\">&lt;link </span      ><span class = \"attributeName\"> subordinates=</span      ><span class = \"attributeValue\">\"robert.taylor helen.jackson michelle.taylor jason.chen harris.anderson brian.carter\"/<span class=\"diffEntry diffTypeIncoming\" id=\"5\"></span></span      ><span class = \"Element\">&gt;</span>\n" + 
+				"        <span class=\"diffEntry diffTypeIncoming\" id=\"6\">    <span class = \"Element\">&lt;/person&gt;</span      ></span>\n" + 
+				"            <span class = \"Element\"><span class=\"diffEntry diffTypeConflict\" id=\"6\">&lt;/personnel</span>&gt;<span class=\"diffEntry diffTypeConflict\" id=\"7\"></span      ></span>",htmlDiffGenerator.getResultedText());
+	
+
+	}
+	
 }
+
