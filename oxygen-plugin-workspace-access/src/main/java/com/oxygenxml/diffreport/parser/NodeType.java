@@ -1,4 +1,4 @@
-package com.oxygenxml.sdksamples.workspace;
+package com.oxygenxml.diffreport.parser;
 
 public enum NodeType {
 	EMPTYDATA,

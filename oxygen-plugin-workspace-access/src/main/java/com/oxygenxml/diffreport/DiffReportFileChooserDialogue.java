@@ -1,4 +1,4 @@
-package com.oxygenxml.sdksamples.workspace;
+package com.oxygenxml.diffreport;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -25,7 +25,7 @@ import javax.swing.filechooser.FileSystemView;
 
 
 
-public class PopUpDialogue {
+public class DiffReportFileChooserDialogue {
 	
 	private JButton compareButton;
 	private JFrame dialog;
@@ -36,7 +36,7 @@ public class PopUpDialogue {
 	private ActionListener CompareButtonActionListener;
 	
 	//Constructor----------------------
-	public PopUpDialogue() {
+	public DiffReportFileChooserDialogue() {
 //		if(dialog == null)
 //			loadDialogue();
 	}

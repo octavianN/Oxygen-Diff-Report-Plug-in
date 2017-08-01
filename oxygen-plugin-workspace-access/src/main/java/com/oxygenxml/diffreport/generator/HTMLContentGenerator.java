@@ -1,10 +1,11 @@
-package com.oxygenxml.sdksamples.workspace;
+package com.oxygenxml.diffreport.generator;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
 import com.ibm.icu.impl.Differ;
+import com.oxygenxml.diffreport.parser.NodeType;
 
 import ro.sync.diff.api.Difference;
 import ro.sync.diff.text.DiffEntry;
@@ -21,16 +22,31 @@ import ro.sync.diff.xml.DiffEntryType;
  */
 public class HTMLContentGenerator implements ContentListener {
 
-	
+	/**
+	 * String builder that keeps the generated text content.
+	 */
 	private StringBuilder resultedText;
+	/**
+	 * The list with the differnces to be added in the generated content.
+	 */
 	private List<Difference> differences;
+	/**
+	 * <code>true</code> if is the left file content generated,
+	 * <code>false</code> if is the right file content generated.
+	 */
 	private boolean isLeft;
+	/**
+	 * 
+	 */
 	private int lastIdx = 0;
+	/**
+	 * The list with the parent diffs to be added in the content.
+	 */
 	private List<DiffEntry> parrentDiffs;
 	
-	private TreeSet<Integer> noDuplicates; //checks index duplicates
+	private TreeSet<Integer> noDuplicates; //checks index duplicates // TODO remove
 	
-	
+	// TODO remove
 	Comparator<Integer> comparator = new Comparator<Integer>() {
         @Override
         public int compare(Integer a, Integer b) {
@@ -38,6 +54,7 @@ public class HTMLContentGenerator implements ContentListener {
         }
     };
     
+    // TODO remove
     Comparator<DiffEntry> compareTwoDifferences = new Comparator<DiffEntry>() {
         @Override
         public int compare(DiffEntry diff1, DiffEntry diff2) {
@@ -61,11 +78,18 @@ public class HTMLContentGenerator implements ContentListener {
         }
     };
 	
+    /**
+     * Constructor.
+     * @param differences The list with the diff entries to be rendered in the output html.
+     * @param isLeft <code>true</code> if is the left file content generated,
+	 *                <code>false</code> if is the right file content generated.
+     */
 	public HTMLContentGenerator(List<Difference> differences, boolean isLeft) {
 		this.differences = differences;
+		this.isLeft = isLeft;
 		
-		TreeSet<DiffEntry> parentDiffsDuplicateRemover = new TreeSet<>(compareTwoDifferences);
-		
+		// Compuute the list with the parent diff entries.
+		TreeSet<DiffEntry> parentDiffsDuplicateRemover = new TreeSet<DiffEntry>();
 		
 		for (Difference difference : differences) {
 			DiffEntry diff = ((DiffEntry) difference).getParentDiffEntry();
@@ -88,15 +112,19 @@ public class HTMLContentGenerator implements ContentListener {
 //			System.out.println("| " + diff.getRightIntervalEnd() + "--" + diff.getRightIntervalEnd() + " |");
 //		}
 //		
-		this.isLeft = isLeft;
+		
+		// Initialize the result string builder.
 		resultedText = new StringBuilder();
 		
+		// TODO remove
 		noDuplicates = new TreeSet<Integer>(comparator);
 		//noDuplicates.add(Integer.MAX_VALUE);
 	}
 	
 	
-	
+	/**
+	 * @return The resulted HTML generated from the given content.
+	 */
 	public String getResultedText() {
 		System.out.println(resultedText.toString());
 		return resultedText.toString();
@@ -105,6 +133,9 @@ public class HTMLContentGenerator implements ContentListener {
 	
 
 
+	/**
+	 * 
+	 */
 	@Override
 	public void startNode(NodeType type) {
 		
@@ -166,7 +197,7 @@ public class HTMLContentGenerator implements ContentListener {
 			int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 			
 			if(currentOffs == start){
-				resultedText.append("<span class=\" ParentDiff \" id=\"" + lastIdx +"\">");
+				resultedText.append("<span class=\"diffParentEntry\" id=\"" + i +"\">");
 			}
 			
 		} 
@@ -233,13 +264,13 @@ public class HTMLContentGenerator implements ContentListener {
 						
 						copyContent(buffer);
 						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdx +"\">");
+						lastIdx = i+1;
 					
 						foundDiff = true;
 
 						break;
 					} else if (currentOffs == end - 1) {
 						local--;
-						lastIdx = i+1;
 						
 						copyContent(buffer);
 						resultedText.append("</span>");

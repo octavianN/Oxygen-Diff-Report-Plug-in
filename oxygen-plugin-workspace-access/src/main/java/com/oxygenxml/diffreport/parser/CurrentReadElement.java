@@ -1,5 +1,4 @@
-package com.oxygenxml.sdksamples.workspace;
-
+package com.oxygenxml.diffreport.parser;
 
 /**
  * An Element could be anything that is between two tags

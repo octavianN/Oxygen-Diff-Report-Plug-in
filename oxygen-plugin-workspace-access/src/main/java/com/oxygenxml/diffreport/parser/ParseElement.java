@@ -1,6 +1,6 @@
-package com.oxygenxml.sdksamples.workspace;
+package com.oxygenxml.diffreport.parser;
 
-
+import com.oxygenxml.diffreport.generator.ContentListener;
 
 /**
  * This class parses the element that is given to it 

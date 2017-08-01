@@ -1,8 +1,9 @@
-package com.oxygenxml.sdksamples.workspace;
+package com.oxygenxml.diffreport.generator;
 
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.List;
 import javax.swing.text.Position;
 
 import org.junit.Test;
+
+import com.oxygenxml.diffreport.parser.XMLMainParser;
 
 import ro.sync.diff.api.Difference;
 import ro.sync.diff.text.DiffEntry;
@@ -30,7 +33,7 @@ public class XMLGeneratorTest {
 	
 	
 	@Test
-	public void testDiffMarkerForElementSimple1() {
+	public void testDiffMarkerForElementSimple1() throws IOException {
 		String str = "<neighbour>\n" + 
 				"    <paragraph>\n" + 
 				"        \n" + 
@@ -71,7 +74,7 @@ public class XMLGeneratorTest {
 	
 	
 	@Test
-	public void testDiffMarkerForElementSimple2() {
+	public void testDiffMarkerForElementSimple2() throws IOException {
 		String str = "<space>                        \n" + 
 				"                <p>EmptySPACE</p>\n" + 
 				"\n" + 
@@ -117,7 +120,7 @@ public class XMLGeneratorTest {
 	
 	
 	@Test
-	public void testDiffMarkerEntersAndTabs() {
+	public void testDiffMarkerEntersAndTabs() throws IOException {
 		String str = "<space>\n" + 
 				"\n" + 
 				"\n" + 
@@ -163,9 +166,10 @@ public class XMLGeneratorTest {
 	
 	/**
 	 * Testing if the ELEMENT differences hilights correctly
+	 * @throws IOException 
 	 */
 	@Test
-	public void testDiffMarkerForElementHarder1() {
+	public void testDiffMarkerForElementHarder1() throws IOException {
 		String str = "<!DOCTYPE nein PUBLIC \"PERSONNEL\" \"personal.dtd\">\n" + 
 				"<?xml-stylesheet type=\"text/css\" href=\"personal.css\"?>\n" + 
 				"<nein>\n" + 
@@ -233,8 +237,12 @@ public class XMLGeneratorTest {
 				"<span class = \"Element\"><span class=\"diffEntry diffTypeConflict\" id=\"6\">&lt;/nein</span>&gt;</span> <span class=\"diffEntry diffTypeOutgoing\" id=\"7\">",htmlDiffGenerator.getResultedText());
 	}
 	
+	/**
+	 * Test thet
+	 * @throws IOException
+	 */
 	@Test
-	public void testDiffMarkerForElementHarder2() {
+	public void testDiffMarkerForElementHarder2() throws IOException {
 		String str = "<smartphonelist>\n" + 
 				"    <smartphone id=\"1\">\n" + 
 				"        <brandName>Samsung</brandName>\n" + 

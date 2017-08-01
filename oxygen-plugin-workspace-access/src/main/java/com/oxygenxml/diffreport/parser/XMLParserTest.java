@@ -1,18 +1,22 @@
-package com.oxygenxml.sdksamples.workspace;
+package com.oxygenxml.diffreport.parser;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.io.StringReader;
 
 import org.junit.Test;
 
+import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
+
 public class XMLParserTest {
 
 	/**
+	 * @throws IOException 
 	 * 
 	 */
 	@Test
-	public void testCheckSerialization() {
+	public void testCheckSerialization() throws IOException {
 		String str = "<neighbourhood COLOR=\"BLUE\">\n" + 
 				"	<house>\n" + 
 				"	<!-- Comment -->\n" + 
@@ -33,10 +37,11 @@ public class XMLParserTest {
 	}
 
 	/**
+	 * @throws IOException 
 	 * 
 	 */
 	@Test
-	public void testCheckSerializationEntities() {
+	public void testCheckSerializationEntities() throws IOException {
 		String str = "<hala>"
 				+ "</hala>";
 		
@@ -88,7 +93,7 @@ public class XMLParserTest {
 	}
 	
 	@Test
-	public void testEnterAndTabs() {
+	public void testEnterAndTabs() throws IOException {
 		String str = "<h></h>\n" + 
 				"\n" + 
 				"\n" + 

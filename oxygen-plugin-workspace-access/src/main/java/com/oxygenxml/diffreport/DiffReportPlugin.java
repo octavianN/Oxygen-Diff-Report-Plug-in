@@ -1,4 +1,4 @@
-package com.oxygenxml.sdksamples.workspace;
+package com.oxygenxml.diffreport;
 
 
 import java.awt.event.ActionEvent;
@@ -24,6 +24,9 @@ import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 
 import com.ibm.icu.impl.Differ;
+import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
+import com.oxygenxml.diffreport.parser.XMLMainParser;
+import com.oxygenxml.sdksamples.workspace.Constants;
 import com.sun.corba.se.impl.orbutil.closure.Constant;
 
 import ro.sync.diff.api.DiffContentTypes;
@@ -47,7 +50,7 @@ import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 /**
  * Plugin extension - workspace access extension.
  */
-public class CustomWorkspaceAccessPluginExtension implements WorkspaceAccessPluginExtension {
+public class DiffReportPlugin implements WorkspaceAccessPluginExtension {
   /**
    * The custom messages area. A sample component added to your custom view.
    */
@@ -80,7 +83,6 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 					// Add our custom action
 					popup.add(selectionSourceAction);
 				}
-
 				@Override
 				public void customizeTextPopUpMenu(JPopupMenu popup,
 						WSTextEditorPage textPage) {
@@ -177,7 +179,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 		   */
 		  public void customizeToolbar(ToolbarInfo toolbarInfo) {
 			  //The toolbar ID is defined in the "plugin.xml"
-			  if("SampleWorkspaceAccessToolbarID".equals(toolbarInfo.getToolbarID())) {
+			  if("DiffReportPluginToolbarID".equals(toolbarInfo.getToolbarID())) {
 				  List<JComponent> comps = new ArrayList<JComponent>(); 
 				  JComponent[] initialComponents = toolbarInfo.getComponents();
 				  boolean hasInitialComponents = initialComponents != null && initialComponents.length > 0; 
@@ -216,7 +218,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   			@Override
   			public void actionPerformed(ActionEvent e) {
   				if(e.getActionCommand() != null){
-  					PopUpDialogue myDialog = new PopUpDialogue();
+  					DiffReportFileChooserDialogue myDialog = new DiffReportFileChooserDialogue();
   					myDialog.showDialogue();                                //loads the dialogue
   					createCompareListener(myDialog, pluginWorkspaceAccess); //if the paths are not null, Compares the files
   				}
@@ -236,7 +238,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   	 * @param myDialog
   	 * @param pluginWorkspaceAccess
   	 */
-  	private void createCompareListener(final PopUpDialogue myDialog, final StandalonePluginWorkspace pluginWorkspaceAccess){
+  	private void createCompareListener(final DiffReportFileChooserDialogue myDialog, final StandalonePluginWorkspace pluginWorkspaceAccess){
   		ActionListener ac = new ActionListener() {
 			
 			@Override
@@ -275,7 +277,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   	 * Saves the paths in two constants
   	 * @param dialog
   	 */
-  	public void saveData (PopUpDialogue dialog){
+  	public void saveData (DiffReportFileChooserDialogue dialog){
   		String file1 = dialog.getFirstLabelField().getText();
   		String file2 = dialog.getSecondLabelField().getText();
   		//System.out.println("First file: " + file1 + "\n" + "Second file: " + file2);
@@ -290,12 +292,12 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   	 * @param pluginWorkspaceAccess 
   	 * @throws FileNotFoundException 
   	 */
-  	@SuppressWarnings({ "unused" })
-	private List<Difference> generateDifferences(PopUpDialogue dialog, StandalonePluginWorkspace pluginWorkspaceAccess) throws FileNotFoundException{
+	private List<Difference> generateDifferences(DiffReportFileChooserDialogue dialog, StandalonePluginWorkspace pluginWorkspaceAccess) throws FileNotFoundException{
 
   		try {
 			DifferencePerformer diffPerformer = pluginWorkspaceAccess.getCompareUtilAccess().createDiffPerformer();
 			DiffOptions diffOptions = new DiffOptions();
+//			diffOptions.setEnableHierarchicalDiff(true);
 			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
 			String firstFile = Constants.getFirstFile();
 			String secondFile = Constants.getSecondFile();
@@ -518,7 +520,12 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 
 			
 			//adds the parsed String to the result
-			parser.parseInputIntoHTMLFormat(doc1Reader);
+			try {
+				parser.parseInputIntoHTMLFormat(doc1Reader);
+			} catch (IOException e) {
+				e.printStackTrace();
+				htmlBuilder.append("Cannot read first file content: " + e.getMessage());
+			}
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 			
 			System.out.println(parser.resultToCheckIfItReadsCorrectly);
@@ -532,7 +539,12 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			//adds the parsed String to the result
 			htmlDiffGenerator = new HTMLContentGenerator(diffs, false);
 			parser.setContentListener(htmlDiffGenerator);
-			parser.parseInputIntoHTMLFormat(doc2Reader);
+			try {
+				parser.parseInputIntoHTMLFormat(doc2Reader);
+			} catch (IOException e) {
+				e.printStackTrace();
+				htmlBuilder.append("Cannot read second file content: " + e.getMessage());
+			}
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 			
 			htmlBuilder.append("</pre>");
