@@ -296,6 +296,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   		try {
 			DifferencePerformer diffPerformer = pluginWorkspaceAccess.getCompareUtilAccess().createDiffPerformer();
 			DiffOptions diffOptions = new DiffOptions();
+			diffOptions.setEnableHierarchicalDiff(true);
 			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
 			String firstFile = Constants.getFirstFile();
 			String secondFile = Constants.getSecondFile();
