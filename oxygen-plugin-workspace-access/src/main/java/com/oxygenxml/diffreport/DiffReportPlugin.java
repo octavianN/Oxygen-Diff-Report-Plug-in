@@ -297,7 +297,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   		try {
 			DifferencePerformer diffPerformer = pluginWorkspaceAccess.getCompareUtilAccess().createDiffPerformer();
 			DiffOptions diffOptions = new DiffOptions();
-//			diffOptions.setEnableHierarchicalDiff(true);
+			diffOptions.setEnableHierarchicalDiff(true);
 			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
 			String firstFile = Constants.getFirstFile();
 			String secondFile = Constants.getSecondFile();
@@ -497,16 +497,26 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 					"span.qname{\n" + 
 					"    color:black;\n" + 
 					"    background-color:inherit;\n" + 
-					"}" + 
+					"}\n" + 
+					"span.diffParentTypeConflict {\n" + 
+					"    border-style: outset;\n" +
+					"}\n" + 
+					"span.diffParentTypeOutgoing{\n" + 
+					"    background-color:#DDDDDD;\n" +
+					"}\n" +
+					"span.diffParentTypeIncoming {\n" + 
+					"    background-color:#D1EDFF;\n" + 
+					"}\n" +
 					"span.diffTypeConflict {\n" + 
 					"    background-color:#FFD1D1;\n" + 
 					"}\n" + 
 					"span.diffTypeOutgoing{\n" + 
 					"    background-color:#DDDDDD;\n" + 
 					"}\n" +
-					"span.diffTypeDeleted {\n" + 
+					"span.diffTypeIncoming {\n" + 
 					"    background-color:#D1EDFF;\n" + 
 					"}\n" +
+					
 					"</style></head>");
 			htmlBuilder.append("<body>");
 			htmlBuilder.append("<table>");
@@ -528,7 +538,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			}
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 			
-			System.out.println(parser.resultToCheckIfItReadsCorrectly);
+			//System.out.println(parser.resultToCheckIfItReadsCorrectly);
 			
 			htmlBuilder.append("</pre>");
 			htmlBuilder.append("</td>");

@@ -1,5 +1,6 @@
 package com.oxygenxml.diffreport.generator;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
@@ -87,31 +88,22 @@ public class HTMLContentGenerator implements ContentListener {
 	public HTMLContentGenerator(List<Difference> differences, boolean isLeft) {
 		this.differences = differences;
 		this.isLeft = isLeft;
+		parrentDiffs = new ArrayList<>();
 		
 		// Compuute the list with the parent diff entries.
 		TreeSet<DiffEntry> parentDiffsDuplicateRemover = new TreeSet<DiffEntry>();
 		
 		for (Difference difference : differences) {
 			DiffEntry diff = ((DiffEntry) difference).getParentDiffEntry();
-			if(diff != null){
-				System.out.print("| " + diff.getLeftIntervalEnd() + "--" + diff.getLeftIntervalEnd() + " |");
-				System.out.println("<---------->");
-				System.out.println("| " + diff.getRightIntervalEnd() + "--" + diff.getRightIntervalEnd() + " |");
-				//parentDiffsDuplicateRemover.add(((DiffEntry)difference).getParentDiffEntry());
-			}else{
-				System.out.println(1);
-			}
+			parentDiffsDuplicateRemover.add(diff);
+			
 		}
 		
-//		while(!parentDiffsDuplicateRemover.isEmpty()){
-//			DiffEntry diff = parentDiffsDuplicateRemover.pollFirst();
-//			parrentDiffs.add(diff);
-//			
-//			System.out.print("| " + diff.getLeftIntervalEnd() + "--" + diff.getLeftIntervalEnd() + " |");
-//			System.out.println("<---------->");
-//			System.out.println("| " + diff.getRightIntervalEnd() + "--" + diff.getRightIntervalEnd() + " |");
-//		}
-//		
+		while(!parentDiffsDuplicateRemover.isEmpty()){
+			DiffEntry diff = parentDiffsDuplicateRemover.pollFirst();
+			parrentDiffs.add(diff);
+		}
+		
 		
 		// Initialize the result string builder.
 		resultedText = new StringBuilder();
@@ -188,7 +180,50 @@ public class HTMLContentGenerator implements ContentListener {
 
 	int local = 0;
 
+	/**
+	 * 
+	 * @param difference
+	 * @param isParent
+	 * @return
+	 */
+	private String getClassForParentDiffType(Difference difference, boolean isParent) {
+
+		byte entryType = ((DiffEntry) difference).getEntryType();
+
+		String diffEntryType = "diffTypeUnknown";
+		if (isParent) {
+			switch (entryType) {
+			case DiffEntryType.DIFF_MODIFIED:
+				diffEntryType = "diffParentTypeConflict";
+				break;
+			case DiffEntryType.DIFF_INSERTED:
+				diffEntryType = "diffParentTypeOutgoing";
+				break;
+			case DiffEntryType.DIFF_REMOVED:
+				diffEntryType = "diffParentTypeIncoming";
+				break;
+			}
+		} else {
+			switch (entryType) {
+			case DiffEntryType.DIFF_MODIFIED:
+				diffEntryType = "diffTypeConflict";
+				break;
+			case DiffEntryType.DIFF_INSERTED:
+				diffEntryType = "diffTypeOutgoing";
+				break;
+			case DiffEntryType.DIFF_REMOVED:
+				diffEntryType = "diffTypeIncoming";
+				break;
+			}
+		}
+
+		return diffEntryType;
+	}
 	
+	/**
+	 * 
+	 * @param currentOffs
+	 */
 	private void checkParentStartDiff(int currentOffs){
 		
 		for(int i = 0 ; i < parrentDiffs.size(); i++){
@@ -197,12 +232,17 @@ public class HTMLContentGenerator implements ContentListener {
 			int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 			
 			if(currentOffs == start){
-				resultedText.append("<span class=\"diffParentEntry\" id=\"" + i +"\">");
+				
+				resultedText.append("<span class=\"diffParentEntry " + getClassForParentDiffType(difference, true)+ "\" id=\"" + i +"\">");
+				break;
 			}
 			
 		} 
 		
 	}
+	
+	
+
 	
 	private void checkParentEndDiff(int currentOffs){
 		
@@ -213,6 +253,8 @@ public class HTMLContentGenerator implements ContentListener {
 			
 			if(currentOffs == end){
 				resultedText.append("</span>");
+				parrentDiffs.remove(i);
+				break;
 			}
 			
 		} 
@@ -224,13 +266,13 @@ public class HTMLContentGenerator implements ContentListener {
 		
 		boolean foundDiff = false;
 
-		System.out.println("currentOffs: " + currentOffs);
+		//System.out.println("currentOffs: " + currentOffs);
 		if(!noDuplicates.contains(new Integer(currentOffs))){
 			noDuplicates.add(new Integer(currentOffs));
 		
 			if(differences != null){
 				
-				//checkParentStartDiff(currentOffs);
+				checkParentStartDiff(currentOffs);
 				
 				for (int i = 0; i < differences.size(); i++) {
 					Difference difference = differences.get(i);
@@ -238,27 +280,15 @@ public class HTMLContentGenerator implements ContentListener {
 											
 					int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 					int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
-					byte entryType = ((DiffEntry)difference).getEntryType();
 					
-					String diffEntryType = "diffTypeUnknown";
-					switch (entryType) {
-					case 1:
-						diffEntryType ="diffTypeConflict";
-						break;
-					case 2:
-						diffEntryType ="diffTypeOutgoing";
-						break;
-					case 3:
-						diffEntryType ="diffTypeIncoming";
-						break;	
-					}
+					String diffEntryType = getClassForParentDiffType(difference, false);
 					
 					
-					if((currentOffs == end - 1) && (start == end)){
+					if( (((currentOffs == start) && (start == end) )) || (((currentOffs == end - 1) && (start == end) )) || ((currentOffs == end - 1 ) && (start + 1 == end)) ){
 						copyContent(buffer);
 						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdx +"\"></span>");
+						lastIdx ++;
 					
-						lastIdx = i+1;
 						foundDiff = true;
 						
 						break;
@@ -267,14 +297,14 @@ public class HTMLContentGenerator implements ContentListener {
 						
 						copyContent(buffer);
 						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdx +"\">");
-						lastIdx = i+1;
+						lastIdx ++;
 					
 						foundDiff = true;
 
 						break;
 					} else if (currentOffs == end - 1) {
 						
-						System.out.println("end " + end + " start: "+ start);
+						//System.out.println("end " + end + " start: "+ start);
 						
 						local--;
 						
@@ -286,7 +316,8 @@ public class HTMLContentGenerator implements ContentListener {
 					}
 					
 				}
-			//	checkParentEndDiff(currentOffs);
+				
+				checkParentEndDiff(currentOffs);
 				
 			}
 		}

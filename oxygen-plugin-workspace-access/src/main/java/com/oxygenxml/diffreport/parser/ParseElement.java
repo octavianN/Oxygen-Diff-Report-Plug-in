@@ -55,19 +55,26 @@ public class ParseElement {
 		int length = elementContent.length();
 		int beginOffset = currentElement.beginOffset;
 		StringBuilder buffer = new StringBuilder();
+		int i;
 		
-		for(int i = 0 ; i < length ; i++){
+//		if(contentListener.checkDiff(beginOffset, buffer.toString())){
+//			System.out.println("MY ERROR IS HERE... element Content:" + elementContent );
+//			buffer = new StringBuilder();
+//		}
+		for( i = 0 ; i < length ; i++){
 	
 			char character = elementContent.charAt(i);
-			System.out.println("Copy empty data ='" + character + "' offs: " + i + beginOffset );
 			buffer.append(returnChangedCharacter(character));
 			
 			
-			if(contentListener.checkDiff(i + beginOffset + 1, buffer.toString())){
+			if(contentListener.checkDiff(i + beginOffset , buffer.toString())){
+//				System.out.println("Copy empty data ='" + character + "' offs: " + (i + beginOffset) + " " + length + currentElement.elementContent.toString());
 				buffer = new StringBuilder();
 			}
 			
 		}
+		
+
 		
 		contentListener.copyContent(buffer.toString());
 	}
@@ -81,27 +88,31 @@ public class ParseElement {
 	 */
 	private void parseNotElement(){
 		
-		contentListener.startNode(currentElement.type);
 		String elementContent = currentElement.elementContent.toString();
 		int length = elementContent.length();
 		int beginOffset = currentElement.beginOffset;
 		StringBuilder buffer = new StringBuilder();
 		
-		int i = 0;
-		for( i = 0 ; i < length ; i++){
+		buffer.append(returnChangedCharacter(elementContent.charAt(0)));
+		contentListener.checkDiff(beginOffset, buffer.toString());
+		contentListener.startNode(currentElement.type);
+		
+		
+		int i;
+		for( i = 1 ; i < length ; i++){
 			
+			buffer.append(returnChangedCharacter(elementContent.charAt(i)));
 			
 			if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
 				buffer = new StringBuilder();
 			}
 			
-			buffer.append(returnChangedCharacter(elementContent.charAt(i)));
 			
 			
 		}
-		if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
-			buffer = new StringBuilder();
-		}
+//		if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
+//			buffer = new StringBuilder();                //TODO  Just removed this
+//		}
 		contentListener.endNode(buffer.toString());
 	}
 	
@@ -147,13 +158,18 @@ public class ParseElement {
 	 */
 	
 	private void parseSimpleElement() {
-		contentListener.startNode(currentElement.type);
 		String elementContent = currentElement.elementContent.toString();
 		int length = elementContent.length();
 		int beginOffset = currentElement.beginOffset;
 		StringBuilder buffer = new StringBuilder();
+		
+		
+		if (contentListener.checkDiff(beginOffset, buffer.toString())) {
+			buffer.append(returnChangedCharacter(elementContent.charAt(0)));
+		}
+		contentListener.startNode(currentElement.type);
 
-		for (int i = 0; i < length; i++) {
+		for (int i = 1; i < length; i++) {
 
 			if(elementContent.charAt(i) == '<'){
 				buffer.append("&lt;");
@@ -162,10 +178,12 @@ public class ParseElement {
 			} else {
 				buffer.append(elementContent.charAt(i));
 			} 
-
+			
+			
 			if (contentListener.checkDiff(i + beginOffset, buffer.toString())) {
 				buffer = new StringBuilder();
 			}
+			
 
 		}
 
@@ -178,17 +196,21 @@ public class ParseElement {
 	 * Parses an element that has an attribute
 	 */
 	private void parseElementWithAttribute(){
-		contentListener.startNode(currentElement.type);
 		String elementContent = currentElement.elementContent.toString();
 		int length = elementContent.length();
 		int beginOffset = currentElement.beginOffset;
 		StringBuilder buffer = new StringBuilder();
-	
+		
+		
+		if(contentListener.checkDiff(beginOffset, buffer.toString())){
+			buffer.append(returnChangedCharacter(elementContent.charAt(0)));
+		}
+		contentListener.startNode(currentElement.type);
 		
 		int currentIndex = 0;
 		
 		//The element***********************************************************
-		for(int i = 0 ; i < length ; i++){
+		for(int i = 1 ; i < length ; i++){
 			
 			currentIndex = i;
 			

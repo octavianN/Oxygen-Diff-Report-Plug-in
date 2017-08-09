@@ -112,17 +112,19 @@ public class XMLMainParser {
 			lastCharacter = readTag(currentElement, reader, lastCharacter);
 
 			parser.setCurrentElement(currentElement);
-			System.err.println("lastCharacter: '" +lastCharacter +"' elem: " + currentElement.type + " beginOffset " + currentElement.beginOffset+ " " + currentElement.elementContent.length());
+//			System.err.println("lastCharacter: '" +lastCharacter +"' elem: " + currentElement.type + " beginOffset " + 
+//					currentElement.beginOffset+ " " + currentElement.elementContent.length() + " " + currentElement.elementContent.toString());
 			parser.parse();
 
 			
-			resultToCheckIfItReadsCorrectly.append(currentElement.beginOffset + " " + currentElement.endOffset + " ");
-			resultToCheckIfItReadsCorrectly.append(currentElement.elementContent.toString());
+//			resultToCheckIfItReadsCorrectly.append(currentElement.beginOffset + " " + currentElement.endOffset + " ");
+//			resultToCheckIfItReadsCorrectly.append(currentElement.elementContent.toString());
 
 
 		} while (lastCharacter != -1);
 		
-		contentListener.checkDiff(currentElement.beginOffset + 2, currentElement.elementContent.toString());
+		
+//		contentListener.checkDiff(currentElement.beginOffset + 1, currentElement.elementContent.toString());
 	}
 
 
@@ -297,7 +299,6 @@ public class XMLMainParser {
 	 */
 	private int readElementWithEndTag(CurrentReadElement currentElement, ReaderWithIndex reader) throws IOException{
 		int currentCharacter = 0;
-		boolean mayHaveAttribute = false;
 
 		currentElement.type = NodeType.EMPTYDATA;
 
@@ -317,9 +318,7 @@ public class XMLMainParser {
 			}
 
 
-			if(checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter)){
-				mayHaveAttribute = true;
-			}else if(mayHaveAttribute){
+			if(!checkForTabsNewLinesOrWhiteSpaces((char)currentCharacter)){
 				currentElement.type = NodeType.TEXTFIELD;
 			}
 
@@ -626,25 +625,25 @@ public class XMLMainParser {
 
 
 
-	public static void main(String[] args) {
-		try {
-			FileReader in = new FileReader("html.in");
-			Reader buf = (Reader) (new BufferedReader(in));
-
-			XMLMainParser parser = new XMLMainParser();
-			HTMLContentGenerator generator = new HTMLContentGenerator(null, true);
-			parser.setContentListener(generator);
-			parser.parseInputIntoHTMLFormat(buf);
-			System.out.println(parser.resultToCheckIfItReadsCorrectly);
-			System.out.println(generator.getResultedText());
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//		try {
+//			FileReader in = new FileReader("html.in");
+//			Reader buf = (Reader) (new BufferedReader(in));
+//
+//			XMLMainParser parser = new XMLMainParser();
+//			HTMLContentGenerator generator = new HTMLContentGenerator(null, true);
+//			parser.setContentListener(generator);
+//			parser.parseInputIntoHTMLFormat(buf);
+//		//	System.out.println(parser.resultToCheckIfItReadsCorrectly);
+//			System.out.println(generator.getResultedText());
+//
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 }
 
 
