@@ -67,6 +67,12 @@ public class ParseElement {
 			buffer.append(returnChangedCharacter(character));
 			
 			
+			// Fixed the problem regarding table-border
+			if(character == '\n'){
+				contentListener.copyContent(buffer.toString());   
+				buffer = new StringBuilder();
+			}
+			
 			if(contentListener.checkDiff(i + beginOffset , buffer.toString())){
 //				System.out.println("Copy empty data ='" + character + "' offs: " + (i + beginOffset) + " " + length + currentElement.elementContent.toString());
 				buffer = new StringBuilder();
@@ -93,8 +99,9 @@ public class ParseElement {
 		int beginOffset = currentElement.beginOffset;
 		StringBuilder buffer = new StringBuilder();
 		
+		
+		contentListener.checkDiff(beginOffset, "");
 		buffer.append(returnChangedCharacter(elementContent.charAt(0)));
-		contentListener.checkDiff(beginOffset, buffer.toString());
 		contentListener.startNode(currentElement.type);
 		
 		
@@ -110,9 +117,9 @@ public class ParseElement {
 			
 			
 		}
-//		if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
-//			buffer = new StringBuilder();                //TODO  Just removed this
-//		}
+		if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
+			buffer = new StringBuilder();                //TODO  Just removed this
+		}
 		contentListener.endNode(buffer.toString());
 	}
 	
@@ -163,9 +170,9 @@ public class ParseElement {
 		int beginOffset = currentElement.beginOffset;
 		StringBuilder buffer = new StringBuilder();
 		
-		
+		buffer.append(returnChangedCharacter(elementContent.charAt(0)));
 		if (contentListener.checkDiff(beginOffset, buffer.toString())) {
-			buffer.append(returnChangedCharacter(elementContent.charAt(0)));
+			buffer = new StringBuilder();
 		}
 		contentListener.startNode(currentElement.type);
 
@@ -201,9 +208,9 @@ public class ParseElement {
 		int beginOffset = currentElement.beginOffset;
 		StringBuilder buffer = new StringBuilder();
 		
-		
+		buffer.append(returnChangedCharacter(elementContent.charAt(0)));
 		if(contentListener.checkDiff(beginOffset, buffer.toString())){
-			buffer.append(returnChangedCharacter(elementContent.charAt(0)));
+			buffer = new StringBuilder();
 		}
 		contentListener.startNode(currentElement.type);
 		

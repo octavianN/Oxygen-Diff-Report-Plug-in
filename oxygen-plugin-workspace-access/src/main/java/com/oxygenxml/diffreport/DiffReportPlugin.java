@@ -3,8 +3,10 @@ package com.oxygenxml.diffreport;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -447,89 +449,44 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 	 * requires to be parsed  
 	 * @param htmlFileToWrite
 	 * @param reader
+	 * @throws IOException 
 	 */
-	private void generateHTMLFile(File htmlFileToWrite, Reader doc1Reader, Reader doc2Reader,List<Difference> diffs){
+	private void generateHTMLFile(File htmlFileToWrite, Reader doc1Reader, Reader doc2Reader,List<Difference> diffs) throws IOException{
 		PrintWriter printWriter = null; 
 		try {
 			printWriter = new PrintWriter(htmlFileToWrite);
 
 			StringBuilder htmlBuilder = new StringBuilder();
 			//begins the html file
+			
 			htmlBuilder.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 			htmlBuilder.append("<head><title>Diff Report</title>");
-			htmlBuilder.append("<style>/*--------------------------------------------\n" + 
-					"    Source code in the instance, source or\n" + 
-					"    annotations.\n" + 
-					"--------------------------------------------*/\n" + 
-					"span.Element {\n" + 
-					"    color: #000096;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" + 
-					"span.attributeName {\n" + 
-					"    color: #F5844C;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" + 
-					"span.attributeValue {\n" + 
-					"    color: #993300;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" + 
-					"span.textField {\n" + 
-					"    color: #000000;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" + 
-					"span.Comment {\n" + 
-					"    color: #006400;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" + 
-					"span.CDATA {\n" + 
-					"    color: #008C00;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" + 
-					"span.PI {\n" + 
-					"    color: #8B26C9;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" + 
-					"span.Doctype {\n" + 
-					"    color: #969600;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" +
-					"/* Title sections */\n" + 
-					"span.qname{\n" + 
-					"    color:black;\n" + 
-					"    background-color:inherit;\n" + 
-					"}\n" + 
-					"span.diffParentTypeConflict {\n" + 
-					"    border-style: outset;\n" +
-					"}\n" + 
-					"span.diffParentTypeOutgoing{\n" + 
-					"    background-color:#DDDDDD;\n" +
-					"}\n" +
-					"span.diffParentTypeIncoming {\n" + 
-					"    background-color:#D1EDFF;\n" + 
-					"}\n" +
-					"span.diffTypeConflict {\n" + 
-					"    background-color:#FFD1D1;\n" + 
-					"}\n" + 
-					"span.diffTypeOutgoing{\n" + 
-					"    background-color:#DDDDDD;\n" + 
-					"}\n" +
-					"span.diffTypeIncoming {\n" + 
-					"    background-color:#D1EDFF;\n" + 
-					"}\n" +
+			htmlBuilder.append("<style>/*--------------------------------------------\n");
+			
+			
+			/*Adding CSS -------------------------------------------------------*/
+			BufferedReader cssReader = new BufferedReader(new FileReader(new File("C:\\Users\\intern3\\Desktop\\myFiles\\diffSample\\css")));
+			 String line;
+			 while ((line = cssReader.readLine()) != null) {
+				 htmlBuilder.append(line + "\n");
+			 }
+			 cssReader.close();
 					
-					"</style></head>");
-			htmlBuilder.append("<body>");
-			htmlBuilder.append("<table>");
-			htmlBuilder.append("<tr>");
-			htmlBuilder.append("<td>");
-			htmlBuilder.append("<pre>");
+			htmlBuilder.append("</style></head>");
+			
+			
+			/*The first document----------------------------------------------*/
+			htmlBuilder.append("<body>\n");
+			htmlBuilder.append("<table>\n");
+			htmlBuilder.append("<tr>\n");
+			htmlBuilder.append("<td>\n");
+			htmlBuilder.append("<pre>\n");
 			
 			XMLMainParser parser = new XMLMainParser();
 			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
 			parser.setContentListener(htmlDiffGenerator);
 
 			
-			//adds the parsed String to the result
 			try {
 				parser.parseInputIntoHTMLFormat(doc1Reader);
 			} catch (IOException e) {
@@ -538,14 +495,25 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			}
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 			
-			//System.out.println(parser.resultToCheckIfItReadsCorrectly);
 			
-			htmlBuilder.append("</pre>");
-			htmlBuilder.append("</td>");
-			htmlBuilder.append("<td>");
+			htmlBuilder.append("</pre>\n");
+			htmlBuilder.append("</td>\n");
+			
+			/*The canvas Section*/
+			
+			htmlBuilder.append("<pre>\n");
+			htmlBuilder.append("<td>\n");
+			
+			htmlBuilder.append("<canvas id=\"myCanvas\" width=\"40\" style=\"border:1px solid #000000;\">");
+			
+			htmlBuilder.append("</pre>\n");
+			htmlBuilder.append("</td>\n");
+			
+			/*The second document----------------------------------------------*/
+			htmlBuilder.append("<td>\n");
 			
 
-			htmlBuilder.append("<pre>");
+			htmlBuilder.append("<pre>\n");
 			//adds the parsed String to the result
 			htmlDiffGenerator = new HTMLContentGenerator(diffs, false);
 			parser.setContentListener(htmlDiffGenerator);
@@ -557,12 +525,12 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			}
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 			
-			htmlBuilder.append("</pre>");
-			htmlBuilder.append("</td>");
-			htmlBuilder.append("</tr>");
-			htmlBuilder.append("</table>");
-			htmlBuilder.append("</body>");
-			htmlBuilder.append("</html>");
+			htmlBuilder.append("</pre>\n");
+			htmlBuilder.append("</td>\n");
+			htmlBuilder.append("</tr>\n");
+			htmlBuilder.append("</table>\n");
+			htmlBuilder.append("</body>\n");
+			htmlBuilder.append("</html>\n");
 			
 			String html = htmlBuilder.toString();
 			

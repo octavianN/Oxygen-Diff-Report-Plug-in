@@ -39,7 +39,8 @@ public class HTMLContentGenerator implements ContentListener {
 	/**
 	 * 
 	 */
-	private int lastIdx = 0;
+	private int lastIdxForChildDiff = 0;
+	private int lastIdxForParentDiff = 0;
 	/**
 	 * The list with the parent diffs to be added in the content.
 	 */
@@ -175,7 +176,7 @@ public class HTMLContentGenerator implements ContentListener {
 	@Override
 	public void endNode(String content) {
 		copyContent(content);
-		resultedText.append("</span      >");
+		resultedText.append("</span>");
 	}
 
 	int local = 0;
@@ -233,7 +234,7 @@ public class HTMLContentGenerator implements ContentListener {
 			
 			if(currentOffs == start){
 				
-				resultedText.append("<span class=\"diffParentEntry " + getClassForParentDiffType(difference, true)+ "\" id=\"" + i +"\">");
+				resultedText.append("<span class=\"diffParentEntry " + getClassForParentDiffType(difference, true)+ "\" id=\"" + lastIdxForParentDiff +"\">");
 				break;
 			}
 			
@@ -254,6 +255,7 @@ public class HTMLContentGenerator implements ContentListener {
 			if(currentOffs == end){
 				resultedText.append("</span>");
 				parrentDiffs.remove(i);
+				lastIdxForParentDiff ++;
 				break;
 			}
 			
@@ -265,7 +267,8 @@ public class HTMLContentGenerator implements ContentListener {
 	public boolean checkDiff(int currentOffs, String buffer) {
 		
 		boolean foundDiff = false;
-
+		int start = 0;
+		int end = 0;
 		//System.out.println("currentOffs: " + currentOffs);
 		if(!noDuplicates.contains(new Integer(currentOffs))){
 			noDuplicates.add(new Integer(currentOffs));
@@ -278,16 +281,16 @@ public class HTMLContentGenerator implements ContentListener {
 					Difference difference = differences.get(i);
 //					System.out.println("difference: " + difference);
 											
-					int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
-					int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
+					start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
+					end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
 					
 					String diffEntryType = getClassForParentDiffType(difference, false);
 					
 					
 					if( (((currentOffs == start) && (start == end) )) || (((currentOffs == end - 1) && (start == end) )) || ((currentOffs == end - 1 ) && (start + 1 == end)) ){
 						copyContent(buffer);
-						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdx +"\"></span>");
-						lastIdx ++;
+						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdxForChildDiff +"\"></span>");
+						lastIdxForChildDiff ++;
 					
 						foundDiff = true;
 						
@@ -296,8 +299,8 @@ public class HTMLContentGenerator implements ContentListener {
 						local++;
 						
 						copyContent(buffer);
-						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdx +"\">");
-						lastIdx ++;
+						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdxForChildDiff +"\">");
+						lastIdxForChildDiff ++;
 					
 						foundDiff = true;
 
@@ -316,8 +319,11 @@ public class HTMLContentGenerator implements ContentListener {
 					}
 					
 				}
-				
-				checkParentEndDiff(currentOffs);
+				if (currentOffs == end - 1) {
+					checkParentEndDiff(currentOffs);
+				} else {
+					checkParentEndDiff(currentOffs);
+				}
 				
 			}
 		}
