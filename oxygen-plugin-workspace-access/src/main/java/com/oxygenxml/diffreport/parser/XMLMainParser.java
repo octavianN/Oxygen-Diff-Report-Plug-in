@@ -233,6 +233,7 @@ public class XMLMainParser {
 		 										have any of the next tags: CDATA, DOCTYPE, COMMENT or a misspelled 
 		 										permutation of characters in which case i should recognize it as an
 		 										element*/
+			currentElement.elementContent.append((char) currentCharacter);
 			currentCharacter = reader.read();
 
 			if ((char) currentCharacter == 'D') { /*The problem is if by choice I want to give an element

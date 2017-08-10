@@ -234,7 +234,7 @@ public class HTMLContentGenerator implements ContentListener {
 			
 			if(currentOffs == start){
 				
-				resultedText.append("<span class=\"diffParentEntry " + getClassForParentDiffType(difference, true)+ "\" id=\"" + lastIdxForParentDiff +"\">");
+				resultedText.append("<span class=\"diffParentEntry " + getClassForParentDiffType(difference, true)+ "\" data-diff-parent-id=\"" + lastIdxForParentDiff +"\">");
 				break;
 			}
 			
@@ -289,7 +289,7 @@ public class HTMLContentGenerator implements ContentListener {
 					
 					if( (((currentOffs == start) && (start == end) )) || (((currentOffs == end - 1) && (start == end) )) || ((currentOffs == end - 1 ) && (start + 1 == end)) ){
 						copyContent(buffer);
-						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdxForChildDiff +"\"></span>");
+						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\"" + lastIdxForChildDiff +"\"></span>");
 						lastIdxForChildDiff ++;
 					
 						foundDiff = true;
@@ -299,7 +299,7 @@ public class HTMLContentGenerator implements ContentListener {
 						local++;
 						
 						copyContent(buffer);
-						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" id=\"" + lastIdxForChildDiff +"\">");
+						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\"" + lastIdxForChildDiff +"\">");
 						lastIdxForChildDiff ++;
 					
 						foundDiff = true;

@@ -504,7 +504,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			htmlBuilder.append("<pre>\n");
 			htmlBuilder.append("<td>\n");
 			
-			htmlBuilder.append("<canvas id=\"myCanvas\" width=\"40\" style=\"border:1px solid #000000;\">");
+			htmlBuilder.append("<canvas id=\"myCanvas\" width=\"40\" >");
 			
 			htmlBuilder.append("</pre>\n");
 			htmlBuilder.append("</td>\n");
