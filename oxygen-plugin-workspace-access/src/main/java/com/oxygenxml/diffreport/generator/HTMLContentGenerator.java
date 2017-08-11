@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
-import com.ibm.icu.impl.Differ;
 import com.oxygenxml.diffreport.parser.NodeType;
 
 import ro.sync.diff.api.Difference;

@@ -504,7 +504,8 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			htmlBuilder.append("<pre>\n");
 			htmlBuilder.append("<td>\n");
 			
-			htmlBuilder.append("<canvas id=\"myCanvas\" width=\"40\" >");
+			htmlBuilder.append("<canvas id=\"myCanvas\" width=\"40\";\">\n" + 
+					"</canvas>");
 			
 			htmlBuilder.append("</pre>\n");
 			htmlBuilder.append("</td>\n");
@@ -531,6 +532,19 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			htmlBuilder.append("</table>\n");
 			htmlBuilder.append("</body>\n");
 			htmlBuilder.append("</html>\n");
+			
+			//---------------------------------------script----------------------------------------------
+			//	htmlBuilder.append("<canvas id=\"myCanvas\" width=\"40\" ></canvas>\n");
+				htmlBuilder.append("<script>");
+				
+				BufferedReader jsReader = new BufferedReader(new FileReader(new File("C:\\Users\\intern3\\Desktop\\myFiles\\diffSample\\script.js")));
+				while ((line = jsReader.readLine()) != null) {
+					 htmlBuilder.append(line + "\n");
+				 }
+				 jsReader.close();
+				
+				 htmlBuilder.append("</script>"); 
+			 //-------------------------------------endScript---------------------------------------------
 			
 			String html = htmlBuilder.toString();
 			

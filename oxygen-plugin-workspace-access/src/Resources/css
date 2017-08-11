@@ -1,0 +1,130 @@
+Source code in the instance, source or
+annotations. 
+--------------------------------------------*/
+span.Element { 
+	color: #000096; 
+	background-color:inherit;
+}
+
+span.attributeName { 
+	color: #E65C00; 
+	background-color:inherit; 
+} 
+
+span.attributeValue { 
+	color: #993300;
+	background-color:inherit; 
+} 
+
+span.textField {
+	color: #000000;
+	background-color:inherit; 
+} 
+
+span.Comment { 
+	color: #006400;
+	background-color:inherit; 
+} 
+
+span.CDATA {
+	color: #008C00; 
+	background-color:inherit; 
+} 
+
+span.PI {
+	color: #8B26C9; 
+	background-color:inherit;
+} 
+
+span.Doctype {
+	color: #1A1AFF;
+	background-color:inherit;
+}
+
+/* Title sections */
+
+span.qname{
+	color:black;
+	background-color:inherit;
+}
+
+
+
+span.diffParentTypeConflict {
+/*	border-style: ridge; */
+	background-color: #ffe6e6;
+	opacity: 0.81;
+    filter: alpha(opacity=50); 
+}
+
+/*span.diffParentTypeConflict:hover {
+    opacity: 1.0;
+    filter: alpha(opacity=100); 
+}*/
+
+span.diffParentTypeOutgoing {
+/*	border-style: ridge;*/
+	background-color: #f0f5f5;
+	opacity: 0.81;
+    filter: alpha(opacity=50); 
+}
+
+/*span.diffParentTypeOutgoing:hover {
+  	opacity: 1.0;
+    filter: alpha(opacity=100); 
+}*/
+
+span.diffParentTypeIncoming {
+/*	border-style: ridge;*/
+	background-color: #ccf2ff;
+	opacity: 0.81;
+    filter: alpha(opacity=50); 
+}
+
+/*span.diffParentTypeIncoming:hover {
+    opacity: 1.0;
+    filter: alpha(opacity=100); 
+}*/
+
+
+
+span.diffTypeConflict {
+	background-color:#FFD1D1;
+	opacity:0.9;
+}
+
+/*span.diffTypeConflict:hover {
+ 	opacity: 1.0;
+    filter: alpha(opacity=100); /
+    background-color:#FFB3B3;
+}*/
+
+span.diffTypeOutgoing{
+	background-color:#DDDDDD;
+	opacity:0.9;
+}
+
+/*span.diffTypeOutgoing: hover{
+	opacity: 1.0;
+    filter: alpha(opacity=100); 
+    background-color:#CCCCCC;
+}*/
+
+span.diffTypeIncoming {
+	background-color:#D1EDFF;
+	opacity: 0.9;
+}
+
+/*span.diffTypeIncoming: hover {
+	opacity: 1.0;
+    filter: alpha(opacity=100); 
+    background-color:#B3E2FF;
+}
+
+tr {
+	border: 1px solid black;
+	border-collapse: collapse;
+}*/
+
+
+
