@@ -622,41 +622,5 @@ public class XMLMainParser {
 
 		return currentCharacter;
 	}
-
-
-
-
-//	public static void main(String[] args) {
-//		try {
-//			FileReader in = new FileReader("html.in");
-//			Reader buf = (Reader) (new BufferedReader(in));
-//
-//			XMLMainParser parser = new XMLMainParser();
-//			HTMLContentGenerator generator = new HTMLContentGenerator(null, true);
-//			parser.setContentListener(generator);
-//			parser.parseInputIntoHTMLFormat(buf);
-//		//	System.out.println(parser.resultToCheckIfItReadsCorrectly);
-//			System.out.println(generator.getResultedText());
-//
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 

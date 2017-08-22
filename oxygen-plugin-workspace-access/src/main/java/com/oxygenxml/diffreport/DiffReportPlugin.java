@@ -36,7 +36,9 @@ import ro.sync.diff.api.DiffException;
 import ro.sync.diff.api.DiffOptions;
 import ro.sync.diff.api.Difference;
 import ro.sync.diff.api.DifferencePerformer;
+import ro.sync.ecss.component.editor.InputURLEditor;
 import ro.sync.ecss.extensions.api.AuthorDocumentController;
+import ro.sync.ecss.extensions.api.editor.AbstractInplaceEditor;
 import ro.sync.ecss.extensions.api.node.AuthorDocumentFragment;
 import ro.sync.exml.editor.EditorPageConstants;
 import ro.sync.exml.plugin.workspace.WorkspaceAccessPluginExtension;
@@ -44,10 +46,12 @@ import ro.sync.exml.workspace.api.editor.WSEditor;
 import ro.sync.exml.workspace.api.editor.page.author.WSAuthorEditorPage;
 import ro.sync.exml.workspace.api.editor.page.text.WSTextEditorPage;
 import ro.sync.exml.workspace.api.listeners.WSEditorChangeListener;
+import ro.sync.exml.workspace.api.standalone.InputURLChooser;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.standalone.ToolbarComponentsCustomizer;
 import ro.sync.exml.workspace.api.standalone.ToolbarInfo;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
+import ro.sync.ui.InputUrlDialog;
 
 /**
  * Plugin extension - workspace access extension.
@@ -195,7 +199,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 				  
 				  //Add your own toolbar button using our "ro.sync.exml.workspace.api.standalone.ui.ToolbarButton" API component
 				  
-				  
+				 
 				  ToolbarButton toolbarActivationButton = createToolbarButton(pluginWorkspaceAccess);
 				  
 				  comps.add(toolbarActivationButton);
@@ -220,8 +224,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   			@Override
   			public void actionPerformed(ActionEvent e) {
   				if(e.getActionCommand() != null){
-  					DiffReportFileChooserDialogue myDialog = new DiffReportFileChooserDialogue();
-  					myDialog.showDialogue();                                //loads the dialogue
+  					DiffReportFileChooserDialogue myDialog = DiffReportFileChooserDialogue.getInstance();
   					createCompareListener(myDialog, pluginWorkspaceAccess); //if the paths are not null, Compares the files
   				}
   				
@@ -246,33 +249,36 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(e.getActionCommand() != null){
-					saveData(myDialog);   // TODO remove it                                  //saves the paths of the files
-					if(Constants.getFirstFile() != null && Constants.getSecondFile() != null){
-						try {
-							
-							
-							List<Difference> diffs = generateDifferences(myDialog, pluginWorkspaceAccess);
-							
-							generateHTMLFile(diffs);
-							
-							if(Desktop.isDesktopSupported()){
-								URI myPage = new File(Constants.pathToFirstHTML).toURI();
-								Desktop.getDesktop().browse(myPage);
-							}
-							
-							
-						} catch (FileNotFoundException e1) {
-							e1.printStackTrace();
-						}catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+
+					try {
+//						myDialog.getDialog().setModal(false);
+						String leftFile = myDialog.getFirstLabelField().getText();
+						String rightFile = myDialog.getSecondLabelField().getText();
+						// String rightFile =
+						// myDialog.getSecondLabelField().getText();
+						File outputFile = new File(myDialog.getThirdLabelField().getText());
+						generateHTMLFile(new File(leftFile).toURI().toURL(), new File(rightFile).toURI().toURL(),
+								outputFile);
+
+						if (Desktop.isDesktopSupported()) {
+							Desktop.getDesktop().browse(outputFile.toURI());
 						}
+
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
+
+					myDialog.dispose();
+
+				
 				}
 			}
 		};
 		myDialog.getCompareButton().addActionListener(ac);
-		//return ac;
+
   	}
   	
   	/**
@@ -287,62 +293,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   		Constants.setSecondFile(file2);
   	}
   	
-  	/**
-  	 * This method saves the chosen paths to the xml files that has
-  	 * to be compared in two static constants in the Constants class
-  	 * @param dialog
-  	 * @param pluginWorkspaceAccess 
-  	 * @throws FileNotFoundException 
-  	 */
-	private List<Difference> generateDifferences(DiffReportFileChooserDialogue dialog, StandalonePluginWorkspace pluginWorkspaceAccess) throws FileNotFoundException{
 
-  		try {
-			DifferencePerformer diffPerformer = pluginWorkspaceAccess.getCompareUtilAccess().createDiffPerformer();
-			DiffOptions diffOptions = new DiffOptions();
-			diffOptions.setEnableHierarchicalDiff(true);
-			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
-			String firstFile = Constants.getFirstFile();
-			String secondFile = Constants.getSecondFile();
-			
-			
-			URL firstURL = new File(firstFile).toURI().toURL();
-			URL secondURL = new File(secondFile).toURI().toURL();
-			
-			Reader reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
-			Reader reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
-
-//			char[] content =  new char[50];
-//			reader1.read(content, 0, 30);
-//			System.out.println("Reader content before diff:\n");
-//			for(int i = 0; i<30;i++){
-//				if(content[i] == '\r')
-//					System.out.print("\\r");
-//				else if(content[i] == '\n')
-//					System.out.print("\\n");
-//				else if(content[i] == '\t')
-//					System.out.print("\\t");
-//				else
-//					System.out.print(content[i]);
-//			}
-//			reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
-			
-			List<Difference> performDiff = diffPerformer.performDiff(reader1, reader2, null, null, contentType, diffOptions, null);
-			printTheDiferencesInTheConsole(performDiff, reader1, reader2, firstURL, secondURL);
-			
-			reader1.close();
-			reader2.close();
-			
-			return performDiff;
-			
-		} catch (DiffException e) {
-			e.printStackTrace();
-			pluginWorkspaceAccess.showErrorMessage("Cannot create diff performer: " + e.getMessage());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-  		return null;
-  		
-  	}
   	
   	/**
   	 * Afisaza in consola diferentele dintre cele doua XML-uri
@@ -390,6 +341,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   	 * @param reader the current file we are reading from
   	 * @param difference the difference we are interested in
   	 */
+	@SuppressWarnings("unused")
 	private void printTheDiferencesInTheConsoleCharacterParser(Reader reader, Difference difference){
 		int i, contor = 0;
 		
@@ -421,25 +373,75 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 	 * Uses the helpGenerateHTML method
 	 * @param diffs
 	 */
-	private void generateHTMLFile(List<Difference> diffs){
+	private void generateHTMLFile(URL firstURL, URL secondURL, File outputFile){
 		
-		File htmlForFirstFile= new File(Constants.pathToFirstHTML);
+		File htmlForFirstFile= outputFile;
 	//	File htmlForSecondFile = new File(Constants.pathToSecondHTML);
 		
+		Reader reader1 = null;
+		Reader reader2 = null;
 		try{
+			DifferencePerformer diffPerformer = pluginWorkspaceAccess.getCompareUtilAccess().createDiffPerformer();
+			DiffOptions diffOptions = new DiffOptions();
+			diffOptions.setEnableHierarchicalDiff(true);
+			//diffOptions.setAlgorithm(DiffOptions.XML_FAST);
+			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
+
+			List<Difference> diffs;
+			try {
+			reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
+			reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
+
+			diffs = diffPerformer.performDiff(reader1, reader2, null, null, contentType, diffOptions, null);
+			} finally {
+				if (reader1 != null) {
+					try {
+						reader1.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				if (reader2 != null) {
+					try {
+						reader2.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
 			
-			URL firstURL = new File(Constants.getFirstFile()).toURI().toURL();
-			URL secondURL = new File(Constants.getSecondFile()).toURI().toURL();
 			
-			Reader reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
-			Reader reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 			
+			reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
+			reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 			generateHTMLFile(htmlForFirstFile, reader1, reader2, diffs);
 			
 		}catch (MalformedURLException e) {
 			e.printStackTrace();
 		}catch (IOException e) {
 			e.printStackTrace();
+		} catch (DiffException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (reader1 != null) {
+				try {
+					reader1.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (reader2 != null) {
+				try {
+					reader2.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		
 	}
@@ -465,7 +467,9 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			
 			
 			/*Adding CSS -------------------------------------------------------*/
-			BufferedReader cssReader = new BufferedReader(new FileReader(new File("C:\\Users\\intern3\\Desktop\\myFiles\\diffSample\\css")));
+//			BufferedReader cssReader = new BufferedReader(new FileReader(new File("C:\\Users\\intern3\\Desktop\\myFiles\\diffSample\\css")));
+			BufferedReader cssReader = new BufferedReader(new FileReader(new File(
+					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\css")));
 			 String line;
 			 while ((line = cssReader.readLine()) != null) {
 				 htmlBuilder.append(line + "\n");
@@ -477,9 +481,22 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			
 			/*The first document----------------------------------------------*/
 			htmlBuilder.append("<body>\n");
-			htmlBuilder.append("<table>\n");
-			htmlBuilder.append("<tr>\n");
-			htmlBuilder.append("<td>\n");
+			htmlBuilder.append("<table align=\"center\">\n");
+			
+			htmlBuilder.append("<tr>\n"
+					+ "<td class=\"ButtonsCheck\" colspan=\"3\">"
+					+ "<button class=\"NextButtonChild Buttons\" onclick=\"nextChildDiff()\" style=\"height:30px;width:50px\"><b> &#11015; </b></button>  "
+					+ "<button class=\"NextButton Buttons\" onclick=\"nextDiff()\" style=\"height:30px;width:50px\"><b> &#11247; </b></button>  "
+					+ "<button class=\"SwapButton Buttons\" onclick=\"swapTexts()\" ><b> swap </b></button>  "
+					+ "<button class=\"PreviousButton Buttons\" onclick=\"previousDiff()\" style=\"height:30px;width:50px\"><b> &#11245; </b></button>"
+					+ "<button class=\"PreviousButtonChild Buttons\" onclick=\"previousChildDiff()\" style=\"height:30px;width:50px\"><b> &#11014; </b></button>"
+					+ "</td> \n");
+			htmlBuilder.append("</tr >\n");
+			
+			
+			
+			htmlBuilder.append("<tr id=\"tr1\">\n");
+			htmlBuilder.append("<td id = \"b1\" class=\"spaceUnder block1\">\n");
 			htmlBuilder.append("<pre>\n");
 			
 			XMLMainParser parser = new XMLMainParser();
@@ -501,17 +518,17 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			
 			/*The canvas Section*/
 			
-			htmlBuilder.append("<pre>\n");
-			htmlBuilder.append("<td>\n");
+//			htmlBuilder.append("<pre>\n");
+			htmlBuilder.append("<td class=\"canvasTD\">\n");
 			
-			htmlBuilder.append("<canvas id=\"myCanvas\" width=\"40\";\">\n" + 
-					"</canvas>");
+			htmlBuilder.append("<div class=\"canvasContainer\"><canvas id=\"myCanvas\" width=\"40\"  height=\"300\";\">\n" + 
+					"</canvas></div>");
 			
-			htmlBuilder.append("</pre>\n");
+//			htmlBuilder.append("</pre>\n");
 			htmlBuilder.append("</td>\n");
 			
 			/*The second document----------------------------------------------*/
-			htmlBuilder.append("<td>\n");
+			htmlBuilder.append("<td id=\"b2\" class=\"spaceUnder block2\">\n");
 			
 
 			htmlBuilder.append("<pre>\n");
@@ -533,19 +550,22 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			htmlBuilder.append("</body>\n");
 			htmlBuilder.append("</html>\n");
 			
-			//---------------------------------------script----------------------------------------------
-			//	htmlBuilder.append("<canvas id=\"myCanvas\" width=\"40\" ></canvas>\n");
-				htmlBuilder.append("<script>");
-				
-				BufferedReader jsReader = new BufferedReader(new FileReader(new File("C:\\Users\\intern3\\Desktop\\myFiles\\diffSample\\script.js")));
-				while ((line = jsReader.readLine()) != null) {
-					 htmlBuilder.append(line + "\n");
-				 }
-				 jsReader.close();
-				
-				 htmlBuilder.append("</script>"); 
-			 //-------------------------------------endScript---------------------------------------------
-			
+			// ---------------------------------------script----------------------------------------------
+
+			htmlBuilder.append("<script>");
+
+//			BufferedReader jsReader = new BufferedReader(
+//					new FileReader(new File("C:\\Users\\intern3\\Desktop\\myFiles\\diffSample\\script.js")));
+			BufferedReader jsReader = new BufferedReader(new FileReader(new File(
+					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\script.js")));
+			while ((line = jsReader.readLine()) != null) {
+				htmlBuilder.append(line + "\n");
+			}
+			jsReader.close();
+
+			htmlBuilder.append("</script>");
+			// -------------------------------------endScript---------------------------------------------
+
 			String html = htmlBuilder.toString();
 			
 			

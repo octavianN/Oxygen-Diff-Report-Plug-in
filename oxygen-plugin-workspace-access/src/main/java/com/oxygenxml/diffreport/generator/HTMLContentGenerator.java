@@ -45,7 +45,9 @@ public class HTMLContentGenerator implements ContentListener {
 	 */
 	private List<DiffEntry> parrentDiffs;
 	
-	private TreeSet<Integer> noDuplicates; //checks index duplicates // TODO remove
+	private int localCount = 0;
+	
+	private int noDuplicates; 
 	
 	// TODO remove
 	Comparator<Integer> comparator = new Comparator<Integer>() {
@@ -55,29 +57,6 @@ public class HTMLContentGenerator implements ContentListener {
         }
     };
     
-    // TODO remove
-    Comparator<DiffEntry> compareTwoDifferences = new Comparator<DiffEntry>() {
-        @Override
-        public int compare(DiffEntry diff1, DiffEntry diff2) {
-            if(diff1.getLeftIntervalStart() == diff2.getLeftIntervalStart()){
-            	if(diff1.getLeftIntervalStart() == diff2.getLeftIntervalStart()){
-            		if(diff1.getRightIntervalStart() == diff2.getRightIntervalStart()){
-            			if(diff1.getRightIntervalEnd() == diff2.getRightIntervalEnd()){
-            				return 0;
-            			}else{
-            				return diff1.getRightIntervalEnd() - diff2.getRightIntervalEnd();
-            			}
-            		}else{
-            			return diff1.getRightIntervalStart() - diff2.getRightIntervalStart();
-            		}
-            	}else{
-            		return diff1.getLeftIntervalStart() - diff2.getLeftIntervalStart();
-            	}
-            }else{
-            	return diff1.getLeftIntervalStart() - diff2.getLeftIntervalStart();
-            }
-        }
-    };
 	
     /**
      * Constructor.
@@ -102,6 +81,8 @@ public class HTMLContentGenerator implements ContentListener {
 		while(!parentDiffsDuplicateRemover.isEmpty()){
 			DiffEntry diff = parentDiffsDuplicateRemover.pollFirst();
 			parrentDiffs.add(diff);
+			
+			System.out.println(diff.getLeftIntervalStart() + " "+  diff.getLeftIntervalEnd() + "---" + diff.getRightIntervalStart() + " " + diff.getRightIntervalEnd()); 
 		}
 		
 		
@@ -109,7 +90,7 @@ public class HTMLContentGenerator implements ContentListener {
 		resultedText = new StringBuilder();
 		
 		// TODO remove
-		noDuplicates = new TreeSet<Integer>(comparator);
+		noDuplicates = -2;
 		//noDuplicates.add(Integer.MAX_VALUE);
 	}
 	
@@ -118,6 +99,9 @@ public class HTMLContentGenerator implements ContentListener {
 	 * @return The resulted HTML generated from the given content.
 	 */
 	public String getResultedText() {
+		if(localCount == 1){
+			resultedText.append("</div>");
+		}
 		System.out.println(resultedText.toString());
 		return resultedText.toString();
 	}
@@ -226,14 +210,16 @@ public class HTMLContentGenerator implements ContentListener {
 	 */
 	private void checkParentStartDiff(int currentOffs){
 		
+//		System.err.println("currentOfset: " + currentOffs);
+		
 		for(int i = 0 ; i < parrentDiffs.size(); i++){
 			Difference difference = parrentDiffs.get(i);
 			
 			int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 			
 			if(currentOffs == start){
-				
-				resultedText.append("<span class=\"diffParentEntry " + getClassForParentDiffType(difference, true)+ "\" data-diff-parent-id=\"" + lastIdxForParentDiff +"\">");
+				localCount++;
+				resultedText.append("<div class=\"diffParentEntry " + getClassForParentDiffType(difference, true)+ "\" data-diff-parent-id=\"" + lastIdxForParentDiff +"\">");
 				break;
 			}
 			
@@ -252,7 +238,8 @@ public class HTMLContentGenerator implements ContentListener {
 			int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
 			
 			if(currentOffs == end){
-				resultedText.append("</span>");
+				localCount--;
+				resultedText.append("</div>");
 				parrentDiffs.remove(i);
 				lastIdxForParentDiff ++;
 				break;
@@ -268,55 +255,60 @@ public class HTMLContentGenerator implements ContentListener {
 		boolean foundDiff = false;
 		int start = 0;
 		int end = 0;
-		//System.out.println("currentOffs: " + currentOffs);
-		if(!noDuplicates.contains(new Integer(currentOffs))){
-			noDuplicates.add(new Integer(currentOffs));
-		
+		if(currentOffs > noDuplicates){
+			noDuplicates = currentOffs;
 			if(differences != null){
 				
 				checkParentStartDiff(currentOffs);
 				
 				for (int i = 0; i < differences.size(); i++) {
 					Difference difference = differences.get(i);
-//					System.out.println("difference: " + difference);
 											
 					start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 					end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
 					
 					String diffEntryType = getClassForParentDiffType(difference, false);
 					
-					
-					if( (((currentOffs == start) && (start == end) )) || (((currentOffs == end - 1) && (start == end) )) || ((currentOffs == end - 1 ) && (start + 1 == end)) ){
-						copyContent(buffer);
-						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\"" + lastIdxForChildDiff +"\"></span>");
-						lastIdxForChildDiff ++;
-					
-						foundDiff = true;
-						
-						break;
-					} else if (currentOffs == start) {
-						local++;
-						
-						copyContent(buffer);
-						resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\"" + lastIdxForChildDiff +"\">");
-						lastIdxForChildDiff ++;
-					
-						foundDiff = true;
+					if (lastIdxForChildDiff < differences.size()) {
+						if ((((currentOffs == start) && (start == end))) || 
+//								 (((currentOffs == end - 1) && (start == end))) || 
+								((currentOffs == end - 1) && (start + 1 == end))) {
+							
+							copyContent(buffer);
+							resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\""
+									+ lastIdxForChildDiff + "\"></span   >");
 
-						break;
-					} else if (currentOffs == end - 1) {
-						
-						//System.out.println("end " + end + " start: "+ start);
-						
-						local--;
-						
-						copyContent(buffer);
-						resultedText.append("</span>");
-						foundDiff = true;
-						
-						break;
+							lastIdxForChildDiff++;
+
+							foundDiff = true;
+
+							break;
+						} else {
+							if (currentOffs == end - 1) {
+
+								local--;
+
+								copyContent(buffer);
+								resultedText.append("</span>");
+								foundDiff = true;
+
+								break;
+							}
+							if (currentOffs == start) {
+								local++;
+
+								copyContent(buffer);
+								resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\""
+										+ lastIdxForChildDiff + "\">");
+								lastIdxForChildDiff++;
+
+								foundDiff = true;
+
+								break;
+							}
+						}
+
 					}
-					
 				}
 				if (currentOffs == end - 1) {
 					checkParentEndDiff(currentOffs);
