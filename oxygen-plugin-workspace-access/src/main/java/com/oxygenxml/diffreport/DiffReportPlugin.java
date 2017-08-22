@@ -56,7 +56,7 @@ import ro.sync.ui.InputUrlDialog;
 /**
  * Plugin extension - workspace access extension.
  */
-public class DiffReportPlugin implements WorkspaceAccessPluginExtension {
+public class DiffReportPlugin implements WorkspaceAccessPluginExtension, ReportGenerator {
   /**
    * The custom messages area. A sample component added to your custom view.
    */
@@ -198,10 +198,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 				  
 				  
 				  //Add your own toolbar button using our "ro.sync.exml.workspace.api.standalone.ui.ToolbarButton" API component
-				  
-				 
 				  ToolbarButton toolbarActivationButton = createToolbarButton(pluginWorkspaceAccess);
-				  
 				  comps.add(toolbarActivationButton);
 				  toolbarInfo.setComponents(comps.toArray(new JComponent[0]));
 			  } 
@@ -219,80 +216,69 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
    * @return the button 
    */
   	private ToolbarButton createToolbarButton(final StandalonePluginWorkspace pluginWorkspaceAccess){
-  		@SuppressWarnings("serial")
-		AbstractAction toolbarButtonAction = new AbstractAction("Show Diff") {
+  		
+		@SuppressWarnings("serial")
+		AbstractAction showDiffAction = new AbstractAction("Show Diff") {
   			@Override
   			public void actionPerformed(ActionEvent e) {
   				if(e.getActionCommand() != null){
   					DiffReportFileChooserDialogue myDialog = DiffReportFileChooserDialogue.getInstance();
-  					createCompareListener(myDialog, pluginWorkspaceAccess); //if the paths are not null, Compares the files
+  					if (myDialog.getReportGenerator() == null) {
+  						myDialog.setReportGenerator(DiffReportPlugin.this);
+  					}
+  					myDialog.setVisible(true);
   				}
   				
   			}
   		};
-  		ToolbarButton button = new ToolbarButton(toolbarButtonAction, true);
+  		ToolbarButton button = new ToolbarButton(showDiffAction, true);
   		button.setIcon(new ImageIcon("img.jpg"));
   		return button;
   	}
   	
   	
-  	/**
-  	 * Takes the PopUp dialogue an adds the Listener to the Compare button
-  	 * so that if both paths are not null, you may proceed to compare the
-  	 * given files
-  	 * @param myDialog
-  	 * @param pluginWorkspaceAccess
-  	 */
-  	private void createCompareListener(final DiffReportFileChooserDialogue myDialog, final StandalonePluginWorkspace pluginWorkspaceAccess){
-  		ActionListener ac = new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(e.getActionCommand() != null){
-
-					try {
-//						myDialog.getDialog().setModal(false);
-						String leftFile = myDialog.getFirstLabelField().getText();
-						String rightFile = myDialog.getSecondLabelField().getText();
-						// String rightFile =
-						// myDialog.getSecondLabelField().getText();
-						File outputFile = new File(myDialog.getThirdLabelField().getText());
-						generateHTMLFile(new File(leftFile).toURI().toURL(), new File(rightFile).toURI().toURL(),
-								outputFile);
-
-						if (Desktop.isDesktopSupported()) {
-							Desktop.getDesktop().browse(outputFile.toURI());
-						}
-
-					} catch (FileNotFoundException e1) {
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-
-					myDialog.dispose();
-
-				
-				}
-			}
-		};
-		myDialog.getCompareButton().addActionListener(ac);
-
-  	}
-  	
-  	/**
-  	 * Saves the paths in two constants
-  	 * @param dialog
-  	 */
-  	public void saveData (DiffReportFileChooserDialogue dialog){
-  		String file1 = dialog.getFirstLabelField().getText();
-  		String file2 = dialog.getSecondLabelField().getText();
-  		//System.out.println("First file: " + file1 + "\n" + "Second file: " + file2);
-  		Constants.setFirstFile(file1);
-  		Constants.setSecondFile(file2);
-  	}
-  	
+//  	/**
+//  	 * Takes the PopUp dialogue an adds the Listener to the Compare button
+//  	 * so that if both paths are not null, you may proceed to compare the
+//  	 * given files
+//  	 * @param myDialog
+//  	 */
+//  	private void createCompareListener(final DiffReportFileChooserDialogue myDialog){
+//  		ActionListener ac = new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				if(e.getActionCommand() != null){
+//
+//					try {
+////						myDialog.getDialog().setModal(false);
+//						String leftFile = myDialog.getFirstLabelField().getText();
+//						String rightFile = myDialog.getSecondLabelField().getText();
+//						// String rightFile =
+//						// myDialog.getSecondLabelField().getText();
+//						File outputFile = new File(myDialog.getThirdLabelField().getText());
+//						generateHTMLFile(new File(leftFile).toURI().toURL(), new File(rightFile).toURI().toURL(),
+//								outputFile);
+//
+//						if (Desktop.isDesktopSupported()) {
+//							Desktop.getDesktop().browse(outputFile.toURI());
+//						}
+//
+//					} catch (FileNotFoundException e1) {
+//						e1.printStackTrace();
+//					} catch (IOException e1) {
+//						// TODO Auto-generated catch block
+//						e1.printStackTrace();
+//					} finally {
+//						myDialog.setVisible(false);
+//					}
+//				
+//				}
+//			}
+//		};
+//		myDialog.getCompareButton().addActionListener(ac);
+//
+//  	}
 
   	
   	/**
@@ -373,7 +359,8 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 	 * Uses the helpGenerateHTML method
 	 * @param diffs
 	 */
-	private void generateHTMLFile(URL firstURL, URL secondURL, File outputFile){
+	@Override
+	public void generateHTMLReport(URL firstURL, URL secondURL, File outputFile){
 		
 		File htmlForFirstFile= outputFile;
 	//	File htmlForSecondFile = new File(Constants.pathToSecondHTML);

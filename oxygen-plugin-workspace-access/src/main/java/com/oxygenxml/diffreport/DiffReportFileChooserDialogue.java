@@ -3,10 +3,9 @@ package com.oxygenxml.diffreport;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dialog.ModalityType;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -14,6 +13,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -26,29 +27,47 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
-
-
-
-public class DiffReportFileChooserDialogue {
+/**
+ * 
+ * @author intern3
+ *
+ */
+public class DiffReportFileChooserDialogue extends JDialog {
 	
-	private JButton compareButton;
-	private JDialog dialog;
-	private JPanel mainPanel;
-	private JButton okButton;
+	private JButton generateDiffButton;
 	private JTextField firstLabelField;
 	private JTextField secondLabelField;
 	private JTextField thirdLabelField;
-	private ActionListener CompareButtonActionListener;
+	private ReportGenerator reportGenerator; 
 	
+	/**
+	 * 
+	 */
 	private static volatile DiffReportFileChooserDialogue instance;
 
-	//Constructor----------------------
+	/**
+	 * Constructor.
+	 */
 	private DiffReportFileChooserDialogue() {
-		dialog = new JDialog();
-		showDialogue();
-	}
-	//----------------------------------
+		this.setModal(true);
+		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				dispose();
+			}
+		});
 
+		this.add(crateMainPanel(), BorderLayout.CENTER);
+		this.setSize(380, 200);
+		this.setLocationRelativeTo(null);
+		this.setTitle("Diff Report Generator");
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
     public static DiffReportFileChooserDialogue getInstance() {
         if (instance == null) {
             synchronized (DiffReportFileChooserDialogue.class) {
@@ -73,17 +92,8 @@ public class DiffReportFileChooserDialogue {
 	}
 	
 	
-	public JDialog getDialog(){
-		return dialog;
-	}
-	
 	public JButton getCompareButton() {
-		return compareButton;
-	}
-
-
-	public void setCompareButton(JButton compareButton) {
-		this.compareButton = compareButton;
+		return generateDiffButton;
 	}
 
 
@@ -106,45 +116,24 @@ public class DiffReportFileChooserDialogue {
 	}
 
 
-	public JButton getOkButton() {
-		return okButton;
-	}
-
-	public void setOkButton(JButton okButton) {
-		this.okButton = okButton;
-	}
-
-	public void dispose(){
-		dialog.dispose();
-		instance = null;
-	}
+//	public void dispose(){
+//		dialog.dispose();
+//		instance = null;
+//	}
 
 	
 
-	/**
-	 * The main function that is invoked in the Constructor
-	 * It creates the Dialog that has the file chooser and
-	 * two buttons
-	 */
-	
-	public void showDialogue() {
-		dialog.setModalityType(ModalityType.TOOLKIT_MODAL);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosed(WindowEvent e) {
-				dispose();
-			}
-		});
-
-		dialog.add(crateMainPanel(), BorderLayout.CENTER);
-	    dialog.setSize(380, 200);
-	    dialog.setLocationRelativeTo(null);
-	    dialog.setTitle("Diff Report Generator");
-	    dialog.setVisible(true);
-
-	}
-	
+//	/**
+//	 * The main function that is invoked in the Constructor
+//	 * It creates the Dialog that has the file chooser and
+//	 * two buttons
+//	 */
+//	
+//	public void showDialogue() {
+//	    dialog.setVisible(true);
+//
+//	}
+//	
 	/**
 	 * In this function the Panel that contains the file choosers and
 	 * the one that has the buttons are unified into one panel
@@ -159,17 +148,17 @@ public class DiffReportFileChooserDialogue {
 
 		//add fileChooserPanel to main panel with constraints
 		constraints.fill = GridBagConstraints.BOTH;
-		constraints.anchor = GridBagConstraints.WEST;
+//		constraints.anchor = GridBagConstraints.WEST;
 		constraints.gridx = 0;
 		constraints.gridy = 0;
-		constraints.weightx = 1;
+//		constraints.weightx = 1;
 		mainPanel.add(fileChooserPanel,constraints);
 		
 		//add buttonPanel to main panel with constraints
 		constraints.gridy++;
 		constraints.anchor = GridBagConstraints.SOUTHEAST;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.weightx = 0;
+//		constraints.weightx = 1;
 		mainPanel.add(buttonPanel, constraints);
 
 		
@@ -218,7 +207,7 @@ public class DiffReportFileChooserDialogue {
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.weightx = 0;
-		constraints.anchor = GridBagConstraints.WEST;
+//		constraints.anchor = GridBagConstraints.WEST;
 		panel.add(fileOne_Label, constraints);
 		
 		//add the TextField for first Path
@@ -228,8 +217,8 @@ public class DiffReportFileChooserDialogue {
 		
 		//add the first browse Button
 		constraints.gridx++;
-		constraints.gridwidth = 1;
-		constraints.weightx = 0;
+		constraints.gridwidth = 0;
+//		constraints.weightx = 0;
 		panel.add(browseButton1, constraints);
 		
 		//add the second label----------------------
@@ -246,7 +235,7 @@ public class DiffReportFileChooserDialogue {
 		
 		//add the second browse Button
 		constraints.gridx++;
-		constraints.gridwidth = 1;
+		constraints.gridwidth = 0;
 		constraints.weightx = 0;
 		panel.add(browseButton2, constraints);
 		
@@ -291,13 +280,11 @@ public class DiffReportFileChooserDialogue {
 				fileChooser.setFileFilter(filter);
 
 				int returnValue = fileChooser.showOpenDialog(null);
-				// int returnValue = jfc.showSaveDialog(null);
 
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					File selectedFile = fileChooser.getSelectedFile();
 					field.setText(selectedFile.toString());
 					
-					//System.out.println(selectedFile.getAbsolutePath());
 				}
 			}
 		};
@@ -321,9 +308,15 @@ public class DiffReportFileChooserDialogue {
 		
 		
 		//Compare button starts here-------------------------------------------------------
-		compareButton = new JButton("Generate Diff");
-		compareButton.setPreferredSize(new Dimension(75, 25));
-		panel.add(compareButton);
+		generateDiffButton = new JButton("Generate Diff");
+		generateDiffButton.setPreferredSize(new Dimension(75, 25));
+		generateDiffButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				generateDiff();
+			}
+		});
+		panel.add(generateDiffButton);
 		panel.add(box1);
 		
 		//ends here--------------------------------------------------------------------
@@ -354,6 +347,47 @@ public class DiffReportFileChooserDialogue {
 		        UIManager.setLookAndFeel(
 		            UIManager.getSystemLookAndFeelClassName());
 		    } catch (Exception e) { }
-		 DiffReportFileChooserDialogue program = new DiffReportFileChooserDialogue();
+		 DiffReportFileChooserDialogue dial = new DiffReportFileChooserDialogue();
+		 dial.setVisible(true);
+	}
+	
+	/**
+	 * 
+	 */
+	private void generateDiff() {
+
+		try {
+//			myDialog.getDialog().setModal(false);
+			String leftFile = getFirstLabelField().getText();
+			String rightFile = getSecondLabelField().getText();
+			// String rightFile =
+			// myDialog.getSecondLabelField().getText();
+			File outputFile = new File(getThirdLabelField().getText());
+			reportGenerator.generateHTMLReport(new File(leftFile).toURI().toURL(), new File(rightFile).toURI().toURL(),
+					outputFile);
+
+			if (Desktop.isDesktopSupported()) {
+				Desktop.getDesktop().browse(outputFile.toURI());
+			}
+
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} finally {
+			setVisible(false);
+		}
+	
+	
+	}
+
+	public void setReportGenerator(ReportGenerator reportGenerator) {
+		this.reportGenerator = reportGenerator;
+	}
+
+	public Object getReportGenerator() {
+		// TODO Auto-generated method stub
+		return this.reportGenerator;
 	}
 }
