@@ -8,8 +8,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -24,8 +26,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
+
+import org.apache.batik.ext.swing.GridBagConstants;
 
 /**
  * 
@@ -54,14 +59,19 @@ public class DiffReportFileChooserDialogue extends JDialog {
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
-				dispose();
+				DiffReportFileChooserDialogue.this.setVisible(false);
 			}
 		});
 
 		this.add(crateMainPanel(), BorderLayout.CENTER);
-		this.setSize(380, 200);
+//		this.setSize(380, 200);
+		this.setPreferredSize(new Dimension(400, 200));
+//		this.setResizable(false);
+		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setTitle("Diff Report Generator");
+		
+		
 	}
 
 	/**
@@ -116,24 +126,7 @@ public class DiffReportFileChooserDialogue extends JDialog {
 	}
 
 
-//	public void dispose(){
-//		dialog.dispose();
-//		instance = null;
-//	}
 
-	
-
-//	/**
-//	 * The main function that is invoked in the Constructor
-//	 * It creates the Dialog that has the file chooser and
-//	 * two buttons
-//	 */
-//	
-//	public void showDialogue() {
-//	    dialog.setVisible(true);
-//
-//	}
-//	
 	/**
 	 * In this function the Panel that contains the file choosers and
 	 * the one that has the buttons are unified into one panel
@@ -141,25 +134,27 @@ public class DiffReportFileChooserDialogue extends JDialog {
 	 */
 	
 	private JPanel crateMainPanel(){
-		JPanel mainPanel = new JPanel(new GridBagLayout());	
-		GridBagConstraints constraints = new GridBagConstraints();
+		BorderLayout layout = new BorderLayout();
+		JPanel mainPanel = new JPanel(layout);	
+//		GridBagConstraints constraints = new GridBagConstraints();
 		JPanel fileChooserPanel = createFileChooserPanel();
 		JPanel buttonPanel = createButtons();
-
-		//add fileChooserPanel to main panel with constraints
-		constraints.fill = GridBagConstraints.BOTH;
-//		constraints.anchor = GridBagConstraints.WEST;
-		constraints.gridx = 0;
-		constraints.gridy = 0;
-//		constraints.weightx = 1;
-		mainPanel.add(fileChooserPanel,constraints);
+		mainPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
+//		//add fileChooserPanel to main panel with constraints
+//		constraints.fill = GridBagConstraints.BOTH;
+////		constraints.anchor = GridBagConstraints.WEST;
+//		constraints.gridx = 0;
+//		constraints.gridy = 0;
+////		constraints.weightx = 1;
+		fileChooserPanel.setBorder(new EmptyBorder(15, 5, 15, 5));
+		mainPanel.add(fileChooserPanel, BorderLayout.CENTER);
 		
-		//add buttonPanel to main panel with constraints
-		constraints.gridy++;
-		constraints.anchor = GridBagConstraints.SOUTHEAST;
-		constraints.fill = GridBagConstraints.HORIZONTAL;
-//		constraints.weightx = 1;
-		mainPanel.add(buttonPanel, constraints);
+//		//add buttonPanel to main panel with constraints
+//		constraints.gridy++;
+//		constraints.anchor = GridBagConstraints.SOUTHEAST;
+//		constraints.fill = GridBagConstraints.HORIZONTAL;
+////		constraints.weightx = 1;
+		mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
 		
 		return mainPanel;
@@ -172,14 +167,16 @@ public class DiffReportFileChooserDialogue extends JDialog {
 	 * @return the panel with all the given components
 	 */
 	private JPanel createFileChooserPanel(){
-		JPanel panel = new JPanel(new GridBagLayout());
+		BorderLayout layout = new BorderLayout();
+		JPanel panel = new JPanel(layout);
 		GridBagConstraints constraints = new GridBagConstraints();
 		
-		JLabel fileOne_Label = new JLabel("Left File: ");
+		JLabel fileOne_Label = new JLabel("Left File:  ");
 		JLabel fileTwo_Label = new JLabel("Right File: ");
-		JLabel fileThree_Label = new JLabel("Output: ");
+		JLabel fileThree_Label = new JLabel("Output:  ");
 		
 		firstLabelField = new JTextField(20);
+//		firstLabelField.
 		secondLabelField = new JTextField(20);
 		thirdLabelField = new JTextField(20);
 		
@@ -203,60 +200,65 @@ public class DiffReportFileChooserDialogue extends JDialog {
 		thirdLabelField.setBackground(Color.LIGHT_GRAY);
 		thirdLabelField.setHorizontalAlignment(JTextField.CENTER);
 		
+		JPanel auxiliaryPanel;
+		
 		// add the first label-----------------
+//		constraints.gridx = 0;
+//		constraints.gridy = 0;
+//		constraints.anchor = GridBagConstraints.WEST;
+		auxiliaryPanel = createFilePannel(fileOne_Label, firstLabelField, browseButton1, 16);
+		panel.add(auxiliaryPanel, BorderLayout.PAGE_START);
+		
+		//add the second label----------------------
+//		constraints.gridx = 0;
+//		constraints.gridy ++ ;
+		auxiliaryPanel = createFilePannel(fileTwo_Label, secondLabelField, browseButton2, 13);
+		panel.add(auxiliaryPanel, BorderLayout.CENTER);
+		
+		
+		//add the third label---------------------
+//		constraints.gridx = 0;
+//		constraints.gridy++;
+		auxiliaryPanel = createFilePannel(fileThree_Label, thirdLabelField, browseButton3, 20);
+		panel.add(auxiliaryPanel, BorderLayout.PAGE_END);
+
+		
+
+		
+		return panel;
+	}
+	
+	private JPanel createFilePannel(JLabel file, JTextField field, JButton button, int ipadxMargin) {
+		GridBagLayout layout = new GridBagLayout();
+		JPanel panel = new JPanel(layout);
+		GridBagConstraints constraints = new GridBagConstraints();
+		
+		constraints.anchor = GridBagConstants.WEST;
+		constraints.fill = GridBagConstants.NONE;
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.weightx = 0;
-//		constraints.anchor = GridBagConstraints.WEST;
-		panel.add(fileOne_Label, constraints);
+		constraints.weighty = 0;
+		constraints.ipadx = ipadxMargin;
+		panel.add(file, constraints);
 		
-		//add the TextField for first Path
-		constraints.gridx++;
-		constraints.weightx = 1;
-		panel.add(firstLabelField, constraints);
 		
-		//add the first browse Button
-		constraints.gridx++;
-		constraints.gridwidth = 0;
-//		constraints.weightx = 0;
-		panel.add(browseButton1, constraints);
-		
-		//add the second label----------------------
-		constraints.gridx = 0;
-		constraints.gridy ++ ;
-		constraints.weightx = 0;
-		constraints.anchor = GridBagConstraints.WEST;
-		panel.add(fileTwo_Label, constraints);
-		
-		//add the TextField for the second Path
+		constraints.anchor = GridBagConstants.CENTER;
+		constraints.fill = GridBagConstants.BOTH;
 		constraints.gridx ++;
 		constraints.weightx = 1;
-		panel.add(secondLabelField, constraints);
+		constraints.weighty = 1;
+		panel.add(field, constraints);
 		
-		//add the second browse Button
-		constraints.gridx++;
-		constraints.gridwidth = 0;
-		constraints.weightx = 0;
-		panel.add(browseButton2, constraints);
 		
-		//add the third label---------------------
-		constraints.gridx = 0;
-		constraints.gridy++;
+		constraints.anchor = GridBagConstants.EAST;
+		constraints.fill = GridBagConstants.NONE;
+		constraints.gridx ++;
 		constraints.weightx = 0;
-		constraints.anchor = GridBagConstraints.WEST;
-		panel.add(fileThree_Label, constraints);
-
-		// add the TextField for the second Path
-		constraints.gridx++;
-		constraints.weightx = 1;
-		panel.add(thirdLabelField, constraints);
-
-		// add the second browse Button
-		constraints.gridx++;
-		constraints.gridwidth = 1;
-		constraints.weightx = 0;
-		panel.add(browseButton3, constraints);
-
+		constraints.ipadx = 0;
+		constraints.weighty = 0;
+		constraints.insets = new Insets(0, 17, 0, 0);
+		panel.add(button, constraints);
 		
 		return panel;
 	}
@@ -294,7 +296,7 @@ public class DiffReportFileChooserDialogue extends JDialog {
 	}
 	
 	/**
-	 * Creating the panel which contains the two functions "Compare" and
+	 * Creating the panel which contains the two functions "Generate Diff" and
 	 * "Cancel" aligned at the right bottom corner 
 	 * @return The panel with the two buttons: Compare and Cancel
 	 */
@@ -307,9 +309,9 @@ public class DiffReportFileChooserDialogue extends JDialog {
 		box2.setBackground(Color.WHITE);
 		
 		
-		//Compare button starts here-------------------------------------------------------
+		//Generate Diff button starts here-------------------------------------------------------
 		generateDiffButton = new JButton("Generate Diff");
-		generateDiffButton.setPreferredSize(new Dimension(75, 25));
+		generateDiffButton.setPreferredSize(new Dimension(97, 25));
 		generateDiffButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -330,7 +332,7 @@ public class DiffReportFileChooserDialogue extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(e.getActionCommand() != null)
-					dispose();
+					setVisible(false);
 			}
 		});
 		cancelButton.setPreferredSize(new Dimension(75, 25));

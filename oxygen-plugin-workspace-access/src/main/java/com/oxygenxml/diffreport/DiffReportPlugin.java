@@ -28,7 +28,6 @@ import javax.swing.text.BadLocationException;
 import com.ibm.icu.impl.Differ;
 import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
 import com.oxygenxml.diffreport.parser.XMLMainParser;
-import com.oxygenxml.sdksamples.workspace.Constants;
 import com.sun.corba.se.impl.orbutil.closure.Constant;
 
 import ro.sync.diff.api.DiffContentTypes;
@@ -227,6 +226,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   						myDialog.setReportGenerator(DiffReportPlugin.this);
   					}
   					myDialog.setVisible(true);
+  					myDialog.pack();
   				}
   				
   			}
