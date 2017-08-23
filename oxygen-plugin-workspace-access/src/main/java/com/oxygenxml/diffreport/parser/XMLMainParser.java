@@ -112,19 +112,9 @@ public class XMLMainParser {
 			lastCharacter = readTag(currentElement, reader, lastCharacter);
 
 			parser.setCurrentElement(currentElement);
-//			System.err.println("lastCharacter: '" +lastCharacter +"' elem: " + currentElement.type + " beginOffset " + 
-//					currentElement.beginOffset+ " " + currentElement.elementContent.length() + " " + currentElement.elementContent.toString());
 			parser.parse();
 
-			
-//			resultToCheckIfItReadsCorrectly.append(currentElement.beginOffset + " " + currentElement.endOffset + " ");
-//			resultToCheckIfItReadsCorrectly.append(currentElement.elementContent.toString());
-
-
 		} while (lastCharacter != -1);
-		
-		
-//		contentListener.checkDiff(currentElement.beginOffset + 1, currentElement.elementContent.toString());
 	}
 
 
@@ -617,8 +607,6 @@ public class XMLMainParser {
 			currentElement.elementContent.append((char) currentCharacter);
 
 		}
-
-		// System.out.println(currentCharacter);
 
 		return currentCharacter;
 	}

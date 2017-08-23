@@ -22,29 +22,7 @@ public class CurrentReadElement{
 		isElementAndHasAttribute = false;
 	}
 
-	public int getBeginOffset() {
-		return beginOffset;
-	}
 
-	public void setBeginOffset(int beginOffset) {
-		this.beginOffset = beginOffset;
-	}
-
-	public int getEndOffset() {
-		return endOffset;
-	}
-
-	public void setEndOffset(int endOffset) {
-		this.endOffset = endOffset;
-	}
-
-	public boolean isElementAndHasAttribute() {
-		return isElementAndHasAttribute;
-	}
-
-	public void setElementAndHasAttribute(boolean isElementAndHasAttribute) {
-		this.isElementAndHasAttribute = isElementAndHasAttribute;
-	}
 
 	
 	

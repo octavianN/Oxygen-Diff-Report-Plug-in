@@ -36,7 +36,6 @@ public class ParseElement {
 		if (currentElement.type == NodeType.ELEMENT){
 			parseElement();
 		} else if (currentElement.type == NodeType.EMPTYDATA){
-			//System.out.println();
 			copyEmptyData();
 		} else {
 			parseNotElement();
@@ -57,10 +56,6 @@ public class ParseElement {
 		StringBuilder buffer = new StringBuilder();
 		int i;
 		
-//		if(contentListener.checkDiff(beginOffset, buffer.toString())){
-//			System.out.println("MY ERROR IS HERE... element Content:" + elementContent );
-//			buffer = new StringBuilder();
-//		}
 		for( i = 0 ; i < length ; i++){
 	
 			char character = elementContent.charAt(i);
@@ -74,7 +69,6 @@ public class ParseElement {
 			}
 			
 			if(contentListener.checkDiff(i + beginOffset , buffer.toString())){
-//				System.out.println("Copy empty data ='" + character + "' offs: " + (i + beginOffset) + " " + length + currentElement.elementContent.toString());
 				buffer = new StringBuilder();
 			}
 			

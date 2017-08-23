@@ -82,7 +82,6 @@ public class HTMLContentGenerator implements ContentListener {
 			DiffEntry diff = parentDiffsDuplicateRemover.pollFirst();
 			parrentDiffs.add(diff);
 			
-			System.out.println(diff.getLeftIntervalStart() + " "+  diff.getLeftIntervalEnd() + "---" + diff.getRightIntervalStart() + " " + diff.getRightIntervalEnd()); 
 		}
 		
 		
@@ -102,7 +101,6 @@ public class HTMLContentGenerator implements ContentListener {
 		if(localCount == 1){
 			resultedText.append("</div>");
 		}
-		System.out.println(resultedText.toString());
 		return resultedText.toString();
 	}
 
@@ -110,7 +108,8 @@ public class HTMLContentGenerator implements ContentListener {
 
 
 	/**
-	 * 
+	 * Depending on the type of the Node, a span is created
+	 * with a class of that Node Type
 	 */
 	@Override
 	public void startNode(NodeType type) {
@@ -165,9 +164,10 @@ public class HTMLContentGenerator implements ContentListener {
 	int local = 0;
 
 	/**
-	 * 
-	 * @param difference
-	 * @param isParent
+	 * Depending on witch type of difference the node has, this function returns 
+	 * the class that defines that 
+	 * @param difference the difference that is analyzed
+	 * @param isParent a boolean that sais if a parent or a child is analized
 	 * @return
 	 */
 	private String getClassForParentDiffType(Difference difference, boolean isParent) {
@@ -175,7 +175,8 @@ public class HTMLContentGenerator implements ContentListener {
 		byte entryType = ((DiffEntry) difference).getEntryType();
 
 		String diffEntryType = "diffTypeUnknown";
-		if (isParent) {
+		if (isParent) { 
+			//analyze parent
 			switch (entryType) {
 			case DiffEntryType.DIFF_MODIFIED:
 				diffEntryType = "diffParentTypeConflict";
@@ -188,6 +189,7 @@ public class HTMLContentGenerator implements ContentListener {
 				break;
 			}
 		} else {
+			//analyze child
 			switch (entryType) {
 			case DiffEntryType.DIFF_MODIFIED:
 				diffEntryType = "diffTypeConflict";
@@ -205,12 +207,11 @@ public class HTMLContentGenerator implements ContentListener {
 	}
 	
 	/**
-	 * 
-	 * @param currentOffs
+	 * If the current offset indicates the beginning of a parent diff, it is returned
+	 * @param currentOffs the offset that is currently analyzed
 	 */
 	private void checkParentStartDiff(int currentOffs){
 		
-//		System.err.println("currentOfset: " + currentOffs);
 		
 		for(int i = 0 ; i < parrentDiffs.size(); i++){
 			Difference difference = parrentDiffs.get(i);
@@ -227,9 +228,11 @@ public class HTMLContentGenerator implements ContentListener {
 		
 	}
 	
-	
 
-	
+	/**
+	 * If the current offset indicates the ending of a parent diff, it is returned
+	 * @param currentOffs the offset that is currently analyzed
+	 */
 	private void checkParentEndDiff(int currentOffs){
 		
 		for(int i = 0 ; i < parrentDiffs.size(); i++){
@@ -251,16 +254,23 @@ public class HTMLContentGenerator implements ContentListener {
 
 	@Override
 	public boolean checkDiff(int currentOffs, String buffer) {
-		
+		//the returned value. If a Child Diff is found, it returns <code>true</code> else <code>false</code>
 		boolean foundDiff = false;
+		//Beginning of a child diff interval
 		int start = 0;
+		//ending of a child diff interval
 		int end = 0;
-		if(currentOffs > noDuplicates){
+		
+		if(currentOffs > noDuplicates){ //does not let any duplicates offsets be rechecked
 			noDuplicates = currentOffs;
+			
 			if(differences != null){
 				
-				checkParentStartDiff(currentOffs);
+				checkParentStartDiff(currentOffs); //check the parent diff first
 				
+				/**
+				 * Check the Child diff
+				 */
 				for (int i = 0; i < differences.size(); i++) {
 					Difference difference = differences.get(i);
 											
@@ -271,7 +281,6 @@ public class HTMLContentGenerator implements ContentListener {
 					
 					if (lastIdxForChildDiff < differences.size()) {
 						if ((((currentOffs == start) && (start == end))) || 
-//								 (((currentOffs == end - 1) && (start == end))) || 
 								((currentOffs == end - 1) && (start + 1 == end))) {
 							
 							copyContent(buffer);
@@ -310,12 +319,10 @@ public class HTMLContentGenerator implements ContentListener {
 
 					}
 				}
-				if (currentOffs == end - 1) {
-					checkParentEndDiff(currentOffs);
-				} else {
-					checkParentEndDiff(currentOffs);
-				}
-				
+				/**
+				 * Check end ParentDiff
+				 */
+				checkParentEndDiff(currentOffs);
 			}
 		}
 		return foundDiff;
