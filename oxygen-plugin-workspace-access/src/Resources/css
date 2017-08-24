@@ -1,6 +1,16 @@
 Source code in the instance, source or
 annotations. 
 --------------------------------------------*/
+pre {
+    white-space: pre-wrap;
+}
+
+body {
+	max-height: 600px;
+}
+table {
+	max-height: 600px;
+}
 
 td {
 	vertical-align: top;
@@ -56,6 +66,7 @@ td.block1 {
     border-bottom-width: 0px;
     border-left-width: 0px;
     border-right-width: 1px;
+    max-width: 1000px;
 }
 
 td.block2 {
@@ -63,6 +74,7 @@ td.block2 {
     border-bottom-width: 0px;
     border-left-width: 1px;
     border-right-width: 0px;
+    max-width: 1000px;
 }
 
 span.Element { 
@@ -112,6 +124,14 @@ span.qname{
 	background-color:inherit;
 }
 
+div.Scroll1 {
+    overflow-x: auto;
+}
+
+
+div.Scroll2 {
+    overflow-x: auto;
+}
 
 
 div.diffParentTypeConflict {

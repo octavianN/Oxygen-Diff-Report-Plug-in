@@ -343,7 +343,7 @@ public class XMLMainParser {
 	private int readElementWithBeginTag(CurrentReadElement currentElement, ReaderWithIndex reader) throws IOException{
 
 		int currentCharacter = findNodeType(currentElement, reader);
-
+		if(currentElement != null && currentElement.type != null)
 		switch (currentElement.type) {
 		case ELEMENT:	
 			currentCharacter = addElement(currentElement, reader);
@@ -367,7 +367,7 @@ public class XMLMainParser {
 			break;
 		}
 
-		currentElement.endOffset = reader.getIndex();
+		//currentElement.endOffset = reader.getIndex();
 
 		return currentCharacter;
 	}

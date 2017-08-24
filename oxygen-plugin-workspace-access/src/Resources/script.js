@@ -480,8 +480,28 @@
 	}
 
 	function swapTexts(){
-		var firstDoc = document.getElementById('b1');
-		var secondDoc = document.getElementById('b2');
+
+				for(i = 0 ; i < parentsList.length; i++){
+			if(parentsList[i].classList.contains("diffParentTypeOutgoing")){
+				parentsList[i].classList.remove("diffParentTypeOutgoing");
+				parentsList[i].classList.add("diffParentTypeIncoming");
+			}else if(parentsList[i].classList.contains("diffParentTypeIncoming")){
+				parentsList[i].classList.remove("diffParentTypeIncoming");
+				parentsList[i].classList.add("diffParentTypeOutgoing");
+			}
+		}
+
+		for(i = 0 ; i < childrenList.length; i++){
+			if(childrenList[i].classList.contains("diffTypeOutgoing")){
+				childrenList[i].classList.remove("diffTypeOutgoing");
+				childrenList[i].classList.add("diffTypeIncoming");
+			}else if(childrenList[i].classList.contains("diffTypeIncoming")){
+				childrenList[i].classList.remove("diffTypeIncoming");
+				childrenList[i].classList.add("diffTypeOutgoing");
+			}
+		}
+		var firstDoc = document.getElementById('swap1');
+		var secondDoc = document.getElementById('swap2');
 		var aux = firstDoc.innerHTML;
 		firstDoc.innerHTML = secondDoc.innerHTML;
 		secondDoc.innerHTML = aux;

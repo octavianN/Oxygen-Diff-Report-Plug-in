@@ -303,7 +303,6 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 		try {
 			printWriter = new PrintWriter(outputFile);
 			StringBuilder htmlBuilder = new StringBuilder();
-
 			/**
 			 * Begin the HTML file.			
 			 */
@@ -333,15 +332,16 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			 */
 			htmlBuilder.append("<tr>\n"
 					+ "<td class=\"ButtonsCheck\" colspan=\"3\">"
-					+ "<button class=\"NextButtonChild Buttons\" onclick=\"nextChildDiff()\" style=\"height:30px;width:50px\"><b> &#11015; </b></button>  "
-					+ "<button class=\"NextButton Buttons\" onclick=\"nextDiff()\" style=\"height:30px;width:50px\"><b> &#11247; </b></button>  "
-					+ "<button class=\"SwapButton Buttons\" onclick=\"swapTexts()\" ><b> swap </b></button>  "
-					+ "<button class=\"PreviousButton Buttons\" onclick=\"previousDiff()\" style=\"height:30px;width:50px\"><b> &#11245; </b></button>"
-					+ "<button class=\"PreviousButtonChild Buttons\" onclick=\"previousChildDiff()\" style=\"height:30px;width:50px\"><b> &#11014; </b></button>"
+					+ "<button class=\"NextButtonChild Buttons\" onclick=\"nextChildDiff()\" style=\"height:30px;width:50px\"><b> &#11015; </b></button>\n  "
+					+ "<button class=\"NextButton Buttons\" onclick=\"nextDiff()\" style=\"height:30px;width:50px\"><b> &#11247; </b></button>\n  "
+					+ "<button class=\"SwapButton Buttons\" onclick=\"swapTexts()\" ><b> swap </b></button>\n  "
+					+ "<button class=\"PreviousButton Buttons\" onclick=\"previousDiff()\" style=\"height:30px;width:50px\"><b> &#11245; </b></button>\n"
+					+ "<button class=\"PreviousButtonChild Buttons\" onclick=\"previousChildDiff()\" style=\"height:30px;width:50px\"><b> &#11014; </b></button>\n"
 					+ "</td> \n");
 			htmlBuilder.append("</tr >\n");
 			htmlBuilder.append("<tr id=\"tr1\">\n");
 			htmlBuilder.append("<td id = \"b1\" class=\"spaceUnder block1\">\n");
+			htmlBuilder.append("<div class=\"Scroll1\"><div class=\"Container1\" id=\"swap1\">\n");
 			htmlBuilder.append("<pre>\n");
 			
 			/**
@@ -362,6 +362,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			 * Add canvas.
 			 */
 			htmlBuilder.append("</pre>\n");
+			htmlBuilder.append("</div></div>\n");
 			htmlBuilder.append("</td>\n");
 			htmlBuilder.append("<td class=\"canvasTD\">\n");		
 			htmlBuilder.append("<div class=\"canvasContainer\"><canvas id=\"myCanvas\" width=\"40\"  height=\"300\";\">\n" + 
@@ -372,6 +373,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			 * Parse second document.
 			 */
 			htmlBuilder.append("<td id=\"b2\" class=\"spaceUnder block2\">\n");
+			htmlBuilder.append("<div class=\"Scroll2\"><div class=\"Container2\" id=\"swap2\">\n");
 			htmlBuilder.append("<pre>\n");
 			htmlDiffGenerator = new HTMLContentGenerator(diffs, false);
 			parser.setContentListener(htmlDiffGenerator);
@@ -387,6 +389,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			 * End Table.
 			 */
 			htmlBuilder.append("</pre>\n");
+			htmlBuilder.append("</div></div>\n");
 			htmlBuilder.append("</td>\n");
 			htmlBuilder.append("</tr>\n");
 			htmlBuilder.append("</table>\n");

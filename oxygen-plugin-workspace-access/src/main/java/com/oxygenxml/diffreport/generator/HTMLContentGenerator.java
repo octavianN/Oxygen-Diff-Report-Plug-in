@@ -113,7 +113,7 @@ public class HTMLContentGenerator implements ContentListener {
 	 */
 	@Override
 	public void startNode(NodeType type) {
-		
+		if(type != null)
 		switch(type){
 		case ELEMENT:
 			resultedText.append( "<span class = \"Element\">" );
