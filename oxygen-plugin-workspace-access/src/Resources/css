@@ -10,6 +10,8 @@ body {
 }
 table {
 	max-height: 600px;
+    padding-top: 22px;
+    z-index: -1;
 }
 
 td {
@@ -47,7 +49,7 @@ button.SwapButton{
 	background-color:  #FF8080
 }
 
-td.ButtonsCheck {
+/*td.ButtonsCheck {
 	text-align:center; 
     vertical-align:middle;
   	border: ridge gray;
@@ -55,7 +57,7 @@ td.ButtonsCheck {
     border-bottom-width: 1px;
     border-left-width: 1px;
     border-right-width: 1px;
-}
+}*/
 
 td.spaceUnder {
   	border: ridge gray;
@@ -123,6 +125,26 @@ span.qname{
 	color:black;
 	background-color:inherit;
 }
+
+div.Floating{
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    text-align:center; 
+    vertical-align:middle;
+    border: ridge gray;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    z-index: 1;
+    background-color: white;
+}
+/*
+div.Absolute{
+    position: absolute;
+
+}*/
 
 div.Scroll1 {
     overflow-x: auto;

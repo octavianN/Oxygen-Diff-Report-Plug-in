@@ -17,6 +17,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.ProgressMonitor;
 import javax.swing.text.BadLocationException;
 
 import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
@@ -25,6 +26,8 @@ import com.oxygenxml.diffreport.parser.XMLMainParser;
 import ro.sync.diff.api.DiffContentTypes;
 import ro.sync.diff.api.DiffException;
 import ro.sync.diff.api.DiffOptions;
+import ro.sync.diff.api.DiffProgressEvent;
+import ro.sync.diff.api.DiffProgressListener;
 import ro.sync.diff.api.Difference;
 import ro.sync.diff.api.DifferencePerformer;
 import ro.sync.ecss.extensions.api.AuthorDocumentController;
@@ -222,7 +225,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 	
 
 	@Override
-	public void generateHTMLReport(URL firstURL, URL secondURL, File outputFile){
+	public void generateHTMLReport(URL firstURL, URL secondURL, File outputFile, ProgressMonitor progressMonitor){
 		
 		File htmlForFirstFile= outputFile;
 		
@@ -239,7 +242,29 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 				reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 				reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 
-				diffs = diffPerformer.performDiff(reader1, reader2, null, null, contentType, diffOptions, null);
+				
+				DiffProgressListener listener = new DiffProgressListener() {
+					
+					@Override
+					public void update(DiffProgressEvent arg0) {
+						System.out.println("Progress: " + arg0.getCount());
+						progressMonitor.setProgress(arg0.getCount());
+					}
+					
+					@Override
+					public void start() {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void finished() {
+						// TODO Auto-generated method stub
+						
+					}
+				};
+				
+				diffs = diffPerformer.performDiff(reader1, reader2, null, null, contentType, diffOptions, listener);
 			} finally {
 				if (reader1 != null) {
 					try {
@@ -330,15 +355,14 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			/**
 			 * Add Buttons for Differences and Swap between texts. 
 			 */
-			htmlBuilder.append("<tr>\n"
-					+ "<td class=\"ButtonsCheck\" colspan=\"3\">"
+			htmlBuilder.append("<div class=\"Floating\"><div class=\"Absolute\">\n"
 					+ "<button class=\"NextButtonChild Buttons\" onclick=\"nextChildDiff()\" style=\"height:30px;width:50px\"><b> &#11015; </b></button>\n  "
 					+ "<button class=\"NextButton Buttons\" onclick=\"nextDiff()\" style=\"height:30px;width:50px\"><b> &#11247; </b></button>\n  "
 					+ "<button class=\"SwapButton Buttons\" onclick=\"swapTexts()\" ><b> swap </b></button>\n  "
 					+ "<button class=\"PreviousButton Buttons\" onclick=\"previousDiff()\" style=\"height:30px;width:50px\"><b> &#11245; </b></button>\n"
 					+ "<button class=\"PreviousButtonChild Buttons\" onclick=\"previousChildDiff()\" style=\"height:30px;width:50px\"><b> &#11014; </b></button>\n"
-					+ "</td> \n");
-			htmlBuilder.append("</tr >\n");
+					);
+			htmlBuilder.append("</div></div>\n");
 			htmlBuilder.append("<tr id=\"tr1\">\n");
 			htmlBuilder.append("<td id = \"b1\" class=\"spaceUnder block1\">\n");
 			htmlBuilder.append("<div class=\"Scroll1\"><div class=\"Container1\" id=\"swap1\">\n");

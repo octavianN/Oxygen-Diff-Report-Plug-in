@@ -320,6 +320,7 @@
     	
     	parentsList[id1].classList.add(concat); 
     	parentsList[id2].classList.add(concat);
+    	parentsList[id1].scrollIntoViewIfNeeded();
     	currentIDParent = id1;
 
     	/*After finding the two matched element, if they are selected
@@ -420,6 +421,7 @@
 
     	childrenList[id1].classList.add(concat); 
     	childrenList[id2].classList.add(concat);
+    	childrenList[id1].scrollIntoViewIfNeeded();
     	currentIDChild = id1;
 
     	/*After finding the two matched element, if they are selected
@@ -481,7 +483,7 @@
 
 	function swapTexts(){
 
-				for(i = 0 ; i < parentsList.length; i++){
+				 for(i = 0 ; i < parentsList.length; i++){
 			if(parentsList[i].classList.contains("diffParentTypeOutgoing")){
 				parentsList[i].classList.remove("diffParentTypeOutgoing");
 				parentsList[i].classList.add("diffParentTypeIncoming");
@@ -516,7 +518,6 @@
 	       	context.clearRect(0, 0, canvas.width, canvas.height);
 
 
-	       	console.log("coordinates: ",parentsList[0].getBoundingClientRect(), parentsList[0].offsetTop, parentsList[0].offsetBottom);
 	       	for(i = 0 ; i < parentsList.length/2 ; i++){
 		        var coordinatesLeft = parentsList[i].getBoundingClientRect();
 		        var coordinatesRight = parentsList[parentsList.length/2 + i].getBoundingClientRect();
@@ -526,13 +527,13 @@
 
 				context.moveTo(0,parentsList[i].offsetTop + coordinatesLeft.height);
 		        context.lineTo(0, parentsList[i].offsetTop);
-		        context.strokeStyle = '#ffffff';
+		        context.strokeStyle = '#f7f7f7';
 				context.stroke();
 		        context.lineTo(40, parentsList[parentsList.length/2 + i].offsetTop);
 		        context.strokeStyle = 'none';
 				context.stroke();
 				context.lineTo(40, parentsList[parentsList.length/2 + i].offsetTop + coordinatesRight.height);
-				context.strokeStyle = '#ffffff';
+				context.strokeStyle = '#f7f7f7';
 				context.stroke();
 		        context.lineTo(0, parentsList[i].offsetBottom);
 		         context.strokeStyle = 'none';

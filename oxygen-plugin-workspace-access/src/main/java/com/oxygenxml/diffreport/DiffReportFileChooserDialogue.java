@@ -24,8 +24,10 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ProgressMonitor;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -328,31 +330,37 @@ public class DiffReportFileChooserDialogue extends JDialog {
 		return panel;
 	}
 
+	ProgressMonitor progressMonitor = new ProgressMonitor(this, "Generating Diff", "", 0, 100);
 
 	/**
 	 * Gets the inputs, gives them to the generateHTML function.
 	 * Is activated when the "Generate Diff" Button is pressed
 	 */
 	private void generateDiff() {
-
+		progressMonitor.setProgress(progressMonitor.getMaximum());
 		try {
 			String leftFile = getFirstLabelField().getText();
 			String rightFile = getSecondLabelField().getText();
 			File outputFile = new File(getThirdLabelField().getText());
+
+			if (!new File(leftFile).exists() || !new File(rightFile).exists()){				
+				throw new FileNotFoundException();
+			}
 			reportGenerator.generateHTMLReport(new File(leftFile).toURI().toURL(), new File(rightFile).toURI().toURL(),
-					outputFile);
+					outputFile, progressMonitor);
 
 			if (Desktop.isDesktopSupported()) {
 				Desktop.getDesktop().browse(outputFile.toURI());
 			}
 
+			setVisible(false);
 		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+			 JOptionPane.showMessageDialog(null, "The path is not Valid", "", JOptionPane.INFORMATION_MESSAGE);
+			 setVisible(true);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} finally {
-			setVisible(false);
 		}
 	}
 	
