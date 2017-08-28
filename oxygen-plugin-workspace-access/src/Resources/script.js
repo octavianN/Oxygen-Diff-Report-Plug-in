@@ -7,6 +7,7 @@
 	var canvas = document.getElementById('myCanvas');
 	var context = canvas.getContext('2d');
 	context.canvas.height = document.getElementById('tr1').offsetHeight;
+	console.log(document.getElementById('tr1').offsetHeight);
 	// get the row where the Next and Previous Buttons are going to be implemented
 	var i;
 	var currentIDParent = -1;
@@ -483,25 +484,25 @@
 
 	function swapTexts(){
 
-				 for(i = 0 ; i < parentsList.length; i++){
-			if(parentsList[i].classList.contains("diffParentTypeOutgoing")){
-				parentsList[i].classList.remove("diffParentTypeOutgoing");
-				parentsList[i].classList.add("diffParentTypeIncoming");
-			}else if(parentsList[i].classList.contains("diffParentTypeIncoming")){
-				parentsList[i].classList.remove("diffParentTypeIncoming");
-				parentsList[i].classList.add("diffParentTypeOutgoing");
-			}
-		}
+		// 		 for(i = 0 ; i < parentsList.length; i++){
+		// 	if(parentsList[i].classList.contains("diffParentTypeOutgoing")){
+		// 		parentsList[i].classList.remove("diffParentTypeOutgoing");
+		// 		parentsList[i].classList.add("diffParentTypeIncoming");
+		// 	}else if(parentsList[i].classList.contains("diffParentTypeIncoming")){
+		// 		parentsList[i].classList.remove("diffParentTypeIncoming");
+		// 		parentsList[i].classList.add("diffParentTypeOutgoing");
+		// 	}
+		// }
 
-		for(i = 0 ; i < childrenList.length; i++){
-			if(childrenList[i].classList.contains("diffTypeOutgoing")){
-				childrenList[i].classList.remove("diffTypeOutgoing");
-				childrenList[i].classList.add("diffTypeIncoming");
-			}else if(childrenList[i].classList.contains("diffTypeIncoming")){
-				childrenList[i].classList.remove("diffTypeIncoming");
-				childrenList[i].classList.add("diffTypeOutgoing");
-			}
-		}
+		// for(i = 0 ; i < childrenList.length; i++){
+		// 	if(childrenList[i].classList.contains("diffTypeOutgoing")){
+		// 		childrenList[i].classList.remove("diffTypeOutgoing");
+		// 		childrenList[i].classList.add("diffTypeIncoming");
+		// 	}else if(childrenList[i].classList.contains("diffTypeIncoming")){
+		// 		childrenList[i].classList.remove("diffTypeIncoming");
+		// 		childrenList[i].classList.add("diffTypeOutgoing");
+		// 	}
+		// }
 		var firstDoc = document.getElementById('swap1');
 		var secondDoc = document.getElementById('swap2');
 		var aux = firstDoc.innerHTML;
@@ -513,6 +514,7 @@
 	function fillCanvas(e1,color){
 
 	     if (canvas.getContext){
+	     	context.canvas.height = document.getElementById('tr1').offsetHeight;
 	        var length = parentsList.length;
 	       	var i;
 	       	context.clearRect(0, 0, canvas.width, canvas.height);

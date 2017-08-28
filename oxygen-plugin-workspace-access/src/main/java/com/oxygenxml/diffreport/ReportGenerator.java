@@ -5,6 +5,8 @@ import java.net.URL;
 
 import javax.swing.ProgressMonitor;
 
+import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
+
 /**
  * 
  * @author intern3
@@ -20,7 +22,10 @@ public interface ReportGenerator {
 	 * @param outputFile The File where the result is written;
 	 * @param progressMonitor 
 	 */
-	void generateHTMLReport(URL firstURL, URL secondURL, File outputFile, ProgressMonitor progressMonitor);
+	HTMLPageGenerator getPageGenerator();
+	void setPageGenerator(HTMLPageGenerator pg);
+	void setPluginWorkspaceAccess(StandalonePluginWorkspace pluginWorkspaceAccess);
+	
 	
 }
 

@@ -1,6 +1,9 @@
 package com.oxygenxml.diffreport;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,8 +29,6 @@ import com.oxygenxml.diffreport.parser.XMLMainParser;
 import ro.sync.diff.api.DiffContentTypes;
 import ro.sync.diff.api.DiffException;
 import ro.sync.diff.api.DiffOptions;
-import ro.sync.diff.api.DiffProgressEvent;
-import ro.sync.diff.api.DiffProgressListener;
 import ro.sync.diff.api.Difference;
 import ro.sync.diff.api.DifferencePerformer;
 import ro.sync.ecss.extensions.api.AuthorDocumentController;
@@ -47,7 +48,7 @@ import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 /**
  * Plugin extension - workspace access extension.
  */
-public class DiffReportPlugin implements WorkspaceAccessPluginExtension, ReportGenerator {
+public class DiffReportPlugin implements WorkspaceAccessPluginExtension{
   /**
    * The custom messages area. A sample component added to your custom view.
    */
@@ -180,7 +181,35 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   				if(e.getActionCommand() != null){
   					DiffReportFileChooserDialogue myDialog = DiffReportFileChooserDialogue.getInstance();
   					if (myDialog.getReportGenerator() == null) {
-  						myDialog.setReportGenerator(DiffReportPlugin.this);
+  						ReportGenerator rep = new ReportGenerator() {
+							
+  							StandalonePluginWorkspace plugin;
+  							HTMLPageGenerator page;
+  							
+							
+							@Override
+							public void setPluginWorkspaceAccess(StandalonePluginWorkspace pluginWorkspaceAccess) {
+								System.err.println("SET");
+								this.plugin = pluginWorkspaceAccess;
+								
+							}
+							
+							@Override
+							public void setPageGenerator(HTMLPageGenerator pg) {
+								this.page = pg;
+								page.setPluginWorkspaceAccess(plugin);
+							}
+							
+							@Override
+							public HTMLPageGenerator getPageGenerator() {
+								return page;
+							}
+							
+
+						};
+						System.err.println("PLUGIN: " + pluginWorkspaceAccess);
+  						rep.setPluginWorkspaceAccess(pluginWorkspaceAccess);
+  						myDialog.setReportGenerator(rep);
   					}
   					myDialog.setVisible(true);
   					myDialog.pack();
@@ -192,7 +221,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   		return button;
   	}
   	
-
+  
 	
   	/**
   	 * This function helps the printTheDiferencesInTheConsole method
@@ -222,229 +251,8 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 			e.printStackTrace();
 		}
 	}
+
 	
-
-	@Override
-	public void generateHTMLReport(URL firstURL, URL secondURL, File outputFile, ProgressMonitor progressMonitor){
-		
-		File htmlForFirstFile= outputFile;
-		
-		Reader reader1 = null;
-		Reader reader2 = null;
-		try {
-			DifferencePerformer diffPerformer = pluginWorkspaceAccess.getCompareUtilAccess().createDiffPerformer();
-			DiffOptions diffOptions = new DiffOptions();
-			diffOptions.setEnableHierarchicalDiff(true);
-			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
-
-			List<Difference> diffs;
-			try {
-				reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
-				reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
-
-				
-				DiffProgressListener listener = new DiffProgressListener() {
-					
-					@Override
-					public void update(DiffProgressEvent arg0) {
-						System.out.println("Progress: " + arg0.getCount());
-						progressMonitor.setProgress(arg0.getCount());
-					}
-					
-					@Override
-					public void start() {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void finished() {
-						// TODO Auto-generated method stub
-						
-					}
-				};
-				
-				diffs = diffPerformer.performDiff(reader1, reader2, null, null, contentType, diffOptions, listener);
-			} finally {
-				if (reader1 != null) {
-					try {
-						reader1.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				if (reader2 != null) {
-					try {
-						reader2.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-
-			reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
-			reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
-			generateHTMLFile(htmlForFirstFile, reader1, reader2, diffs);
-
-		}catch (MalformedURLException e) {
-			e.printStackTrace();
-		}catch (IOException e) {
-			e.printStackTrace();
-		} catch (DiffException e) {
-			e.printStackTrace();
-		} finally {
-			if (reader1 != null) {
-				try {
-					reader1.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (reader2 != null) {
-				try {
-					reader2.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-	}
-	
-	/**
-	 * Receives the file that needs to be written and the file that
-	 * requires to be parsed. Then generates a HTML with the
-	 * two XML files highlighting their differences.
-	 * The Colors and Interactions between the two texts are written
-	 * in CSS and JavaScript.
-	 * @param outputFile The file where the HTML file is written 
-	 * @param doc1Reader Reader for Left File
-	 * @param doc2Reader Reader for Right File
-	 * @param diffs list of differences between the files
-	 * @throws IOException
-	 */
-	private void generateHTMLFile(File outputFile, Reader doc1Reader, Reader doc2Reader,List<Difference> diffs) throws IOException{
-		PrintWriter printWriter = null; 
-		try {
-			printWriter = new PrintWriter(outputFile);
-			StringBuilder htmlBuilder = new StringBuilder();
-			/**
-			 * Begin the HTML file.			
-			 */
-			htmlBuilder.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-			htmlBuilder.append("<head><title>Diff Report</title>");
-			htmlBuilder.append("<style>/*--------------------------------------------\n");
-			
-			/**
-			 * Add the CSS file.
-			 */
-			BufferedReader cssReader = new BufferedReader(new FileReader(new File(
-					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\css")));
-			 String line;
-			 while ((line = cssReader.readLine()) != null) {
-				 htmlBuilder.append(line + "\n");
-			 }
-			 cssReader.close();
-			/**
-			 * Start Table.		
-			 */
-			htmlBuilder.append("</style></head>");
-			htmlBuilder.append("<body>\n");
-			htmlBuilder.append("<table align=\"center\">\n");
-			
-			/**
-			 * Add Buttons for Differences and Swap between texts. 
-			 */
-			htmlBuilder.append("<div class=\"Floating\"><div class=\"Absolute\">\n"
-					+ "<button class=\"NextButtonChild Buttons\" onclick=\"nextChildDiff()\" style=\"height:30px;width:50px\"><b> &#11015; </b></button>\n  "
-					+ "<button class=\"NextButton Buttons\" onclick=\"nextDiff()\" style=\"height:30px;width:50px\"><b> &#11247; </b></button>\n  "
-					+ "<button class=\"SwapButton Buttons\" onclick=\"swapTexts()\" ><b> swap </b></button>\n  "
-					+ "<button class=\"PreviousButton Buttons\" onclick=\"previousDiff()\" style=\"height:30px;width:50px\"><b> &#11245; </b></button>\n"
-					+ "<button class=\"PreviousButtonChild Buttons\" onclick=\"previousChildDiff()\" style=\"height:30px;width:50px\"><b> &#11014; </b></button>\n"
-					);
-			htmlBuilder.append("</div></div>\n");
-			htmlBuilder.append("<tr id=\"tr1\">\n");
-			htmlBuilder.append("<td id = \"b1\" class=\"spaceUnder block1\">\n");
-			htmlBuilder.append("<div class=\"Scroll1\"><div class=\"Container1\" id=\"swap1\">\n");
-			htmlBuilder.append("<pre>\n");
-			
-			/**
-			 * Parse first document.
-			 */
-			XMLMainParser parser = new XMLMainParser();
-			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
-			parser.setContentListener(htmlDiffGenerator);			
-			try {
-				parser.parseInputIntoHTMLFormat(doc1Reader);
-			} catch (IOException e) {
-				e.printStackTrace();
-				htmlBuilder.append("Cannot read first file content: " + e.getMessage());
-			}
-			htmlBuilder.append(htmlDiffGenerator.getResultedText());
-			
-			/**
-			 * Add canvas.
-			 */
-			htmlBuilder.append("</pre>\n");
-			htmlBuilder.append("</div></div>\n");
-			htmlBuilder.append("</td>\n");
-			htmlBuilder.append("<td class=\"canvasTD\">\n");		
-			htmlBuilder.append("<div class=\"canvasContainer\"><canvas id=\"myCanvas\" width=\"40\"  height=\"300\";\">\n" + 
-					"</canvas></div>");
-			htmlBuilder.append("</td>\n");
-			
-			/**
-			 * Parse second document.
-			 */
-			htmlBuilder.append("<td id=\"b2\" class=\"spaceUnder block2\">\n");
-			htmlBuilder.append("<div class=\"Scroll2\"><div class=\"Container2\" id=\"swap2\">\n");
-			htmlBuilder.append("<pre>\n");
-			htmlDiffGenerator = new HTMLContentGenerator(diffs, false);
-			parser.setContentListener(htmlDiffGenerator);
-			try {
-				parser.parseInputIntoHTMLFormat(doc2Reader);
-			} catch (IOException e) {
-				e.printStackTrace();
-				htmlBuilder.append("Cannot read second file content: " + e.getMessage());
-			}
-			htmlBuilder.append(htmlDiffGenerator.getResultedText());
-			
-			/**
-			 * End Table.
-			 */
-			htmlBuilder.append("</pre>\n");
-			htmlBuilder.append("</div></div>\n");
-			htmlBuilder.append("</td>\n");
-			htmlBuilder.append("</tr>\n");
-			htmlBuilder.append("</table>\n");
-			htmlBuilder.append("</body>\n");
-			htmlBuilder.append("</html>\n");
-			
-			/**
-			 * Script.
-			 */
-			htmlBuilder.append("<script>");
-			BufferedReader jsReader = new BufferedReader(new FileReader(new File(
-					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\script.js")));
-			while ((line = jsReader.readLine()) != null) {
-				htmlBuilder.append(line + "\n");
-			}
-			jsReader.close();
-			htmlBuilder.append("</script>");
-			
-			/**
-			 * Write result into output file
-			 */
-			String html = htmlBuilder.toString();
-			printWriter.print(html);
-			printWriter.flush();
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}finally{
-			printWriter.close();
-		}
-	}
 	
 	
 	/**

@@ -9,10 +9,13 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,7 +45,8 @@ import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
  * @author intern3
  *
  */
-public class DiffReportFileChooserDialogue extends JDialog {
+public class DiffReportFileChooserDialogue extends JDialog
+											implements PropertyChangeListener{
 	
 	private JButton generateDiffButton;
 	private JTextField firstLabelField;
@@ -98,9 +102,13 @@ public class DiffReportFileChooserDialogue extends JDialog {
 	
 	
 	//Getters and Setters
+    
+    
 	public JTextField getThirdLabelField() {
 		return thirdLabelField;
 	}
+
+
 
 	public void setThirdLabelField(JTextField thirdLabelField) {
 		this.thirdLabelField = thirdLabelField;
@@ -330,14 +338,13 @@ public class DiffReportFileChooserDialogue extends JDialog {
 		return panel;
 	}
 
-	ProgressMonitor progressMonitor = new ProgressMonitor(this, "Generating Diff", "", 0, 100);
-
+	
+	ProgressMonitor progressMonitor;
 	/**
 	 * Gets the inputs, gives them to the generateHTML function.
 	 * Is activated when the "Generate Diff" Button is pressed
 	 */
 	private void generateDiff() {
-		progressMonitor.setProgress(progressMonitor.getMaximum());
 		try {
 			String leftFile = getFirstLabelField().getText();
 			String rightFile = getSecondLabelField().getText();
@@ -346,16 +353,22 @@ public class DiffReportFileChooserDialogue extends JDialog {
 			if (!new File(leftFile).exists() || !new File(rightFile).exists()){				
 				throw new FileNotFoundException();
 			}
-			reportGenerator.generateHTMLReport(new File(leftFile).toURI().toURL(), new File(rightFile).toURI().toURL(),
-					outputFile, progressMonitor);
+			progressMonitor = new ProgressMonitor(this, "Generating Diff", "", 0, 100);
+			progressMonitor.setMillisToDecideToPopup(0);
+			HTMLPageGenerator pageGenerator = new HTMLPageGenerator();
+			reportGenerator.setPageGenerator(pageGenerator);
+			pageGenerator.addPropertyChangeListener(this);
+			pageGenerator.setProgressMonitor(progressMonitor);
+			
+			pageGenerator.generateHTMLReport(new File(leftFile).toURI().toURL(),
+					new File(rightFile).toURI().toURL(),
+					outputFile);
 
-			if (Desktop.isDesktopSupported()) {
-				Desktop.getDesktop().browse(outputFile.toURI());
-			}
-
-			setVisible(false);
 		} catch (FileNotFoundException e1) {
-			 JOptionPane.showMessageDialog(null, "The path is not Valid", "", JOptionPane.INFORMATION_MESSAGE);
+			 JOptionPane.showMessageDialog(null, 
+					 "The path is not Valid", 
+					 "", 
+					 JOptionPane.INFORMATION_MESSAGE);
 			 setVisible(true);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -363,6 +376,24 @@ public class DiffReportFileChooserDialogue extends JDialog {
 		} finally {
 		}
 	}
+	
+	public void propertyChange(PropertyChangeEvent evt) {
+        if ("progress" == evt.getPropertyName() ) {
+            int progress = (Integer) evt.getNewValue();
+            progressMonitor.setProgress(progress);
+            String message =
+                String.format("Completed %d%%.\n", progress);
+            progressMonitor.setNote(message);
+            if (progressMonitor.isCanceled() || reportGenerator.getPageGenerator().isDone()) {
+                Toolkit.getDefaultToolkit().beep();
+                if (progressMonitor.isCanceled()) {
+                    reportGenerator.getPageGenerator().cancel(true);
+                } else {
+                }
+            }
+        }
+ 
+    }
 	
 	public static void main(String[] args) {
 		 try {
