@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Random;
@@ -40,6 +41,8 @@ public class HTMLPageGenerator
 	private URL firstURL;
 	private URL secondURL; 
 	private File outputFile;
+	private int progress;
+	private double lengthFile1, lengthFile2;
 	
 
 
@@ -49,6 +52,8 @@ public class HTMLPageGenerator
 
 
 	public HTMLPageGenerator() {
+		this.progress = 0;
+		lengthFile1 = lengthFile2 = 0;
 	}
 		
 	
@@ -61,6 +66,15 @@ public class HTMLPageGenerator
 	
 	
 	public void generateHTMLReport(URL firstURL, URL secondURL, File outputFile ){
+		try {
+			File f = new File(firstURL.toURI());
+			lengthFile1 = f.length();
+			f = new File(secondURL.toURI());
+			lengthFile2 = f.length();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.firstURL = firstURL;
 		this.secondURL = secondURL;
 		this.outputFile = outputFile;
@@ -73,8 +87,8 @@ public class HTMLPageGenerator
 	
 	private void generateHTMLReport() {
 		File htmlForFirstFile = outputFile;
-		progressMonitor.setProgress(0);
-		progressMonitor.setNote("Loaded " + 0 + " %");
+		progressMonitor.setProgress(progress);
+		progressMonitor.setNote("Checking Differences: " + progress + " %");
 		
 		Reader reader1 = null;
 		Reader reader2 = null;
@@ -90,8 +104,9 @@ public class HTMLPageGenerator
 				reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 				
 				diffs = diffPerformer.performDiff(reader1, reader2, null, null, contentType, diffOptions, null);
-				progressMonitor.setProgress(10);
-				progressMonitor.setNote("Loaded " + 10 + " %");
+				progress += 10;
+				progressMonitor.setProgress(progress);
+				progressMonitor.setNote("Generating FIRST file: " + progress + " %");
 				
 			} finally {
 				if (reader1 != null) {
@@ -178,8 +193,8 @@ public class HTMLPageGenerator
 			 }
 			 cssReader.close();
 			 
-			 progressMonitor.setProgress(20);
-			 progressMonitor.setNote("Loaded " + 20 + " %");
+//			 progressMonitor.setProgress(20);
+//			 progressMonitor.setNote("Loaded " + 20 + " %");
 			/**
 			 * Start Table.		
 			 */
@@ -210,16 +225,14 @@ public class HTMLPageGenerator
 			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
 			parser.setContentListener(htmlDiffGenerator);			
 			try {
-				parser.parseInputIntoHTMLFormat(doc1Reader);
+				parser.parseInputIntoHTMLFormat(doc1Reader,progressMonitor, progress, lengthFile1, false);
 			} catch (IOException e) {
 				e.printStackTrace();
 				htmlBuilder.append("Cannot read first file content: " + e.getMessage());
 			}
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
+		
 			
-			progressMonitor.setProgress(50);
-			progressMonitor.setNote("Loaded " + 50 + " %");
-//			
 			/**
 			 * Add canvas.
 			 */
@@ -240,15 +253,15 @@ public class HTMLPageGenerator
 			htmlDiffGenerator = new HTMLContentGenerator(diffs, false);
 			parser.setContentListener(htmlDiffGenerator);
 			try {
-				parser.parseInputIntoHTMLFormat(doc2Reader);
+				parser.parseInputIntoHTMLFormat(doc2Reader, progressMonitor, progress, lengthFile2, true);
 			} catch (IOException e) {
 				e.printStackTrace();
 				htmlBuilder.append("Cannot read second file content: " + e.getMessage());
 			}
 			htmlBuilder.append(htmlDiffGenerator.getResultedText());
 			
-			progressMonitor.setProgress(80);
-			progressMonitor.setNote("Loaded " + 80 + " %");
+			progressMonitor.setProgress(90);
+			progressMonitor.setNote("Finalizing!");
 			
 			/**
 			 * End Table.
@@ -273,8 +286,6 @@ public class HTMLPageGenerator
 			jsReader.close();
 			htmlBuilder.append("</script>");
 			
-			progressMonitor.setProgress(90);
-			progressMonitor.setNote("Loaded " + 90 + " %");
 			/**
 			 * Write result into output file
 			 */
@@ -282,7 +293,7 @@ public class HTMLPageGenerator
 			printWriter.print(html);
 			printWriter.flush();
 			progressMonitor.setProgress(100);
-			progressMonitor.setNote("Loaded " + 100 + " %");
+			progressMonitor.setNote("Done ");
 			
 			
 		} catch (FileNotFoundException e) {

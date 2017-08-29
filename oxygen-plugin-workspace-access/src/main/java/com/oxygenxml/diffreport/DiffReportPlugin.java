@@ -183,21 +183,12 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   					if (myDialog.getReportGenerator() == null) {
   						ReportGenerator rep = new ReportGenerator() {
 							
-  							StandalonePluginWorkspace plugin;
   							HTMLPageGenerator page;
-  							
-							
-							@Override
-							public void setPluginWorkspaceAccess(StandalonePluginWorkspace pluginWorkspaceAccess) {
-								System.err.println("SET");
-								this.plugin = pluginWorkspaceAccess;
-								
-							}
 							
 							@Override
 							public void setPageGenerator(HTMLPageGenerator pg) {
 								this.page = pg;
-								page.setPluginWorkspaceAccess(plugin);
+								page.setPluginWorkspaceAccess(pluginWorkspaceAccess);
 							}
 							
 							@Override
@@ -208,7 +199,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
 
 						};
 						System.err.println("PLUGIN: " + pluginWorkspaceAccess);
-  						rep.setPluginWorkspaceAccess(pluginWorkspaceAccess);
+//  						rep.setPluginWorkspaceAccess(pluginWorkspaceAccess);
   						myDialog.setReportGenerator(rep);
   					}
   					myDialog.setVisible(true);

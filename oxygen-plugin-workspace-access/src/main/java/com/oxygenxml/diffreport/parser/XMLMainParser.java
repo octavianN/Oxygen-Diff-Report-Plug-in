@@ -1,15 +1,11 @@
 package com.oxygenxml.diffreport.parser;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
-import com.oxygenxml.diffreport.generator.ContentListener;
-import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
+import javax.swing.ProgressMonitor;
 
-import ro.sync.diff.text.DiffEntry;
+import com.oxygenxml.diffreport.generator.ContentListener;
 
 
 /**
@@ -90,6 +86,19 @@ public class XMLMainParser {
 	}
 
 
+	public int getPercentage(double lengthFile, double parsedLength, boolean isSecondFile) {
+		double percentage = 0;
+		percentage = lengthFile / parsedLength;
+		percentage = 100.0 / percentage;
+		percentage = percentage * 40.0 / 100.0;
+		if (isSecondFile) {
+			percentage += 50;
+		} else {
+			percentage += 10;
+		}
+		return (int) percentage;
+	}
+	
 	/**
 	 * Passes the File and wraps it into a ReaderWithIndex
 	 * I then initialize the parser and set it with the
@@ -99,22 +108,39 @@ public class XMLMainParser {
 	 * Then I am passing the result to the parser
 	 * @throws IOException If content cannot be read.
 	 */
-	public void parseInputIntoHTMLFormat(Reader read) throws IOException {
+	public void parseInputIntoHTMLFormat(Reader read, 
+										ProgressMonitor progressMonitor, 
+										int progress, 
+										double lengthFile,
+										boolean isSecondFile) throws IOException {
+		
 		int lastCharacter = Integer.MIN_VALUE;
 		ReaderWithIndex reader = new ReaderWithIndex(read);
 		ParseElement parser = new ParseElement();
 		parser.setContentListener(contentListener);
-
+		double parsedLength = 0;
+		
 		CurrentReadElement currentElement = null;
 		do {
 			
 			currentElement = new CurrentReadElement();
 			lastCharacter = readTag(currentElement, reader, lastCharacter);
-
+			
 			parser.setCurrentElement(currentElement);
 			parser.parse();
-
+			
+			parsedLength += currentElement.elementContent.length() ;
+			progress = getPercentage(lengthFile, parsedLength, isSecondFile);
+			
+			progressMonitor.setProgress(progress );
+			if(!isSecondFile) {
+				progressMonitor.setNote("Generating FIRST file: " + progress + " %");
+			}else {
+				progressMonitor.setNote("Generating SECOND file: " + progress + " %");
+			}
 		} while (lastCharacter != -1);
+		
+		
 	}
 
 

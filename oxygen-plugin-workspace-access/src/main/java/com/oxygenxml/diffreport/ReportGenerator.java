@@ -24,7 +24,6 @@ public interface ReportGenerator {
 	 */
 	HTMLPageGenerator getPageGenerator();
 	void setPageGenerator(HTMLPageGenerator pg);
-	void setPluginWorkspaceAccess(StandalonePluginWorkspace pluginWorkspaceAccess);
 	
 	
 }
