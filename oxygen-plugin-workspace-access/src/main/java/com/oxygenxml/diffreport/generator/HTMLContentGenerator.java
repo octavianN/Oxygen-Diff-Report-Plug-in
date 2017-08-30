@@ -49,6 +49,10 @@ public class HTMLContentGenerator implements ContentListener {
 	
 	private int noDuplicates; 
 	
+	private int diffTypeConflict;
+	private int diffTypeOutgoing;
+	private int diffTypeIncoming;
+	
 	// TODO remove
 	Comparator<Integer> comparator = new Comparator<Integer>() {
         @Override
@@ -68,6 +72,10 @@ public class HTMLContentGenerator implements ContentListener {
 		this.differences = differences;
 		this.isLeft = isLeft;
 		parrentDiffs = new ArrayList<>();
+		
+		diffTypeConflict = 0;
+		diffTypeOutgoing = 0;
+		diffTypeIncoming = 0;
 		
 		// Compuute the list with the parent diff entries.
 		TreeSet<DiffEntry> parentDiffsDuplicateRemover = new TreeSet<DiffEntry>();
@@ -104,7 +112,17 @@ public class HTMLContentGenerator implements ContentListener {
 		return resultedText.toString();
 	}
 
-	
+	public int getDiffTypeConflict() {
+		return diffTypeConflict;
+	}
+
+	public int getDiffTypeOutgoing() {
+		return diffTypeOutgoing;
+	}
+
+	public int getDiffTypeIncoming() {
+		return diffTypeIncoming;
+	}
 
 
 	/**
@@ -170,7 +188,7 @@ public class HTMLContentGenerator implements ContentListener {
 	 * @param isParent a boolean that sais if a parent or a child is analized
 	 * @return
 	 */
-	private String getClassForParentDiffType(Difference difference, boolean isParent) {
+	private String getClassForParentDiffType(Difference difference, boolean isParent, int currentOffs) {
 
 		byte entryType = ((DiffEntry) difference).getEntryType();
 
@@ -190,15 +208,25 @@ public class HTMLContentGenerator implements ContentListener {
 			}
 		} else {
 			//analyze child
+			int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 			switch (entryType) {
 			case DiffEntryType.DIFF_MODIFIED:
 				diffEntryType = "diffTypeConflict";
+				if(start == currentOffs) {
+					diffTypeConflict++;
+				}
 				break;
 			case DiffEntryType.DIFF_INSERTED:
 				diffEntryType = "diffTypeOutgoing";
+				if(start == currentOffs) {
+					diffTypeOutgoing++;
+				}
 				break;
 			case DiffEntryType.DIFF_REMOVED:
 				diffEntryType = "diffTypeIncoming";
+				if(start == currentOffs) {
+					diffTypeIncoming++;
+				}
 				break;
 			}
 		}
@@ -220,7 +248,7 @@ public class HTMLContentGenerator implements ContentListener {
 			
 			if(currentOffs == start){
 				localCount++;
-				resultedText.append("<div class=\"diffParentEntry " + getClassForParentDiffType(difference, true)+ "\" data-diff-parent-id=\"" + lastIdxForParentDiff +"\">");
+				resultedText.append("<div class=\"diffParentEntry " + getClassForParentDiffType(difference, true, currentOffs)+ "\" data-diff-parent-id=\"" + lastIdxForParentDiff +"\">");
 				break;
 			}
 			
@@ -228,6 +256,7 @@ public class HTMLContentGenerator implements ContentListener {
 		
 	}
 	
+
 
 	/**
 	 * If the current offset indicates the ending of a parent diff, it is returned
@@ -277,7 +306,7 @@ public class HTMLContentGenerator implements ContentListener {
 					start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 					end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
 					
-					String diffEntryType = getClassForParentDiffType(difference, false);
+					String diffEntryType = getClassForParentDiffType(difference, false, currentOffs);
 					
 					if (lastIdxForChildDiff < differences.size()) {
 						if ((((currentOffs == start) && (start == end))) || 

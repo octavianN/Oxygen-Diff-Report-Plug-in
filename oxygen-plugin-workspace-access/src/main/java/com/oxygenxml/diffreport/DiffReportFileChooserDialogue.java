@@ -31,7 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
-import javax.swing.UIManager;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
@@ -42,7 +42,7 @@ import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 
 /**
  * Dialog with three fields. Compare two files and choose where to save the result
- * @author intern3
+ * @author Dina_Andrei
  *
  */
 public class DiffReportFileChooserDialogue extends JDialog
@@ -52,7 +52,9 @@ public class DiffReportFileChooserDialogue extends JDialog
 	private JTextField firstLabelField;
 	private JTextField secondLabelField;
 	private JTextField thirdLabelField;
-	private ReportGenerator reportGenerator; 
+	private ReportGenerator reportGenerator;
+	ProgressMonitor progressMonitor;
+	private SwingWorker<Void,Void> swingWorker;
 	
 	/**
 	 * The Singleton Instance of the object
@@ -307,7 +309,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 		box2.setBackground(Color.WHITE);
 		
 		/**
-		 * Generate Diff Button.
+		 * Generate Diff Button. 
 		 */
 		generateDiffButton = new JButton("Generate Diff");
 		generateDiffButton.setPreferredSize(new Dimension(97, 25));
@@ -339,69 +341,123 @@ public class DiffReportFileChooserDialogue extends JDialog
 	}
 
 	
-	ProgressMonitor progressMonitor;
+
 	/**
 	 * Gets the inputs, gives them to the generateHTML function.
 	 * Is activated when the "Generate Diff" Button is pressed
+	 * Upon pressing the swingWorker method execute() sends the
+	 * process in background. A Process Monitor will appear and
+	 * the html page will pop when the progress bar reaches 100
 	 */
 	private void generateDiff() {
 		try {
 			String leftFile = getFirstLabelField().getText();
 			String rightFile = getSecondLabelField().getText();
 			File outputFile = new File(getThirdLabelField().getText());
-
+			
+			// If any of the input files does not exist or have an unidentified extension, an exception is thrown
 			if (!new File(leftFile).exists() || !new File(rightFile).exists()){				
 				throw new FileNotFoundException();
 			}
 			progressMonitor = new ProgressMonitor(this, "Generating Diff", "", 0, 100);
-			progressMonitor.setMillisToDecideToPopup(0);
+			//set the progress monitor to pop up after a second of waiting
+			if (progressMonitor != null) {
+				progressMonitor.setMillisToDecideToPopup(100);
+			}
+			//"Generate Button" is pressed -> a new HTMLPageGenerator is created
 			HTMLPageGenerator pageGenerator = new HTMLPageGenerator();
-			reportGenerator.setPageGenerator(pageGenerator);
-			pageGenerator.addPropertyChangeListener(this);
-			pageGenerator.setProgressMonitor(progressMonitor);
+			/**
+			 * SwingWorker execute() method works with the ProgressMonitor.
+			 * It is used as a wrapper for the pageGenerator.
+			 */
+			swingWorker = new SwingWorker<Void,Void>() {
+				/**
+				 * Launches on execute() method.
+				 * generateHTMLReport() for big inputs takes a long time so has to be ran in background 
+				 * 
+				 */
+				@Override
+				protected Void doInBackground() throws Exception {
+					pageGenerator.generateHTMLReport(new File(leftFile).toURI().toURL(),
+							new File(rightFile).toURI().toURL(),
+							outputFile);
+					return null;
+				}
+				/**
+				 * When the Progress Bar reaches 100, the HTML is launched in the browser and the
+				 * Dialog disappears
+				 */
+				@Override
+				protected void done() {
+			        Toolkit.getDefaultToolkit().beep();
+			        if (Desktop.isDesktopSupported()) {
+						try {
+							Desktop.getDesktop().browse(outputFile.toURI());
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+			        DiffReportFileChooserDialogue.getInstance().setVisible(false);
+			    }
+				
+			};
 			
-			pageGenerator.generateHTMLReport(new File(leftFile).toURI().toURL(),
-					new File(rightFile).toURI().toURL(),
-					outputFile);
+			reportGenerator.setPageGenerator(pageGenerator);
+			swingWorker.addPropertyChangeListener(this);
+			
+			/**
+			 * Sets an interface used as a wrapper for the ProgressMonitor that only uses
+			 * two of the classes methods.
+			 */
+			pageGenerator.setProgressMonitor(new IProgressMonitor() {
+				
+				@Override
+				public void setProgress(int progress) {
+					progressMonitor.setProgress(progress);
+				}
+				
+				
+				@Override
+				public void setNote(String note) {
+					progressMonitor.setNote(note);
+					
+				}
+			});
+			
+			swingWorker.execute();
 
 		} catch (FileNotFoundException e1) {
+			//If the input files are not valid prints an error message.
 			 JOptionPane.showMessageDialog(null, 
 					 "The path is not Valid", 
 					 "", 
 					 JOptionPane.INFORMATION_MESSAGE);
 			 setVisible(true);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} finally {
 		}
 	}
 	
+	/**
+	 * Occur whenever the value of a bound property changes for a bean
+	 * Is set on the SwingWorker
+	 * When pressing the Cancel Button on the Progress Dialog, it closes
+	 */
 	public void propertyChange(PropertyChangeEvent evt) {
-        if ("progress" == evt.getPropertyName() ) {
-            int progress = (Integer) evt.getNewValue();
-            progressMonitor.setProgress(progress);
-            String message =
-                String.format("Completed %d%%.\n", progress);
-            progressMonitor.setNote(message);
-            if (progressMonitor.isCanceled() || reportGenerator.getPageGenerator().isDone()) {
-                Toolkit.getDefaultToolkit().beep();
-                if (progressMonitor.isCanceled()) {
-                    reportGenerator.getPageGenerator().cancel(true);
-                } else {
-                }
-            }
-        }
- 
+		if (progressMonitor != null) {
+			if ("progress" == evt.getPropertyName()) {
+				int progress = (Integer) evt.getNewValue();
+				progressMonitor.setProgress(progress);
+				String message = String.format("Completed %d%%.\n", progress);
+				progressMonitor.setNote(message);
+				if (progressMonitor.isCanceled() || swingWorker.isDone()) {
+					Toolkit.getDefaultToolkit().beep();
+					if (progressMonitor.isCanceled()) {
+						swingWorker.cancel(true);
+					} else {
+					}
+				}
+			}
+		}
     }
 	
-	public static void main(String[] args) {
-		 try {
-		        UIManager.setLookAndFeel(
-		            UIManager.getSystemLookAndFeelClassName());
-		    } catch (Exception e) { }
-		 DiffReportFileChooserDialogue dial = new DiffReportFileChooserDialogue();
-		 dial.setVisible(true);
-	}
 
 }

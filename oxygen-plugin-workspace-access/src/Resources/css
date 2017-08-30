@@ -9,7 +9,6 @@ body {
 	max-height: 600px;
 }
 table {
-	max-height: 600px;
     padding-top: 22px;
     z-index: -1;
 }
@@ -25,26 +24,31 @@ div.canvasContainer{
 	padding: 0px;
 }
 button.NextButtonChild{
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\DiffNextBlock24.png");
 	border-radius: 50%;
-	background-color: #99CCFF
+	background-color: #99CCFF;
 }
 
 button.PreviousButtonChild{
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\DiffPreviousBlock24.png");
 	border-radius: 50%;
-	background-color: #99CCFF
+	background-color: #99CCFF;
 }
 
 button.NextButton {
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\DiffNext24.png");
 	border-radius: 50%;
-	background-color: #99CCFF
+	background-color: #99CCFF;
 }
 
 button.PreviousButton{
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\DiffPrevious24.png");
 	border-radius: 50%;
-	background-color: #99CCFF
+	background-color: #99CCFF;
 }
 
 button.SwapButton{
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\SVNStartPanelSynchronize24.png");
 	border-radius: 50%;
 	background-color:  #FF8080
 }
@@ -126,7 +130,7 @@ span.qname{
 	background-color:inherit;
 }
 
-div.Floating{
+div.FloatingUp{
     position: fixed;
     top: 0px;
     width: 100%;
@@ -140,11 +144,65 @@ div.Floating{
     z-index: 1;
     background-color: white;
 }
-/*
-div.Absolute{
-    position: absolute;
 
-}*/
+
+li{
+    list-style-position: inside;
+    list-style-type: none;
+}
+li::before{
+    content: '\00b7';
+    font-size:100px;
+    line-height: 24px;
+    vertical-align: middle;
+}
+
+span.unu{
+    color: black;
+}
+
+li.unu{
+    color: #ff9999;
+}
+
+li.doi{
+    color: #d1e0e0;
+}
+
+li.trei{
+    color: #80ccff;
+}
+div.FloatingDown{
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    padding-left: 45%;
+    vertical-align:middle;
+    border: ridge gray;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    z-index: 1;
+    background-color: white;
+}
+
+div.NameOfFileLeft{
+    float: left;
+    text-align: right;
+    width:33%;
+}
+
+div.NameOfFileRight{
+    float: right;
+    text-align: left;
+    width:33%;
+}
+
+div.NameOfFileButton{
+    float: right;
+    width:33%;
+}
 
 div.Scroll1 {
     overflow-x: auto;

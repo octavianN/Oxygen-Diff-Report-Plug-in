@@ -5,6 +5,7 @@ import java.io.Reader;
 
 import javax.swing.ProgressMonitor;
 
+import com.oxygenxml.diffreport.IProgressMonitor;
 import com.oxygenxml.diffreport.generator.ContentListener;
 
 
@@ -18,7 +19,7 @@ import com.oxygenxml.diffreport.generator.ContentListener;
  * ELEMENT, CDATA, DOCTYPE, PI, COMMENT...
  * It passes that element to the ParseElemet Class.
  * 
- * @author intern3
+ * @author Dina_Andrei
  *
  */
 public class XMLMainParser {
@@ -86,30 +87,54 @@ public class XMLMainParser {
 	}
 
 
+	/**
+	 * The length of each file by calculus is 40% of the elapsed time of the whole program
+	 * So 100% of the execution time to parse one file is 40% of the total time it takes
+	 * to execute the program
+	 * @param lengthFile number of bytes in the given file
+	 * @param parsedLength length parsed so far
+	 * @param isSecondFile a boolean that tells if we are dealing with the second file or the first
+	 * <code>isSecondFile = true </code> the second file is parsed
+	 * <code>isSecondFile = false </code> the first file is parsed
+	 * @return the percentage
+	 */
 	public int getPercentage(double lengthFile, double parsedLength, boolean isSecondFile) {
 		double percentage = 0;
-		percentage = lengthFile / parsedLength;
-		percentage = 100.0 / percentage;
+		//what percent is parsedLength out of the length of the file
+		{
+			percentage = lengthFile / parsedLength;
+			percentage = 100.0 / percentage;
+		}
+		//transforms the x out of 100% in y out of 40%
 		percentage = percentage * 40.0 / 100.0;
 		if (isSecondFile) {
+			//second file goes from 50% to 90%
 			percentage += 50;
 		} else {
+			//first file goes from 10% to 50%
 			percentage += 10;
 		}
 		return (int) percentage;
 	}
 	
 	/**
-	 * Passes the File and wraps it into a ReaderWithIndex
+	 * * Passes the File and wraps it into a ReaderWithIndex
 	 * I then initialize the parser and set it with the
 	 * current Listener
 	 * I am reading the current tag:
 	 * NOTE: A tag could be between "> <", a TextField
 	 * Then I am passing the result to the parser
-	 * @throws IOException If content cannot be read.
+	 * @param read - current File of the two XML files
+	 * @param progressMonitor - Progress Bar Generator
+	 * @param progress - percentage of the total execution time 
+	 * @param lengthFile - number of bytes in the given file
+	 * @param isSecondFile a boolean that tells if we are dealing with the second file or the first
+	 * <code>isSecondFile = true </code> the second file is parsed
+	 * <code>isSecondFile = false </code> the first file is parsed
+	 * @throws IOException
 	 */
 	public void parseInputIntoHTMLFormat(Reader read, 
-										ProgressMonitor progressMonitor, 
+										IProgressMonitor progressMonitor, 
 										int progress, 
 										double lengthFile,
 										boolean isSecondFile) throws IOException {
@@ -131,19 +156,18 @@ public class XMLMainParser {
 			
 			parsedLength += currentElement.elementContent.length() ;
 			progress = getPercentage(lengthFile, parsedLength, isSecondFile);
-			
-			progressMonitor.setProgress(progress );
-			if(!isSecondFile) {
-				progressMonitor.setNote("Generating FIRST file: " + progress + " %");
-			}else {
-				progressMonitor.setNote("Generating SECOND file: " + progress + " %");
+			if(progressMonitor!=null){
+				progressMonitor.setProgress(progress);
+				if (!isSecondFile) {
+					progressMonitor.setNote("Generating FIRST file: " + progress + " %");
+				} else {
+					progressMonitor.setNote("Generating SECOND file: " + progress + " %");
+				}
 			}
 		} while (lastCharacter != -1);
 		
 		
 	}
-
-
 
 
 	/**

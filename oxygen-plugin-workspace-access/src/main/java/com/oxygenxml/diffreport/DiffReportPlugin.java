@@ -179,27 +179,29 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   			@Override
   			public void actionPerformed(ActionEvent e) {
   				if(e.getActionCommand() != null){
+  					//The dialog is created when the Toolbar button is pressed 
   					DiffReportFileChooserDialogue myDialog = DiffReportFileChooserDialogue.getInstance();
   					if (myDialog.getReportGenerator() == null) {
+  						
+  						/**
+  						 * When pressing the Generate Diff button, a new object has to be created in orther
+  						 * to run the alorithm, and it has to be "set" on the interface
+  						 */ 
   						ReportGenerator rep = new ReportGenerator() {
 							
   							HTMLPageGenerator page;
 							
+  							/**
+  							 * Sets the PageGenerator and it also gives it the pluginWorkspaceAccess in order
+  							 * to execute the difference Algorithm
+  							 */
 							@Override
 							public void setPageGenerator(HTMLPageGenerator pg) {
 								this.page = pg;
 								page.setPluginWorkspaceAccess(pluginWorkspaceAccess);
 							}
-							
-							@Override
-							public HTMLPageGenerator getPageGenerator() {
-								return page;
-							}
-							
 
 						};
-						System.err.println("PLUGIN: " + pluginWorkspaceAccess);
-//  						rep.setPluginWorkspaceAccess(pluginWorkspaceAccess);
   						myDialog.setReportGenerator(rep);
   					}
   					myDialog.setVisible(true);
@@ -211,40 +213,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   		ToolbarButton button = new ToolbarButton(showDiffAction, false);
   		return button;
   	}
-  	
-  
-	
-  	/**
-  	 * This function helps the printTheDiferencesInTheConsole method
-  	 * parse the file and print the differences between the two XMLs
-  	 * @param reader the current file we are reading from
-  	 * @param difference the difference we are interested in
-  	 */
-	@SuppressWarnings("unused")
-	private void printTheDiferencesInTheConsoleCharacterParser(Reader reader, Difference difference){
-		int i, contor = 0;
-		
-		try {
-			while((i = reader.read()) != -1){
-				if (contor >= difference.getLeftIntervalStart() && contor < difference.getLeftIntervalEnd()) {
-					
-					if (((char)i != '\r')) {
-						System.out.print((char)i);
-						
-					}
-				}
-				contor++;
-				if (contor > difference.getLeftIntervalEnd()) {
-					break;
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
-	
-	
 	
 	/**
 	 * Create the Swing action which shows the current selection.

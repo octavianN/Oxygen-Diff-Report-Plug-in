@@ -112,7 +112,7 @@ public class ParseElement {
 			
 		}
 		if(contentListener.checkDiff(i + beginOffset, buffer.toString())){
-			buffer = new StringBuilder();                //TODO  Just removed this
+			buffer = new StringBuilder();             
 		}
 		contentListener.endNode(buffer.toString());
 	}
