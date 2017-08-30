@@ -140,10 +140,8 @@
 	    		}
 
 	    		parentsList[i].style.background = color;
- 				fillCanvas(parentsList[i], color);
-
-	    		// fillCanvas(x[i], color);
 	    		parentsList[i].style.opacity = "0.9";
+	    		fillCanvas(parentsList[i], color);
 	    	}
 	    }
 	}
@@ -176,9 +174,8 @@
 	    		}
 
 	    		parentsList[i].style.background = color;
-	    		fillCanvas(parentsList[i], color);
-	    		// fillCanvas(x[i], color);
 	    		parentsList[i].style.opacity = "0.81";
+	    		fillCanvas(parentsList[i], color);
 	    	}
 	    }
 	}
@@ -343,7 +340,7 @@
 			currentIDParent = -1;
 		}
 
-		
+		// fillCanvas(parentsList[id1], "#ffffff");		
 		
 	}
 
@@ -484,25 +481,7 @@
 
 	function swapTexts(){
 
-		// 		 for(i = 0 ; i < parentsList.length; i++){
-		// 	if(parentsList[i].classList.contains("diffParentTypeOutgoing")){
-		// 		parentsList[i].classList.remove("diffParentTypeOutgoing");
-		// 		parentsList[i].classList.add("diffParentTypeIncoming");
-		// 	}else if(parentsList[i].classList.contains("diffParentTypeIncoming")){
-		// 		parentsList[i].classList.remove("diffParentTypeIncoming");
-		// 		parentsList[i].classList.add("diffParentTypeOutgoing");
-		// 	}
-		// }
 
-		// for(i = 0 ; i < childrenList.length; i++){
-		// 	if(childrenList[i].classList.contains("diffTypeOutgoing")){
-		// 		childrenList[i].classList.remove("diffTypeOutgoing");
-		// 		childrenList[i].classList.add("diffTypeIncoming");
-		// 	}else if(childrenList[i].classList.contains("diffTypeIncoming")){
-		// 		childrenList[i].classList.remove("diffTypeIncoming");
-		// 		childrenList[i].classList.add("diffTypeOutgoing");
-		// 	}
-		// }
 		var firstDoc = document.getElementById('swap1');
 		var secondDoc = document.getElementById('swap2');
 		var aux = firstDoc.innerHTML;
@@ -524,31 +503,34 @@
 		        var coordinatesLeft = parentsList[i].getBoundingClientRect();
 		        var coordinatesRight = parentsList[parentsList.length/2 + i].getBoundingClientRect();
 
-		        context.beginPath();
-		        context.lineWidth = 4;
+		       context.beginPath();
 
+		        context.lineWidth = 0.5;
 				context.moveTo(0,parentsList[i].offsetTop + coordinatesLeft.height);
 		        context.lineTo(0, parentsList[i].offsetTop);
-		        context.strokeStyle = '#f7f7f7';
+		        context.strokeStyle = '#b9b9b9';
 				context.stroke();
 		        context.lineTo(40, parentsList[parentsList.length/2 + i].offsetTop);
 		        context.strokeStyle = 'none';
 				context.stroke();
 				context.lineTo(40, parentsList[parentsList.length/2 + i].offsetTop + coordinatesRight.height);
-				context.strokeStyle = '#f7f7f7';
+				context.strokeStyle = '#b9b9b9';
 				context.stroke();
 		        context.lineTo(0, parentsList[i].offsetBottom);
-		         context.strokeStyle = 'none';
-				context.stroke();
+		        context.strokeStyle = 'none';
+		        context.stroke();
+				
 				context.closePath();
 				
-
+				context.stroke();
 				context.fillStyle = getColor(parentsList[i]);
 		        if(parentsList[i] == e1 || parentsList[i + parentsList.length] == e1){
 		        	
 		      		context.fillStyle = color;
+		      		context.stroke();
 		        }
 		     	context.fill();
+		     	context.stroke();
 	        }
 	           
 	    } else {

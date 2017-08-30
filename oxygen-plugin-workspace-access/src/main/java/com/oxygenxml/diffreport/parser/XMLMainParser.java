@@ -88,33 +88,42 @@ public class XMLMainParser {
 
 
 	/**
-	 * The length of each file by calculus is 40% of the elapsed time of the whole program
-	 * So 100% of the execution time to parse one file is 40% of the total time it takes
-	 * to execute the program
-	 * @param lengthFile number of bytes in the given file
-	 * @param parsedLength length parsed so far
-	 * @param isSecondFile a boolean that tells if we are dealing with the second file or the first
+	 * The length of each file by calculus is the percentage of its length reported to the total length,
+	 * the sum, of the the two files in contrast with the elapsed time of the whole program.
+	 * So 100% of the execution time to parse one file is <number>percentage of file length out of total length<number>% 
+	 * of the total time it takes to execute the program.
+	 * @param oldPercentage - the percentage that has already accumulated 
+	 * @param totalLength - length of both files
+	 * @param lengthFile - number of bytes in the given file
+	 * @param parsedLength - length parsed so far
+	 * @param isSecondFile - a boolean that tells if we are dealing with the second file or the first
 	 * <code>isSecondFile = true </code> the second file is parsed
 	 * <code>isSecondFile = false </code> the first file is parsed
 	 * @return the percentage
 	 */
-	public int getPercentage(double lengthFile, double parsedLength, boolean isSecondFile) {
-		double percentage = 0;
+	public int getPercentage(int oldPercentage, double totalLength, double lengthFile, double parsedLength, boolean isSecondFile) {
+		double percentageForProgressBar = 0;
 		//what percent is parsedLength out of the length of the file
 		{
-			percentage = lengthFile / parsedLength;
-			percentage = 100.0 / percentage;
+			percentageForProgressBar = lengthFile / parsedLength;
+			percentageForProgressBar = 100.0 / percentageForProgressBar;
 		}
+		
+		double percentageOfLengths = 0;
+		{
+			percentageOfLengths = totalLength / lengthFile;
+			percentageOfLengths = 100.0 / percentageOfLengths;
+		}
+		
+		percentageOfLengths = percentageOfLengths * 80.0 / 100.0;
 		//transforms the x out of 100% in y out of 40%
-		percentage = percentage * 40.0 / 100.0;
-		if (isSecondFile) {
-			//second file goes from 50% to 90%
-			percentage += 50;
-		} else {
-			//first file goes from 10% to 50%
-			percentage += 10;
-		}
-		return (int) percentage;
+		percentageForProgressBar = percentageForProgressBar * percentageOfLengths / 100.0;
+		
+		
+			percentageForProgressBar += oldPercentage;
+
+		
+		return (int) percentageForProgressBar;
 	}
 	
 	/**
@@ -128,15 +137,19 @@ public class XMLMainParser {
 	 * @param progressMonitor - Progress Bar Generator
 	 * @param progress - percentage of the total execution time 
 	 * @param lengthFile - number of bytes in the given file
+	 * @param totalLength - length of both files
+	 * @param oldPercentage - the percentage that has already accumulated 
 	 * @param isSecondFile a boolean that tells if we are dealing with the second file or the first
 	 * <code>isSecondFile = true </code> the second file is parsed
 	 * <code>isSecondFile = false </code> the first file is parsed
 	 * @throws IOException
 	 */
-	public void parseInputIntoHTMLFormat(Reader read, 
+	public int parseInputIntoHTMLFormat(Reader read, 
 										IProgressMonitor progressMonitor, 
 										int progress, 
 										double lengthFile,
+										double totalLength,
+										int oldPercentage,
 										boolean isSecondFile) throws IOException {
 		
 		int lastCharacter = Integer.MIN_VALUE;
@@ -155,7 +168,7 @@ public class XMLMainParser {
 			parser.parse();
 			
 			parsedLength += currentElement.elementContent.length() ;
-			progress = getPercentage(lengthFile, parsedLength, isSecondFile);
+			progress = getPercentage(oldPercentage, totalLength, lengthFile, parsedLength, isSecondFile);
 			if(progressMonitor!=null){
 				progressMonitor.setProgress(progress);
 				if (!isSecondFile) {
@@ -166,7 +179,7 @@ public class XMLMainParser {
 			}
 		} while (lastCharacter != -1);
 		
-		
+		return progress;
 	}
 
 

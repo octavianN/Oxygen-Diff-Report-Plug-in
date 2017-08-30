@@ -362,7 +362,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 			progressMonitor = new ProgressMonitor(this, "Generating Diff", "", 0, 100);
 			//set the progress monitor to pop up after a second of waiting
 			if (progressMonitor != null) {
-				progressMonitor.setMillisToDecideToPopup(100);
+				progressMonitor.setMillisToDecideToPopup(10);
 			}
 			//"Generate Button" is pressed -> a new HTMLPageGenerator is created
 			HTMLPageGenerator pageGenerator = new HTMLPageGenerator();

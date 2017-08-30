@@ -32,11 +32,11 @@ public class HTMLPageGenerator  {
 	private URL secondURL; 
 	private File outputFile;
 	private int progress;
-	private double lengthFile1, lengthFile2;
+	private double lengthFile1, lengthFile2, totalLength;
 	
 	public HTMLPageGenerator() {
 		this.progress = 0;
-		lengthFile1 = lengthFile2 = 0;
+		lengthFile1 = lengthFile2 = totalLength = 0;
 	}
 		
 
@@ -63,6 +63,9 @@ public class HTMLPageGenerator  {
 			lengthFile1 = f.length();
 			f = new File(secondURL.toURI());
 			lengthFile2 = f.length();
+			totalLength = lengthFile1 + lengthFile2;
+			
+			
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -244,9 +247,10 @@ public class HTMLPageGenerator  {
 			
 			XMLMainParser parser = new XMLMainParser();
 			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
-			parser.setContentListener(htmlDiffGenerator);			
+			parser.setContentListener(htmlDiffGenerator);	
+			int oldPercentage = 10;
 			try {
-				parser.parseInputIntoHTMLFormat(doc1Reader,progressMonitor, progress, lengthFile1, false);
+				oldPercentage = parser.parseInputIntoHTMLFormat(doc1Reader,progressMonitor, progress, lengthFile1, totalLength, oldPercentage, false);
 			} catch (IOException e) {
 				e.printStackTrace();
 				htmlBuilder.append("Cannot read first file content: " + e.getMessage());
@@ -277,7 +281,7 @@ public class HTMLPageGenerator  {
 			htmlDiffGenerator = new HTMLContentGenerator(diffs, false);
 			parser.setContentListener(htmlDiffGenerator);
 			try {
-				parser.parseInputIntoHTMLFormat(doc2Reader, progressMonitor, progress, lengthFile2, true);
+				parser.parseInputIntoHTMLFormat(doc2Reader, progressMonitor, progress, lengthFile2, totalLength, oldPercentage, true);
 			} catch (IOException e) {
 				e.printStackTrace();
 				htmlBuilder.append("Cannot read second file content: " + e.getMessage());
