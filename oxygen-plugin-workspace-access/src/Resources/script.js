@@ -206,8 +206,6 @@
 	    		}else if(colorForBackgrund == "diffTypeIncoming"){
 	    			childrenList[i].style.background = 'rgb('+128+',' +206+','+255+')';
 	    		}
-	    	// 	y[i].style.background = 'rgb('+255+',' +255+','+0+')';
-	    	// 	y[i].style.opacity = "0.8";
 	    	}
 	    }
 	}
@@ -339,8 +337,6 @@
 			parentsList[id2].setAttribute("identify1", "0");
 			currentIDParent = -1;
 		}
-
-		// fillCanvas(parentsList[id1], "#ffffff");		
 		
 	}
 

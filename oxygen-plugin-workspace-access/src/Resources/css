@@ -53,15 +53,6 @@ button.SwapButton{
 	background-color:  #FF8080
 }
 
-/*td.ButtonsCheck {
-	text-align:center; 
-    vertical-align:middle;
-  	border: ridge gray;
-    border-top-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-    border-right-width: 1px;
-}*/
 
 td.spaceUnder {
   	border: ridge gray;
@@ -215,7 +206,6 @@ div.Scroll2 {
 
 
 div.diffParentTypeConflict {
-/*	border-style: ridge; */
 	background-color: #ffe6e6;
 	opacity: 0.81;
     filter: alpha(opacity=50); 
@@ -229,7 +219,6 @@ div.diffParentTypeConflict {
 }
 
 div.diffParentTypeConflict_sel {
-/*	border-style: ridge; */
     border: ridge #ff4d4d;
     border-top-width: 2px;
     border-bottom-width: 2px;
@@ -238,13 +227,7 @@ div.diffParentTypeConflict_sel {
 }
 
 
-/*span.diffParentTypeConflict:hover {
-    opacity: 1.0;
-    filter: alpha(opacity=100); 
-}*/
-
 div.diffParentTypeOutgoing {
-/*	border-style: ridge;*/
 	background-color: #f0f5f5;
 	opacity: 0.81;
     filter: alpha(opacity=50); 
@@ -258,7 +241,6 @@ div.diffParentTypeOutgoing {
 }
 
 div.diffParentTypeOutgoing_sel {
-/*	border-style: ridge; */
     border: ridge #a3c2c2;
     border-top-width: 2px;
     border-bottom-width: 2px;
@@ -266,13 +248,7 @@ div.diffParentTypeOutgoing_sel {
     border-right-width: 0px;
 }
 
-/*span.diffParentTypeOutgoing:hover {
-  	opacity: 1.0;
-    filter: alpha(opacity=100); 
-}*/
-
 div.diffParentTypeIncoming {
-/*	border-style: ridge;*/
 	background-color: #ccf2ff;
 	opacity: 0.81;
     filter: alpha(opacity=50); 
@@ -286,19 +262,12 @@ div.diffParentTypeIncoming {
 }
 
 div.diffParentTypeIncoming_sel {
-/*	border-style: ridge; */
     border: ridge #33ccff;
     border-top-width: 2px;
     border-bottom-width: 2px;
     border-left-width: 0px;
     border-right-width: 0px;
 }
-/*span.diffParentTypeIncoming:hover {
-    opacity: 1.0;
-    filter: alpha(opacity=100); 
-}*/
-
-
 
 span.diffTypeConflict {
 	background-color:#FFB3B3;
@@ -313,12 +282,6 @@ span.diffTypeConflict_sel {
     border-right-width: 2px;
 }
 
-/*span.diffTypeConflict:hover {
- 	opacity: 1.0;
-    filter: alpha(opacity=100); /
-    background-color:#FFB3B3;
-}*/
-
 span.diffTypeOutgoing{
 	background-color:#DDDDDD;
 	opacity:0.9;
@@ -332,12 +295,6 @@ span.diffTypeOutgoing_sel {
     border-right-width: 2px;
 }
 
-/*span.diffTypeOutgoing: hover{
-	opacity: 1.0;
-    filter: alpha(opacity=100); 
-    background-color:#CCCCCC;
-}*/
-
 span.diffTypeIncoming {
 	background-color:#D1EDFF;
 	opacity: 0.9;
@@ -350,16 +307,3 @@ span.diffTypeIncoming_sel {
     border-left-width: 2px;
     border-right-width: 2px;
 }
-
-/*span.diffTypeIncoming: hover {
-	opacity: 1.0;
-    filter: alpha(opacity=100); 
-    background-color:#B3E2FF;
-}
-
-tr {
-	border: 1px solid black;
-	border-collapse: collapse;
-}*/
-
-
