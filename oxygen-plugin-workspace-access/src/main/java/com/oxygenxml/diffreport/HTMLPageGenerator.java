@@ -13,6 +13,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
+import org.mozilla.javascript.JavaScriptException;
+
 import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
 import com.oxygenxml.diffreport.parser.XMLMainParser;
 
@@ -23,6 +25,13 @@ import ro.sync.diff.api.Difference;
 import ro.sync.diff.api.DifferencePerformer;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 
+/**
+ * Creates the HTML page with the two parsed XML files
+ * Adds the Table, Content, Buttons, JavaScript 
+ * 
+ * @author Dina_Andrei
+ *
+ */
 public class HTMLPageGenerator  {
 	
 	/**

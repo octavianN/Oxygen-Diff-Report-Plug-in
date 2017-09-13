@@ -6,7 +6,7 @@ import com.oxygenxml.diffreport.parser.NodeType;
  * 
  * Content listener to the parse events.
  * 
- * @author intern3
+ * @author Dina_Andrei
  */
 public interface ContentListener {
 

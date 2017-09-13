@@ -5,7 +5,7 @@ package com.oxygenxml.diffreport.parser;
  * no matter their order. It remembers the content of the tag,
  * its begin and end offset in the text it's read from, the type
  * of the element.
- * @author intern3
+ * @author Dina_Andrei
  *
  */
 public class CurrentReadElement{

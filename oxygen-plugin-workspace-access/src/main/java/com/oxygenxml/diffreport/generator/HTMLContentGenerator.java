@@ -14,10 +14,10 @@ import ro.sync.diff.xml.DiffEntryType;
 
 
 /**
- * Lister
+ * Lister.
  * It listens to the content given by the parsers and
  * adds spans accordingly
- * @author intern3
+ * @author Dina_Andrei
  *
  */
 public class HTMLContentGenerator implements ContentListener {

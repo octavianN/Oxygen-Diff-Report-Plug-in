@@ -8,8 +8,9 @@ import javax.swing.ProgressMonitor;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 
 /**
- * 
- * @author intern3
+ * Takes the input from the dialogue and makes the connection between
+ * the Generate Diff Button and the Oxygen Plug-In
+ * @author Dina_Andrei
  *
  */
 public interface ReportGenerator {

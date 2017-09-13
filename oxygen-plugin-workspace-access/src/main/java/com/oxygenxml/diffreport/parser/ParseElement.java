@@ -6,7 +6,7 @@ import com.oxygenxml.diffreport.generator.ContentListener;
  * This class parses the element that is given to it 
  * by the XMLMainParser and at each element it gives the data
  * to the Listener. This last one decides what to do with it
- * @author intern3
+ * @author Dina_Andrei
  *
  */
 public class ParseElement {
