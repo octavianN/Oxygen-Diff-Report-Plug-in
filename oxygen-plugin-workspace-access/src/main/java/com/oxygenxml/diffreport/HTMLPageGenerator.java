@@ -88,8 +88,6 @@ public class HTMLPageGenerator  {
 	 */
 	private void generateHTMLReport() throws URISyntaxException {
 		File htmlForFirstFile = outputFile;
-		progressMonitor.setProgress(progress);
-		progressMonitor.setNote("Checking Differences: " + progress + " %");
 
 		Reader reader1 = null;
 		Reader reader2 = null;
@@ -98,9 +96,9 @@ public class HTMLPageGenerator  {
 			DiffOptions diffOptions = new DiffOptions();
 			diffOptions.setEnableHierarchicalDiff(true);
 			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
-
 			List<Difference> diffs;
 			try {
+				
 				reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 				reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 				
@@ -131,7 +129,7 @@ public class HTMLPageGenerator  {
 			//reopening the files
 			reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 			reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
-			generateHTMLFile(htmlForFirstFile, reader1, reader2, diffs, progressMonitor);
+			generateHTMLFile(htmlForFirstFile, reader1, reader2, diffs);
 
 		}catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -169,15 +167,13 @@ public class HTMLPageGenerator  {
 	 * @param doc1Reader Reader for Left File
 	 * @param doc2Reader Reader for Right File
 	 * @param diffs list of differences between the files
-	 * @param progressMonitor The Progress Bar that displays the current status
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
 	private void generateHTMLFile(	File outputFile, 
 									Reader doc1Reader, 
 									Reader doc2Reader,
-									List<Difference> diffs, 
-									IProgressMonitor progressMonitor) throws IOException, URISyntaxException{
+									List<Difference> diffs) throws IOException, URISyntaxException{
 		
 		PrintWriter printWriter = null; 
 		try {

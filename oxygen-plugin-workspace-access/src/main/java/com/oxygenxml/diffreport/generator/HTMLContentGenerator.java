@@ -40,6 +40,7 @@ public class HTMLContentGenerator implements ContentListener {
 	 */
 	private int lastIdxForChildDiff = 0;
 	private int lastIdxForParentDiff = 0;
+	private int currentChildDiff = 0;
 	/**
 	 * The list with the parent diffs to be added in the content.
 	 */
@@ -241,10 +242,15 @@ public class HTMLContentGenerator implements ContentListener {
 	private void checkParentStartDiff(int currentOffs){
 		
 		
-		for(int i = 0 ; i < parrentDiffs.size(); i++){
+		for(int i = lastIdxForParentDiff ; i < parrentDiffs.size(); i++){
 			Difference difference = parrentDiffs.get(i);
 			
 			int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
+			int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
+			
+			if(!(currentOffs >= start && currentOffs <= end)) {
+				break;
+			}
 			
 			if(currentOffs == start){
 				localCount++;
@@ -264,15 +270,19 @@ public class HTMLContentGenerator implements ContentListener {
 	 */
 	private void checkParentEndDiff(int currentOffs){
 		
-		for(int i = 0 ; i < parrentDiffs.size(); i++){
+		for(int i = lastIdxForParentDiff ; i < parrentDiffs.size(); i++){
 			Difference difference = parrentDiffs.get(i);
 			
+			int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 			int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
+			
+			if(!(currentOffs >= start && currentOffs <= end)) {
+				break;
+			}
 			
 			if(currentOffs == end){
 				localCount--;
 				resultedText.append("</div>");
-				parrentDiffs.remove(i);
 				lastIdxForParentDiff ++;
 				break;
 			}
@@ -285,75 +295,104 @@ public class HTMLContentGenerator implements ContentListener {
 	public boolean checkDiff(int currentOffs, String buffer) {
 		//the returned value. If a Child Diff is found, it returns <code>true</code> else <code>false</code>
 		boolean foundDiff = false;
-		//Beginning of a child diff interval
-		int start = 0;
-		//ending of a child diff interval
-		int end = 0;
+		
 		
 		if(currentOffs > noDuplicates){ //does not let any duplicates offsets be rechecked
 			noDuplicates = currentOffs;
 			
 			if(differences != null){
-				
-				checkParentStartDiff(currentOffs); //check the parent diff first
-				
 				/**
-				 * Check the Child diff
+				 * Check the ParentDiff Start Tag
 				 */
-				for (int i = 0; i < differences.size(); i++) {
-					Difference difference = differences.get(i);
-											
-					start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
-					end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
-					
-					String diffEntryType = getClassForParentDiffType(difference, false, currentOffs);
-					
-					if (lastIdxForChildDiff < differences.size()) {
-						if ((((currentOffs == start) && (start == end))) || 
-								((currentOffs == end - 1) && (start + 1 == end))) {
-							
-							copyContent(buffer);
-							resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\""
-									+ lastIdxForChildDiff + "\"></span   >");
-
-							lastIdxForChildDiff++;
-
-							foundDiff = true;
-
-							break;
-						} else {
-							if (currentOffs == end - 1) {
-
-								local--;
-
-								copyContent(buffer);
-								resultedText.append("</span>");
-								foundDiff = true;
-
-								break;
-							}
-							if (currentOffs == start) {
-								local++;
-
-								copyContent(buffer);
-								resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\""
-										+ lastIdxForChildDiff + "\">");
-								lastIdxForChildDiff++;
-
-								foundDiff = true;
-
-								break;
-							}
-						}
-
-					}
-				}
+				checkParentStartDiff(currentOffs); 
 				/**
-				 * Check end ParentDiff
+				 * Check ChildDiff
+				 */
+				foundDiff = checkChild(currentOffs, buffer);
+				
+				/**
+				 * Check ParentDiff end tag
 				 */
 				checkParentEndDiff(currentOffs);
 			}
 		}
+		return foundDiff;
+	}
+	
+	/**
+	 * 
+	 * @param currentOffs
+	 * @param buffer
+	 * @return
+	 */
+	private boolean checkChild( int currentOffs, String buffer) {
+		//Beginning of a ChildDiff interval
+		int start;
+		//ending of a ChildDiff interval
+		int end;
+		//initially they are 0
+		start = end = 0;
+		
+		boolean foundDiff = false;
+		for (int i = currentChildDiff; i < differences.size(); i++) {
+			Difference difference = differences.get(i);
+			
+			start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
+			end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
+			
+			/**
+			 * Time Improvement:
+			 * In order to cut out meaningless operations, is checked if currentOffs is inside the current 
+			 * difference interval. If it's below the start or above the end it is useless to go through the rest of
+			 * the differences.   
+			 */
+			if(!(currentOffs >= start && currentOffs <= end)) {
+				break;
+			}
+			String diffEntryType = getClassForParentDiffType(difference, false, currentOffs);
+			
+			if ((((currentOffs == start) && (start == end))) || ((currentOffs == end - 1) && (start + 1 == end))) {
+
+				copyContent(buffer);
+				resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\""
+						+ lastIdxForChildDiff + "\"></span   >");
+				
+				lastIdxForChildDiff++;
+				currentChildDiff = lastIdxForChildDiff;
+
+				foundDiff = true;
+
+				break;
+			} else {
+				if (currentOffs == end - 1) {
+
+					local--;
+
+					copyContent(buffer);
+					resultedText.append("</span>");
+					foundDiff = true;
+					currentChildDiff = lastIdxForChildDiff;
+
+					break;
+				}
+				if (currentOffs == start) {
+					local++;
+
+					copyContent(buffer);
+					resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\""
+							+ lastIdxForChildDiff + "\">");
+					lastIdxForChildDiff++;
+
+					foundDiff = true;
+
+					break;
+				}
+			}
+			
+			
+
+		}
+
 		return foundDiff;
 	}
 	
