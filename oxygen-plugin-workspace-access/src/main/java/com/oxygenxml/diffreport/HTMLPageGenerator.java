@@ -25,12 +25,21 @@ import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 
 public class HTMLPageGenerator  {
 	
-	
+	/**
+	 * Algorithm that generates the differences between the given files
+	 */
 	private StandalonePluginWorkspace pluginWorkspaceAccess;
+	/**
+	 * Progress Bar pop-up dialog
+	 */
 	private IProgressMonitor progressMonitor;
 	private URL firstURL;
 	private URL secondURL; 
 	private File outputFile;
+	/**
+	 * Current progress. An integer between 0 and 100.
+	 * When parsing each tag, the progress will be incremented.
+	 */
 	private int progress;
 	private double lengthFile1, lengthFile2, totalLength;
 	
@@ -99,6 +108,7 @@ public class HTMLPageGenerator  {
 			List<Difference> diffs;
 			try {
 				
+				progressMonitor.setMillisToDecideToPopup(0);
 				reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 				reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 				
@@ -200,8 +210,6 @@ public class HTMLPageGenerator  {
 			 }
 			 cssReader.close();
 			 
-//			 progressMonitor.setProgress(20);
-//			 progressMonitor.setNote("Loaded " + 20 + " %");
 			/**
 			 * Start Table.		
 			 */
@@ -214,7 +222,9 @@ public class HTMLPageGenerator  {
 			 */
 			String leftPath = new File(firstURL.toURI()).toString();
 			String rightPath = new File(secondURL.toURI()).toString();
-
+			/**
+			 * in the left and right of the buttons, the name of the compared files are displayed
+			 */
 			htmlBuilder.append("<div class=\"FloatingUp\">\n"
 					+ "<div class=\"NameOfFileLeft\">"
 					+ "<b>"+givePathGetFileName(leftPath)+"</b>"
@@ -239,8 +249,6 @@ public class HTMLPageGenerator  {
 			/**
 			 * Parse first document.
 			 */
-			
-			
 			XMLMainParser parser = new XMLMainParser();
 			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
 			parser.setContentListener(htmlDiffGenerator);	
@@ -290,7 +298,6 @@ public class HTMLPageGenerator  {
 			/**
 			 * End Table.
 			 */
-			
 			htmlBuilder.append("</pre>\n");
 			htmlBuilder.append("</div></div>\n");
 			htmlBuilder.append("</td>\n");
@@ -336,7 +343,7 @@ public class HTMLPageGenerator  {
 	}
 
 	/**
-	 * Takes the Path that is given <pathExample>"C:\some\text\in.extension"</pathExample>
+	 * Takes the Path that is given <b>"C:\some\text\FILE_NAME.extension"</b>
 	 * and returns the last file with the extension
 	 * @param filePath
 	 * @return

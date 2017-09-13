@@ -27,7 +27,7 @@ public class HTMLContentGenerator implements ContentListener {
 	 */
 	private StringBuilder resultedText;
 	/**
-	 * The list with the differnces to be added in the generated content.
+	 * The list with the differences to be added in the generated content.
 	 */
 	private List<Difference> differences;
 	/**
@@ -36,31 +36,38 @@ public class HTMLContentGenerator implements ContentListener {
 	 */
 	private boolean isLeft;
 	/**
-	 * 
+	 * the value of diff-entry-type id
 	 */
 	private int lastIdxForChildDiff = 0;
+	/**
+	 * the value of diff-parent-entry-type id
+	 * also the current ParentDiff
+	 */
 	private int lastIdxForParentDiff = 0;
+	/**
+	 * current ChildDiff
+	 */
 	private int currentChildDiff = 0;
 	/**
 	 * The list with the parent diffs to be added in the content.
 	 */
 	private List<DiffEntry> parrentDiffs;
-	
+	/**
+	 * Counts the spans to see if they are closed.
+	 * If the value is bigger than 0, then the value represents the number of unclosed spans.
+	 * If the value is smaller than 0, then the value represents how many spans are closed in excess.
+	 */
 	private int localCount = 0;
-	
+	/**
+	 * An error may occur and an offset may be analyzed twice.
+	 * This variable does not allow checking an offset twice
+	 */
 	private int noDuplicates; 
 	
 	private int diffTypeConflict;
 	private int diffTypeOutgoing;
 	private int diffTypeIncoming;
-	
-	// TODO remove
-	Comparator<Integer> comparator = new Comparator<Integer>() {
-        @Override
-        public int compare(Integer a, Integer b) {
-            return b-a;
-        }
-    };
+
     
 	
     /**
@@ -97,9 +104,8 @@ public class HTMLContentGenerator implements ContentListener {
 		// Initialize the result string builder.
 		resultedText = new StringBuilder();
 		
-		// TODO remove
+		//initial value, could be any value, but not a positive one, nor 0 or -1
 		noDuplicates = -2;
-		//noDuplicates.add(Integer.MAX_VALUE);
 	}
 	
 	
@@ -236,7 +242,7 @@ public class HTMLContentGenerator implements ContentListener {
 	}
 	
 	/**
-	 * If the current offset indicates the beginning of a parent diff, it is returned
+	 * If the current offset indicates the beginning of a ParentDiff, it is marked with a <b>div</b> tag
 	 * @param currentOffs the offset that is currently analyzed
 	 */
 	private void checkParentStartDiff(int currentOffs){
@@ -248,7 +254,7 @@ public class HTMLContentGenerator implements ContentListener {
 			int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 			int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
 			
-			if(!(currentOffs >= start && currentOffs <= end)) {
+			if(timeImproovementChecker(start, end, currentOffs)) {
 				break;
 			}
 			
@@ -265,7 +271,7 @@ public class HTMLContentGenerator implements ContentListener {
 
 
 	/**
-	 * If the current offset indicates the ending of a parent diff, it is returned
+	 * If the current offset indicates the ending of a ParentDiff, it is marked with a <b>div</b> tag
 	 * @param currentOffs the offset that is currently analyzed
 	 */
 	private void checkParentEndDiff(int currentOffs){
@@ -276,7 +282,7 @@ public class HTMLContentGenerator implements ContentListener {
 			int start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 			int end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
 			
-			if(!(currentOffs >= start && currentOffs <= end)) {
+			if(timeImproovementChecker(start, end, currentOffs)) {
 				break;
 			}
 			
@@ -320,10 +326,10 @@ public class HTMLContentGenerator implements ContentListener {
 	}
 	
 	/**
-	 * 
+	 * If the current offset indicates the end or the beginning of a ChildDiff, it is marked with a <b>span</b> tag
 	 * @param currentOffs
 	 * @param buffer
-	 * @return
+	 * @return <code> true </code> if the current offset is either the beginning or the end of a ChildDiff
 	 */
 	private boolean checkChild( int currentOffs, String buffer) {
 		//Beginning of a ChildDiff interval
@@ -339,19 +345,18 @@ public class HTMLContentGenerator implements ContentListener {
 			
 			start = isLeft ?  difference.getLeftIntervalStart() : difference.getRightIntervalStart();
 			end = isLeft ?  difference.getLeftIntervalEnd() : difference.getRightIntervalEnd();
-			
-			/**
-			 * Time Improvement:
-			 * In order to cut out meaningless operations, is checked if currentOffs is inside the current 
-			 * difference interval. If it's below the start or above the end it is useless to go through the rest of
-			 * the differences.   
-			 */
-			if(!(currentOffs >= start && currentOffs <= end)) {
+						
+
+			//Time Improvement:
+			if(timeImproovementChecker(start, end, currentOffs)) {
 				break;
 			}
+			
 			String diffEntryType = getClassForParentDiffType(difference, false, currentOffs);
 			
-			if ((((currentOffs == start) && (start == end))) || ((currentOffs == end - 1) && (start + 1 == end))) {
+			//if the offset is start/end and the difference between beginning end ending of a difference is either 0 or 1
+			if ((((currentOffs == start) && (start == end))) 
+					|| ((currentOffs == end - 1) && (start + 1 == end))) {
 
 				copyContent(buffer);
 				resultedText.append("<span class=\"diffEntry " + diffEntryType + "\" data-diff-id=\""
@@ -364,6 +369,7 @@ public class HTMLContentGenerator implements ContentListener {
 
 				break;
 			} else {
+				//the algorithm adds a 1, so the current offset has to be compared to the ending - 1 offset
 				if (currentOffs == end - 1) {
 
 					local--;
@@ -375,6 +381,7 @@ public class HTMLContentGenerator implements ContentListener {
 
 					break;
 				}
+				//checks if there is a start offset
 				if (currentOffs == start) {
 					local++;
 
@@ -394,6 +401,20 @@ public class HTMLContentGenerator implements ContentListener {
 		}
 
 		return foundDiff;
+	}
+	
+	/**
+	 * Time Improvement:
+	 * In order to cut out meaningless operations, is checked if currentOffs is inside the current 
+	 * difference interval. If it's below the start or above the end it is useless to go through the rest of
+	 * the differences. 
+	 * @param start - interval Begin Offset
+	 * @param end - interval End Offset
+	 * @param currentOffs - current Offset
+	 * @return <code>true</code> if the offset is NOT inside the interval.
+	 */
+	public boolean timeImproovementChecker(int start, int end, int currentOffs) {
+		return !(currentOffs >= start && currentOffs <= end);
 	}
 	
 	

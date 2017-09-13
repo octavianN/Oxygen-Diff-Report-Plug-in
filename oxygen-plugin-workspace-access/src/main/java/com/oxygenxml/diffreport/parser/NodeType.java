@@ -2,7 +2,7 @@ package com.oxygenxml.diffreport.parser;
 
 /**
  * Node Types in a HTML File
- * @author intern3
+ * @author Dina_Andrei
  *
  */
 public enum NodeType {
@@ -12,33 +12,53 @@ public enum NodeType {
 	 */
 	EMPTYDATA,
 	
-	//Normal Element 
+	/**
+	 * Normal Element 
+	 */
 	ELEMENT,
 	
-	//Closing Element
+	/**
+	 * Closing Element
+	 */
 	ELEMENT_CLOSE,
 	
-	// The text that appears between a start and closing node
+	/**
+	 * The text that appears between a start and closing node
+	 */
 	TEXTFIELD,
 	
-	//AttributeName of an element
+	/**
+	 * AttributeName of an element
+	 */
 	ATTRIBUTENAME,
 	
-	//AttributeValue of the AttributeName 
+	/**
+	 * AttributeValue of the AttributeName 
+	 */
 	ATTRIBUTEVALUE,
 	
-	//Processing Information Node
+	/**
+	 * Processing Information Node
+	 */
 	PI,
 	
-	//Doctype Node
+	/**
+	 * Doctype Node
+	 */
 	DOCTYPE,
 	
-	//CData Ndoe
+	/**
+	 * CData Node
+	 */
 	CDATA,
 	
-	//Comment Field
+	/**
+	 * Comment Field
+	 */
 	COMMENT,
 	
-	//DiffEntry field
+	/**
+	 * DiffEntry field
+	 */
 	DIFFENTRY
 }

@@ -12,6 +12,7 @@
 	var i;
 	var currentIDParent = -1;
 	var currentIDChild = -1;
+	var currentDiff = document.getElementsByClassName("CurrentDifference");
 
 	var childrenListHalf;
 	if(childrenList.length % 2 == 1)	
@@ -141,7 +142,7 @@
 
 	    		parentsList[i].style.background = color;
 	    		parentsList[i].style.opacity = "0.9";
-	    		fillCanvas(parentsList[i], color);
+	    		fillCanvas(parentsList[i], "#ffffff");
 	    	}
 	    }
 	}
@@ -175,7 +176,7 @@
 
 	    		parentsList[i].style.background = color;
 	    		parentsList[i].style.opacity = "0.81";
-	    		fillCanvas(parentsList[i], color);
+	    		fillCanvas(parentsList[i], "#ffffff");
 	    	}
 	    }
 	}
@@ -391,7 +392,6 @@
 		}
 
 		for(i = childrenListHalf; i < childrenList.length; i++){
-			console.log("half: ",childrenListHalf, "whole: ", childrenList.length);
 			var value2 = parseInt(childrenList[i].getAttribute("data-diff-id"));
 			
 			var concat=getConcatForChild(i);
@@ -410,8 +410,7 @@
 		}
 
 
-	   var concat = getConcatForChild(id1);
-   
+	   	var concat = getConcatForChild(id1);
 
     	childrenList[id1].classList.add(concat); 
     	childrenList[id2].classList.add(concat);
@@ -436,6 +435,7 @@
 			childrenList[id2].setAttribute("identify", "0");
 			currentIDChild = -1;
 		}
+
 
 	}
 
@@ -502,18 +502,15 @@
 		       context.beginPath();
 
 		        context.lineWidth = 0.5;
+		        context.strokeStyle = '#b9b9b9';
 				context.moveTo(0,parentsList[i].offsetTop + coordinatesLeft.height);
 		        context.lineTo(0, parentsList[i].offsetTop);
-		        context.strokeStyle = '#b9b9b9';
 				context.stroke();
 		        context.lineTo(40, parentsList[parentsList.length/2 + i].offsetTop);
-		        context.strokeStyle = 'none';
 				context.stroke();
 				context.lineTo(40, parentsList[parentsList.length/2 + i].offsetTop + coordinatesRight.height);
-				context.strokeStyle = '#b9b9b9';
 				context.stroke();
 		        context.lineTo(0, parentsList[i].offsetBottom);
-		        context.strokeStyle = 'none';
 		        context.stroke();
 				
 				context.closePath();

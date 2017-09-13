@@ -27,7 +27,6 @@ public class XMLMainParser {
 	 * Listener to the parse events, used to generate the HTML content.
 	 */
 	private ContentListener contentListener;
-	public StringBuilder resultToCheckIfItReadsCorrectly;// TODO remove
 
 	/**
 	 * Every time I read an element I want to know
@@ -38,7 +37,9 @@ public class XMLMainParser {
 	 *
 	 */
 	class ReaderWithIndex extends Reader{
-
+		/**
+		 * current offset in the file
+		 */
 		private int index;
 		private Reader innerReader;
 
@@ -74,7 +75,7 @@ public class XMLMainParser {
 	 * Constructor.
 	 */
 	public XMLMainParser(){
-		resultToCheckIfItReadsCorrectly = new StringBuilder();
+
 	}
 
 
@@ -89,8 +90,8 @@ public class XMLMainParser {
 
 	/**
 	 * The length of each file by calculus is the percentage of its length reported to the total length,
-	 * the sum, of the the two files in contrast with the elapsed time of the whole program.
-	 * So 100% of the execution time to parse one file is <number>percentage of file length out of total length<number>% 
+	 * (the sum of the the two files in contrast with the elapsed time of the whole program).
+	 * So 100% of the execution time to parse one file is <b>(percentage of file length out of total length) %</b> 
 	 * of the total time it takes to execute the program.
 	 * @param oldPercentage - the percentage that has already accumulated 
 	 * @param totalLength - length of both files
@@ -160,10 +161,11 @@ public class XMLMainParser {
 		
 		CurrentReadElement currentElement = null;
 		do {
-			
+			//creates an Element with the current tag
 			currentElement = new CurrentReadElement();
 			lastCharacter = readTag(currentElement, reader, lastCharacter);
 			
+			//parses the Tag
 			parser.setCurrentElement(currentElement);
 			parser.parse();
 			

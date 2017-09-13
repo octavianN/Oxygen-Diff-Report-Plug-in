@@ -36,9 +36,8 @@ public interface ContentListener {
 	
 	
 	/**
-	 * Given an index it compares it to any of the 
-	 * Beginning or Ending offsets. Starts and ends
-	 * spans accordingly;
+	 * Given an offset, it is compared with all of the offset and checks if it is one of 
+	 * Beginning or Ending offsets. Starts and ends spans accordingly;
 	 * @param i current Index
 	 * @param buffer the Content so far
 	 * @return <code>true</code> if a diff entry was found.

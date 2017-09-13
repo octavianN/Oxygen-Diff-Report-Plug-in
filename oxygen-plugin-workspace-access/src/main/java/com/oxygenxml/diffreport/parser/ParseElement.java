@@ -11,7 +11,9 @@ import com.oxygenxml.diffreport.generator.ContentListener;
  */
 public class ParseElement {
 
-	
+	/**
+	 * The result. Depending on every tag, it puts the tags.
+	 */
 	private ContentListener contentListener;
 	private CurrentReadElement currentElement;
 	

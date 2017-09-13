@@ -9,12 +9,26 @@ package com.oxygenxml.diffreport.parser;
  *
  */
 public class CurrentReadElement{
-	
+	/**
+	 * The beginning offset of the tag extracted from the file
+	 */
 	int beginOffset;
+	/**
+	 * the ending offset of the tag extracted from the file
+	 */
 	int endOffset;
-	boolean isElementAndHasAttribute;  /*In case between tags there is an element
-	 									I want to know if it has an attribute or not*/
+	/**
+	 * In case between tags there is an element
+		I want to know if it has an attribute or not
+	 */
+	boolean isElementAndHasAttribute;  
+	/**
+	 * the content of the tag
+	 */
 	StringBuilder elementContent;
+	/**
+	 * Tag Type: Element, CDATA, Doctype etc.. 
+	 */
 	NodeType type;
 	
 	public CurrentReadElement() {
