@@ -54,16 +54,19 @@ public class DiffReportFileChooserDialogue extends JDialog
 	private JTextField thirdLabelField;
 	private ReportGenerator reportGenerator;
 	ProgressMonitor progressMonitor;
+	/**
+	 * Launches the execute() method on the parser and diffGenerator to be executed in background.
+	 */
 	private SwingWorker<Void,Void> swingWorker;
 	
 	/**
-	 * The Singleton Instance of the object
+	 * The Singleton Instance of the object.
 	 */
 	private static volatile DiffReportFileChooserDialogue instance;
 
 	/**
 	 * Constructor.
-	 * Sets the preferences of the dialog and builds it
+	 * Sets the preferences of the dialog and builds it.
 	 */
 	private DiffReportFileChooserDialogue() {
 		this.setModal(true);
@@ -104,8 +107,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 	
 	
 	//Getters and Setters
-    
-    
+
 	public JTextField getThirdLabelField() {
 		return thirdLabelField;
 	}
@@ -356,12 +358,12 @@ public class DiffReportFileChooserDialogue extends JDialog
 			File outputFile = new File(getThirdLabelField().getText());
 			
 			// If any of the input files does not exist or have an unidentified extension, an exception is thrown
-			if (!new File(leftFile).exists() || !new File(rightFile).exists()){				
+			if (!new File(leftFile).exists() || !new File(rightFile).exists() || !outputFile.exists()){				
 				throw new FileNotFoundException();
 			}
 			progressMonitor = new ProgressMonitor(this, "Generating Diff", "", 0, 100);
 			//"Generate Button" is pressed -> a new HTMLPageGenerator is created
-			HTMLPageGenerator pageGenerator = new HTMLPageGenerator();
+			PageGenerator pageGenerator = new HTMLPageGenerator();
 			/**
 			 * SwingWorker execute() method works with the ProgressMonitor.
 			 * It is used as a wrapper for the pageGenerator.
@@ -440,9 +442,9 @@ public class DiffReportFileChooserDialogue extends JDialog
 	}
 	
 	/**
-	 * Occur whenever the value of a bound property changes for a bean
-	 * Is set on the SwingWorker
-	 * When pressing the Cancel Button on the Progress Dialog, it closes
+	 * Occur whenever the value of a bound property changes for a bean.
+	 * Is set on the SwingWorker.
+	 * When pressing the Cancel Button on the Progress Dialog, it closes.
 	 */
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (progressMonitor != null) {

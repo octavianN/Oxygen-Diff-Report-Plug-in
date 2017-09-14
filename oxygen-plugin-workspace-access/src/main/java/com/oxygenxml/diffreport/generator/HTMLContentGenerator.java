@@ -16,7 +16,7 @@ import ro.sync.diff.xml.DiffEntryType;
 /**
  * Lister.
  * It listens to the content given by the parsers and
- * adds spans accordingly
+ * adds span and div tags accordingly.
  * @author Dina_Andrei
  *
  */
@@ -133,8 +133,7 @@ public class HTMLContentGenerator implements ContentListener {
 
 
 	/**
-	 * Depending on the type of the Node, a span is created
-	 * with a class of that Node Type
+	 * When is given a certain type it starts a span with a class of the tag type.
 	 */
 	@Override
 	public void startNode(NodeType type) {

@@ -32,7 +32,7 @@ import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
  * @author Dina_Andrei
  *
  */
-public class HTMLPageGenerator  {
+public class HTMLPageGenerator implements PageGenerator {
 	
 	/**
 	 * Algorithm that generates the differences between the given files
@@ -118,6 +118,8 @@ public class HTMLPageGenerator  {
 			try {
 				
 				progressMonitor.setMillisToDecideToPopup(0);
+				progressMonitor.setProgress(0);
+				progressMonitor.setNote("Generating Differences: " + 5 + " %");
 				reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 				reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 				
@@ -258,7 +260,7 @@ public class HTMLPageGenerator  {
 			/**
 			 * Parse first document.
 			 */
-			XMLMainParser parser = new XMLMainParser();
+			MainParser parser = new XMLMainParser();
 			HTMLContentGenerator htmlDiffGenerator = new HTMLContentGenerator(diffs, true);
 			parser.setContentListener(htmlDiffGenerator);	
 			int oldPercentage = 10;
@@ -355,7 +357,7 @@ public class HTMLPageGenerator  {
 	 * Takes the Path that is given <b>"C:\some\text\FILE_NAME.extension"</b>
 	 * and returns the last file with the extension
 	 * @param filePath
-	 * @return
+	 * @return name of the XML file.
 	 */
 	private String givePathGetFileName(String filePath) {
 		String result = "";

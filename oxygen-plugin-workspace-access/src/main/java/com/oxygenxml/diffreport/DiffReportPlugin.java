@@ -189,14 +189,14 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   						 */ 
   						ReportGenerator rep = new ReportGenerator() {
 							
-  							HTMLPageGenerator page;
+  							PageGenerator page;
 							
   							/**
   							 * Sets the PageGenerator and it also gives it the pluginWorkspaceAccess in order
   							 * to execute the difference Algorithm
   							 */
 							@Override
-							public void setPageGenerator(HTMLPageGenerator pg) {
+							public void setPageGenerator(PageGenerator pg) {
 								this.page = pg;
 								page.setPluginWorkspaceAccess(pluginWorkspaceAccess);
 							}

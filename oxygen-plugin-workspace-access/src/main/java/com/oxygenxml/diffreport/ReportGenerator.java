@@ -1,12 +1,5 @@
 package com.oxygenxml.diffreport;
 
-import java.io.File;
-import java.net.URL;
-
-import javax.swing.ProgressMonitor;
-
-import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
-
 /**
  * Takes the input from the dialogue and makes the connection between
  * the Generate Diff Button and the Oxygen Plug-In
@@ -23,7 +16,7 @@ public interface ReportGenerator {
 	 * @param outputFile The File where the result is written;
 	 * @param progressMonitor 
 	 */
-	void setPageGenerator(HTMLPageGenerator pg);
+	void setPageGenerator(PageGenerator pg);
 	
 	
 }

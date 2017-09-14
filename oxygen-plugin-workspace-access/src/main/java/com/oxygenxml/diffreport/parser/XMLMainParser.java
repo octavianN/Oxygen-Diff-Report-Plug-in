@@ -6,6 +6,7 @@ import java.io.Reader;
 import javax.swing.ProgressMonitor;
 
 import com.oxygenxml.diffreport.IProgressMonitor;
+import com.oxygenxml.diffreport.MainParser;
 import com.oxygenxml.diffreport.generator.ContentListener;
 
 
@@ -22,7 +23,7 @@ import com.oxygenxml.diffreport.generator.ContentListener;
  * @author Dina_Andrei
  *
  */
-public class XMLMainParser {
+public class XMLMainParser implements MainParser{
 	/**
 	 * Listener to the parse events, used to generate the HTML content.
 	 */
@@ -98,8 +99,8 @@ public class XMLMainParser {
 	 * @param lengthFile - number of bytes in the given file
 	 * @param parsedLength - length parsed so far
 	 * @param isSecondFile - a boolean that tells if we are dealing with the second file or the first
-	 * <code>isSecondFile = true </code> the second file is parsed
-	 * <code>isSecondFile = false </code> the first file is parsed
+	 * if <code>isSecondFile == true </code> the second file is parsed
+	 * else if <code>isSecondFile == false </code> the first file is parsed
 	 * @return the percentage
 	 */
 	public int getPercentage(int oldPercentage, double totalLength, double lengthFile, double parsedLength, boolean isSecondFile) {
@@ -127,24 +128,8 @@ public class XMLMainParser {
 		return (int) percentageForProgressBar;
 	}
 	
-	/**
-	 * * Passes the File and wraps it into a ReaderWithIndex
-	 * I then initialize the parser and set it with the
-	 * current Listener
-	 * I am reading the current tag:
-	 * NOTE: A tag could be between "> <", a TextField
-	 * Then I am passing the result to the parser
-	 * @param read - current File of the two XML files
-	 * @param progressMonitor - Progress Bar Generator
-	 * @param progress - percentage of the total execution time 
-	 * @param lengthFile - number of bytes in the given file
-	 * @param totalLength - length of both files
-	 * @param oldPercentage - the percentage that has already accumulated 
-	 * @param isSecondFile a boolean that tells if we are dealing with the second file or the first
-	 * <code>isSecondFile = true </code> the second file is parsed
-	 * <code>isSecondFile = false </code> the first file is parsed
-	 * @throws IOException
-	 */
+
+	
 	public int parseInputIntoHTMLFormat(Reader read, 
 										IProgressMonitor progressMonitor, 
 										int progress, 
@@ -223,8 +208,8 @@ public class XMLMainParser {
 	 * I go through characters one by one and compare them with the given string.
 	 * If there is no difference it return null, otherwise it returns the string
 	 * up until the difference occurs
-	 * @param reader
-	 * @param comparedToThis
+	 * @param reader characters are read one by one until they reach comparedToThis length
+	 * @param comparedToThis the characters are compared to this string
 	 * @return
 	 * @throws IOException
 	 */
@@ -431,8 +416,6 @@ public class XMLMainParser {
 		default:
 			break;
 		}
-
-		//currentElement.endOffset = reader.getIndex();
 
 		return currentCharacter;
 	}
