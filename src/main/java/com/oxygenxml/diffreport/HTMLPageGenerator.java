@@ -24,6 +24,7 @@ import ro.sync.diff.api.DiffOptions;
 import ro.sync.diff.api.Difference;
 import ro.sync.diff.api.DifferencePerformer;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
+import ro.sync.util.Resource;
 
 /**
  * Creates the HTML page with the two parsed XML files
@@ -74,8 +75,9 @@ public class HTMLPageGenerator implements PageGenerator {
 	 * @param firstURL Path of the first file as a URL
 	 * @param secondURL Path of the second file as a URL
 	 * @param outputFile Path of the output file
+	 * @throws DiffException 
 	 */
-	public void generateHTMLReport(URL firstURL, URL secondURL, File outputFile ){
+	public void generateHTMLReport(URL firstURL, URL secondURL, File outputFile, int algorithmName) throws DiffException{
 		try {
 			File f = new File(firstURL.toURI());
 			lengthFile1 = f.length();
@@ -92,10 +94,11 @@ public class HTMLPageGenerator implements PageGenerator {
 		this.outputFile = outputFile;
 		
 		try {
-			generateHTMLReport();
+			generateHTMLReport(algorithmName);
+		
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
-		}	
+		}
 	}
 	
 	/**
@@ -103,28 +106,29 @@ public class HTMLPageGenerator implements PageGenerator {
 	 * The algorithm runs in 10% the time of the whole program execution time.
 	 * The differences are put in a list that is given further to the parser.
 	 * @throws URISyntaxException
+	 * @throws DiffException 
 	 */
-	private void generateHTMLReport() throws URISyntaxException {
+	private void generateHTMLReport(int algorithmName) throws URISyntaxException, DiffException {
 		File htmlForFirstFile = outputFile;
 
 		Reader reader1 = null;
 		Reader reader2 = null;
+		
+		progressMonitor.setMillisToDecideToPopup(0);
+		progressMonitor.setProgress(0);
+		progressMonitor.setNote("Generating Differences: " + 5 + " %");
 		try {
 			DifferencePerformer diffPerformer = pluginWorkspaceAccess.getCompareUtilAccess().createDiffPerformer();
-			DiffOptions diffOptions = new DiffOptions();
-			diffOptions.setEnableHierarchicalDiff(true);
-			String contentType = DiffContentTypes.XML_CONTENT_TYPE;
 			List<Difference> diffs;
 			try {
-				
-				progressMonitor.setMillisToDecideToPopup(0);
-				progressMonitor.setProgress(0);
-				progressMonitor.setNote("Generating Differences: " + 5 + " %");
+
 				reader1 = pluginWorkspaceAccess.getUtilAccess().createReader(firstURL, "UTF-8");
 				reader2 = pluginWorkspaceAccess.getUtilAccess().createReader(secondURL, "UTF-8");
 				
 				//Algorithm return a list of differences
-				diffs = diffPerformer.performDiff(reader1, reader2, null, null, contentType, diffOptions, null);
+				diffs = AlgorithmFactory.getDifferencesWithAlgorithm(reader1, reader2, algorithmName, diffPerformer);
+				if(diffs==null)
+					return;
 				progress += 10;
 				progressMonitor.setProgress(progress);
 				progressMonitor.setNote("Generating FIRST file: " + progress + " %");
@@ -155,8 +159,6 @@ public class HTMLPageGenerator implements PageGenerator {
 		}catch (MalformedURLException e) {
 			e.printStackTrace();
 		}catch (IOException e) {
-			e.printStackTrace();
-		} catch (DiffException e) {
 			e.printStackTrace();
 		} finally {
 			//closing the files
@@ -214,7 +216,7 @@ public class HTMLPageGenerator implements PageGenerator {
 			 * Add the CSS file.
 			 */
 			BufferedReader cssReader = new BufferedReader(new FileReader(new File(
-					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\css")));
+					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\diffStyle.css")));
 			 String line;
 			 while ((line = cssReader.readLine()) != null) {
 				 htmlBuilder.append(line + "\n");
@@ -329,7 +331,7 @@ public class HTMLPageGenerator implements PageGenerator {
 			 */
 			htmlBuilder.append("<script>");
 			BufferedReader jsReader = new BufferedReader(new FileReader(new File(
-					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\script.js")));
+					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\script.js")));
 			while ((line = jsReader.readLine()) != null) {
 				htmlBuilder.append(line + "\n");
 			}

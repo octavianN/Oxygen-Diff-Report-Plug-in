@@ -21,6 +21,10 @@
 
   <files>
     <file>
+      <source>target/${project.build.finalName}-images.jar</source>
+      <outputDirectory>/lib</outputDirectory>
+    </file>
+    <file>
       <source>target/build/${project.build.finalName}.jar</source>
       <outputDirectory>/lib</outputDirectory>
     </file>
@@ -28,6 +32,10 @@
       <source>plugin.xml</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
+    </file>
+    <file>
+      <source>i18n/translation.xml</source>
+      <outputDirectory>/i18n</outputDirectory>
     </file>
   </files>
 </assembly>

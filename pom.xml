@@ -68,6 +68,19 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.4</version>
         <executions>
+          <!--  Put the images into a separate JAR -->
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+			            <id>build-images-jar</id>
+			            <configuration>
+							<descriptors>
+								<descriptor>assembly-images.xml</descriptor>
+							</descriptors>
+						</configuration>
+			          </execution>
           <execution>
             <id>make-assembly</id>
             <phase>package</phase>

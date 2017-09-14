@@ -9,6 +9,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Label;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,14 +20,18 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -38,7 +43,13 @@ import javax.swing.filechooser.FileSystemView;
 
 import org.apache.batik.ext.swing.GridBagConstants;
 
+import constants.ImageConstants;
+import constants.Labels;
+import ro.sync.diff.api.DiffException;
+import ro.sync.diff.api.DiffOptions;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
+import ro.sync.ui.Icons;
+import translator.TranslatorImplementation;
 
 /**
  * Dialog with three fields. Compare two files and choose where to save the result
@@ -53,6 +64,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 	private JTextField secondLabelField;
 	private JTextField thirdLabelField;
 	private ReportGenerator reportGenerator;
+	private int algorithmName;
 	ProgressMonitor progressMonitor;
 	/**
 	 * Launches the execute() method on the parser and diffGenerator to be executed in background.
@@ -79,10 +91,10 @@ public class DiffReportFileChooserDialogue extends JDialog
 		});
 
 		this.add(crateMainPanel(), BorderLayout.CENTER);
-		this.setPreferredSize(new Dimension(450, 180));
+		this.setPreferredSize(new Dimension(450, 215));
 		this.pack();
 		this.setLocationRelativeTo(null);
-		this.setTitle("Diff Report Generator");
+		this.setTitle(Labels.TITLE);
 		
 		
 	}
@@ -164,7 +176,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 		JPanel buttonPanel = createButtons();
 		
 		mainPanel.setBorder(new EmptyBorder(0, 0, 5, 0));
-		fileChooserPanel.setBorder(new EmptyBorder(15, 5, 15, 5));
+		fileChooserPanel.setBorder(new EmptyBorder(15, 15, 0, 5));
 		
 		mainPanel.add(fileChooserPanel, BorderLayout.NORTH);
 		mainPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -172,6 +184,8 @@ public class DiffReportFileChooserDialogue extends JDialog
 		
 		return mainPanel;
 	}
+	
+	
 	
 	/**
 	 * Each component is given to a function that creates a panel.
@@ -185,9 +199,10 @@ public class DiffReportFileChooserDialogue extends JDialog
 		JPanel auxiliaryPanel;
 		GridBagConstraints constraints = new GridBagConstraints();
 		
-		JLabel fileOne_Label = new JLabel("Left File:  ");
-		JLabel fileTwo_Label = new JLabel("Right File: ");
-		JLabel fileThree_Label = new JLabel("Output:  ");
+		TranslatorImplementation tr = new TranslatorImplementation();
+		JLabel fileOne_Label = new JLabel(tr.getTraslation(Labels.LEFT_FILE));
+		JLabel fileTwo_Label = new JLabel(tr.getTraslation(Labels.RIGHT_FILE));
+		JLabel fileThree_Label = new JLabel(tr.getTraslation(Labels.OUTPUT_FILE));
 		
 		firstLabelField = new JTextField(20);
 		secondLabelField = new JTextField(20);
@@ -215,14 +230,18 @@ public class DiffReportFileChooserDialogue extends JDialog
 		constraints.gridy ++ ;
 		auxiliaryPanel = createFilePannel(fileTwo_Label, secondLabelField, browseButton2, 10);
 		panel.add(auxiliaryPanel, constraints);
-
+		
+		constraints.gridy ++;
+		auxiliaryPanel = createComboBoxPanel();
+		constraints.fill = GridBagConstants.NONE;
+		constraints.insets = new Insets(0, 6, 30, 0);
+		panel.add(auxiliaryPanel, constraints);
+		
 		constraints.gridy++;
+		constraints.fill = GridBagConstants.BOTH;
 		auxiliaryPanel = createFilePannel(fileThree_Label, thirdLabelField, browseButton3, 17);
 		constraints.insets = new Insets(0, 6, 0, 0);
 		panel.add(auxiliaryPanel, constraints);
-
-
-		
 
 		
 		return panel;
@@ -271,13 +290,72 @@ public class DiffReportFileChooserDialogue extends JDialog
 	}
 	
 	/**
+	 * Crates the ComboBox that lets the user choose the algorithm to differentiate the files.
+	 * @return the panel that contains the two components: Label + ComboBox
+	 */
+	private JPanel createComboBoxPanel() {
+		GridBagLayout layout = new GridBagLayout();
+		GridBagConstraints constraints = new GridBagConstraints();
+		JPanel panel = new JPanel(layout);
+		Integer[] types = {DiffOptions.AUTO, DiffOptions.XML_FAST, DiffOptions.XML_ACCURATE};
+		JLabel labelAlgorithm= new JLabel();
+		JComboBox<Integer> algorithmType = new JComboBox<Integer>(types);
+		TranslatorImplementation tr = new TranslatorImplementation();
+		labelAlgorithm.setText(tr.getTraslation(Labels.ALGORITHM_LABEL));
+		
+		// takes the ID's from the combo Box and transforms them into their correlating name. 
+		algorithmType.setRenderer(new DefaultListCellRenderer() {
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+					boolean cellHasFocus) {
+				String rendererVal = "Auto";
+				switch ((int)value) {
+				case DiffOptions.XML_ACCURATE:
+					rendererVal = "XML Accurate";
+					break;
+				case DiffOptions.XML_FAST:
+					rendererVal = "XML Fast";
+					break;
+				default:
+					break;
+				}
+				
+				return super.getListCellRendererComponent(list, rendererVal, index, isSelected, cellHasFocus);
+			}
+		});
+		
+		//Action listener for the ComboBox. It is only remembered the chosen Algorithm.
+		algorithmType.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+		        int algType = algorithmType.getItemAt(algorithmType.getSelectedIndex());
+		        algorithmName = algType;
+				
+			}
+		});
+		
+		constraints.fill = GridBagConstants.HORIZONTAL;
+		constraints.anchor = GridBagConstants.WEST;
+		constraints.gridx = 0;
+		constraints.weightx = 1;
+		constraints.weighty = 0;
+		panel.add(labelAlgorithm, constraints);
+		
+		constraints.gridx++;
+		constraints.insets = new Insets(0, 6, 0, 0);
+		panel.add(algorithmType, constraints);
+		return panel;
+	}
+	
+	/**
 	 * Creates a Browse button and remembers the given path
 	 * in the field param.
 	 * @param field -> The field responsible with remembering the Path
 	 * @return the browsing Button for each of the files
 	 */
 	private ToolbarButton createBrowseButton(final JTextField field){
-		ImageIcon imageIcon = new ImageIcon("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\Open16.png");
+		ImageIcon imageIcon = Icons.getIcon(ImageConstants.DOC_BROWSE_BUTTON);
 		AbstractAction browseAction = new AbstractAction("Browse", imageIcon) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -310,10 +388,12 @@ public class DiffReportFileChooserDialogue extends JDialog
 		box1.setBackground(Color.WHITE);
 		box2.setBackground(Color.WHITE);
 		
+		TranslatorImplementation tr = new TranslatorImplementation();
+		
 		/**
 		 * Generate Diff Button. 
 		 */
-		generateDiffButton = new JButton("Generate Diff");
+		generateDiffButton = new JButton(tr.getTraslation(Labels.GENERATE_DIFF_BUTTON));
 		generateDiffButton.setPreferredSize(new Dimension(97, 25));
 		generateDiffButton.addActionListener(new ActionListener() {
 			@Override
@@ -327,7 +407,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 		/**
 		 * Cancel Button.
 		 */
-		JButton cancelButton = new JButton("Cancel");
+		JButton cancelButton = new JButton(tr.getTraslation(Labels.CLOSE_BUTTON));
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -372,13 +452,27 @@ public class DiffReportFileChooserDialogue extends JDialog
 				/**
 				 * Launches on execute() method.
 				 * generateHTMLReport() for big inputs takes a long time so has to be ran in background 
+				 * @throws DiffException 
+				 * @throws MalformedURLException 
 				 * 
 				 */
 				@Override
-				protected Void doInBackground() throws Exception {
-					pageGenerator.generateHTMLReport(new File(leftFile).toURI().toURL(),
-							new File(rightFile).toURI().toURL(),
-							outputFile);
+				protected Void doInBackground() throws MalformedURLException  {
+					try {
+						pageGenerator.generateHTMLReport(new File(leftFile).toURI().toURL(),
+								new File(rightFile).toURI().toURL(),
+								outputFile,
+								algorithmName);
+					} catch (DiffException e) {
+						JOptionPane.showMessageDialog(null, 
+								 "Algorithm Does not WORK!", 
+								 "", 
+								 JOptionPane.INFORMATION_MESSAGE);
+						 setVisible(true);
+						 progressMonitor.setProgress(100);
+						 
+						e.printStackTrace();
+					}
 					return null;
 				}
 				/**

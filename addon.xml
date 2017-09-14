@@ -8,22 +8,17 @@ https://www.oxygenxml.com/doc/versions/18.1/ug-editor/topics/packing-and-deployi
         id="com.oxygenxml.plugin.WorkspaceAccess">
         <xt:location href="${project.build.finalName}-plugin.jar"/>
         <xt:version>${project.version}.0</xt:version>
-        <xt:oxy_version>17.0+</xt:oxy_version>
+        <xt:oxy_version>19.1+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>Oxygen XML Editor</xt:author>
-        <xt:name>WorkspaceAccess</xt:name>
+        <xt:name>Diff Report</xt:name>
         <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
             <head>
-                <title>Sample Workspace Access plugin</title>
+                <title>Oxygen Diff Report plugin</title>
             </head>
             <body>
                 <div>
-                    <p>This plugin installs access to the &lt;oXygen/&gt; workspace. That enables
-                        &lt;oXygen/&gt; to open/save/close resources, access the editors content,
-                        etc. Such a plugin must implement an WorkspacePluginExtension. </p>
-                    <p>For more details see <a
-                        href="http://www.oxygenxml.com/doc/ug-oxygen/index.html?q=/doc/ug-oxygen/concepts/workspace-access-plugin.html"
-                        >http://www.oxygenxml.com/doc/ug-oxygen/index.html?q=/doc/ug-oxygen/concepts/workspace-access-plugin.html</a>
+                    <p>TODO
                     </p>
                 </div>
             </body>

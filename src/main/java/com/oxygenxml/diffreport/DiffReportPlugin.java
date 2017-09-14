@@ -26,6 +26,7 @@ import javax.swing.text.BadLocationException;
 import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
 import com.oxygenxml.diffreport.parser.XMLMainParser;
 
+import constants.ImageConstants;
 import ro.sync.diff.api.DiffContentTypes;
 import ro.sync.diff.api.DiffException;
 import ro.sync.diff.api.DiffOptions;
@@ -43,6 +44,7 @@ import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.standalone.ToolbarComponentsCustomizer;
 import ro.sync.exml.workspace.api.standalone.ToolbarInfo;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
+import ro.sync.ui.Icons;
 
 
 /**
@@ -173,7 +175,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
    * @return the button 
    */
   	private ToolbarButton createToolbarButton(final StandalonePluginWorkspace pluginWorkspaceAccess){
-  		ImageIcon imageIcon = new ImageIcon("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\DiffFiles24.png");
+  		ImageIcon imageIcon =Icons.getIcon(ImageConstants.DIFF_DIALOG_GENERATOR_IMAGE);
 		@SuppressWarnings("serial")
 		AbstractAction showDiffAction = new AbstractAction("HTML: Show Diff", imageIcon) {
   			@Override

@@ -24,31 +24,31 @@ div.canvasContainer{
 	padding: 0px;
 }
 button.NextButtonChild{
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\DiffNextBlock24.png");
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\DiffNextBlock24.png");
 	border-radius: 50%;
 	background-color: #99CCFF;
 }
 
 button.PreviousButtonChild{
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\DiffPreviousBlock24.png");
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\DiffPreviousBlock24.png");
 	border-radius: 50%;
 	background-color: #99CCFF;
 }
 
 button.NextButton {
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\DiffNext24.png");
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\DiffNext24.png");
 	border-radius: 50%;
 	background-color: #99CCFF;
 }
 
 button.PreviousButton{
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\DiffPrevious24.png");
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\DiffPrevious24.png");
 	border-radius: 50%;
 	background-color: #99CCFF;
 }
 
 button.SwapButton{
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\oxygen-plugin-workspace-access\\src\\Resources\\SVNStartPanelSynchronize24.png");
+    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\SVNStartPanelSynchronize24.png");
 	border-radius: 50%;
 	background-color:  #FF8080
 }
@@ -181,18 +181,18 @@ div.FloatingDown{
 div.NameOfFileLeft{
     float: left;
     text-align: right;
-    width:33%;
+    width:33.3%;
 }
 
 div.NameOfFileRight{
     float: right;
     text-align: left;
-    width:33%;
+    width:33.3%;
 }
 
 div.NameOfFileButton{
     float: right;
-    width:33%;
+    width:33.3%;
 }
 
 div.Scroll1 {

@@ -3,6 +3,7 @@ package com.oxygenxml.diffreport;
 import java.io.File;
 import java.net.URL;
 
+import ro.sync.diff.api.DiffException;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 
 /**
@@ -20,8 +21,9 @@ public interface PageGenerator {
 	 * @param firstURL - left XML file
 	 * @param secondURL - right XML file 
 	 * @param outputFile - resulted HTML file
+	 * @throws DiffException 
 	 */
-	void generateHTMLReport(URL firstURL, URL secondURL, File outputFile );
+	void generateHTMLReport(URL firstURL, URL secondURL, File outputFile , int algorithmName) throws DiffException;
 	 
 	/**
 	 * The progress bar that will pop to show the progress when generating the differences and parsing the files
