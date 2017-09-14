@@ -174,6 +174,7 @@ public class HTMLContentGenerator implements ContentListener {
 		
 	}
 
+	
 	@Override
 	public void copyContent(String content){
 		resultedText.append(content);
