@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.oxygenxml.samples</groupId>
-  <artifactId>oxygen-plugin-workspace-access</artifactId>
+  <groupId>com.oxygenxml</groupId>
+  <artifactId>diff.report</artifactId>
   <version>1.0</version>
   
   <properties>
@@ -63,24 +63,11 @@
           <outputDirectory>${project.build.directory}/build</outputDirectory>
         </configuration>
       </plugin>
-
+      
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.4</version>
         <executions>
-          <!--  Put the images into a separate JAR -->
-					<execution>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-			            <id>build-images-jar</id>
-			            <configuration>
-							<descriptors>
-								<descriptor>assembly-images.xml</descriptor>
-							</descriptors>
-						</configuration>
-			          </execution>
           <execution>
             <id>make-assembly</id>
             <phase>package</phase>
@@ -88,16 +75,30 @@
               <goal>single</goal>
             </goals>
             <configuration>
-                <archiveBaseDirectory>${project.basedir}</archiveBaseDirectory>
+              <archiveBaseDirectory>${project.basedir}</archiveBaseDirectory>
               <descriptors>
                 <descriptor>assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+          
+          <!--  Put the images into a separate JAR -->
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <id>build-images-jar</id>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly-images.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
         </executions>
       </plugin>
       
-       <plugin>
+      <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <version>3.0.2</version>
         <executions>
@@ -110,16 +111,16 @@
             </goals>
             <configuration>
               <outputDirectory>${basedir}/target/</outputDirectory>
-              <resources>          
+              <resources>
                 <resource>
-		         <directory>${project.basedir}</directory>
-		          <includes>
-		            <include>addon.xml</include>
-		          </includes>
+                  <directory>${project.basedir}</directory>
+                  <includes>
+                    <include>addon.xml</include>
+                  </includes>
                   <filtering>true</filtering>
                 </resource>
-              </resources>              
-            </configuration>            
+              </resources>
+            </configuration>
           </execution>
         </executions>
       </plugin>
