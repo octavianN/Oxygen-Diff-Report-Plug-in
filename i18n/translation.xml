@@ -7,7 +7,7 @@
         <language description="Japanese" lang="ja_JP" />
         <language description="Dutch" lang="nl_NL" />
     </languageList>
-    <key value="output">
+    <key value="output_file">
         <comment>Label displayed for the output text field</comment>
         <val lang="en_US">Output: </val>
         <val lang="de_DE">de_DE_translation</val>

@@ -181,13 +181,13 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   			@Override
   			public void actionPerformed(ActionEvent e) {
   				if(e.getActionCommand() != null){
-  					//The dialog is created when the Toolbar button is pressed 
+  					//The dialog is created when the Toolbar button is pressed. The singleton is created.
   					DiffReportFileChooserDialogue myDialog = DiffReportFileChooserDialogue.getInstance();
   					if (myDialog.getReportGenerator() == null) {
   						
   						/**
   						 * When pressing the Generate Diff button, a new object has to be created in orther
-  						 * to run the alorithm, and it has to be "set" on the interface
+  						 * to run the alorithm, and it has to be "set" on the interface.
   						 */ 
   						ReportGenerator rep = new ReportGenerator() {
 							

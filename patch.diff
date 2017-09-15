@@ -1,0 +1,118 @@
+diff --git a/src/main/java/com/oxygenxml/diffreport/DiffReportFileChooserDialogue.java b/src/main/java/com/oxygenxml/diffreport/DiffReportFileChooserDialogue.java
+index b408007..8ae31da 100644
+--- a/src/main/java/com/oxygenxml/diffreport/DiffReportFileChooserDialogue.java
++++ b/src/main/java/com/oxygenxml/diffreport/DiffReportFileChooserDialogue.java
+@@ -9,7 +9,6 @@ import java.awt.FlowLayout;
+ import java.awt.GridBagConstraints;
+ import java.awt.GridBagLayout;
+ import java.awt.Insets;
+-import java.awt.Label;
+ import java.awt.Toolkit;
+ import java.awt.event.ActionEvent;
+ import java.awt.event.ActionListener;
+@@ -21,6 +20,7 @@ import java.io.File;
+ import java.io.FileNotFoundException;
+ import java.io.IOException;
+ import java.net.MalformedURLException;
++import java.util.concurrent.ExecutionException;
+ 
+ import javax.swing.AbstractAction;
+ import javax.swing.Box;
+@@ -69,7 +69,7 @@ public class DiffReportFileChooserDialogue extends JDialog
+ 	/**
+ 	 * Launches the execute() method on the parser and diffGenerator to be executed in background.
+ 	 */
+-	private SwingWorker<Void,Void> swingWorker;
++	private SwingWorker<Boolean, Void> swingWorker;
+ 	
+ 	/**
+ 	 * The Singleton Instance of the object.
+@@ -438,9 +438,14 @@ public class DiffReportFileChooserDialogue extends JDialog
+ 			File outputFile = new File(getThirdLabelField().getText());
+ 			
+ 			// If any of the input files does not exist or have an unidentified extension, an exception is thrown
+-			if (!new File(leftFile).exists() || !new File(rightFile).exists() || !outputFile.exists()){				
++			if (!new File(leftFile).exists() || !new File(rightFile).exists() || !outputFile.getParentFile().exists()){				
+ 				throw new FileNotFoundException();
+ 			}
++			
++		
++			outputFile.createNewFile();
++			
++
+ 			progressMonitor = new ProgressMonitor(this, "Generating Diff", "", 0, 100);
+ 			//"Generate Button" is pressed -> a new HTMLPageGenerator is created
+ 			PageGenerator pageGenerator = new HTMLPageGenerator();
+@@ -448,7 +453,7 @@ public class DiffReportFileChooserDialogue extends JDialog
+ 			 * SwingWorker execute() method works with the ProgressMonitor.
+ 			 * It is used as a wrapper for the pageGenerator.
+ 			 */
+-			swingWorker = new SwingWorker<Void,Void>() {
++			swingWorker = new SwingWorker<Boolean,Void>() {
+ 				/**
+ 				 * Launches on execute() method.
+ 				 * generateHTMLReport() for big inputs takes a long time so has to be ran in background 
+@@ -457,7 +462,7 @@ public class DiffReportFileChooserDialogue extends JDialog
+ 				 * 
+ 				 */
+ 				@Override
+-				protected Void doInBackground() throws MalformedURLException  {
++				protected Boolean doInBackground()  {
+ 					try {
+ 						pageGenerator.generateHTMLReport(new File(leftFile).toURI().toURL(),
+ 								new File(rightFile).toURI().toURL(),
+@@ -472,8 +477,11 @@ public class DiffReportFileChooserDialogue extends JDialog
+ 						 progressMonitor.setProgress(100);
+ 						 
+ 						e.printStackTrace();
++						return false;
++					}catch (MalformedURLException ew) {
++					
+ 					}
+-					return null;
++					return true;
+ 				}
+ 				/**
+ 				 * When the Progress Bar reaches 100, the HTML is launched in the browser and the
+@@ -481,15 +489,24 @@ public class DiffReportFileChooserDialogue extends JDialog
+ 				 */
+ 				@Override
+ 				protected void done() {
+-			        Toolkit.getDefaultToolkit().beep();
+-			        if (Desktop.isDesktopSupported()) {
+-						try {
+-							Desktop.getDesktop().browse(outputFile.toURI());
+-						} catch (IOException e) {
+-							e.printStackTrace();
++					try {
++						boolean isDone = get().booleanValue();
++						Toolkit.getDefaultToolkit().beep();
++						if (Desktop.isDesktopSupported()) {
++							if(isDone) {
++								try {
++									Desktop.getDesktop().browse(outputFile.toURI());
++								} catch (IOException e) {
++									e.printStackTrace();
++								}
++							}
+ 						}
++						DiffReportFileChooserDialogue.getInstance().setVisible(false);
++					} catch (InterruptedException e1) {
++						e1.printStackTrace();
++					} catch (ExecutionException e1) {
++						e1.printStackTrace();
+ 					}
+-			        DiffReportFileChooserDialogue.getInstance().setVisible(false);
+ 			    }
+ 				
+ 			};
+@@ -532,6 +549,9 @@ public class DiffReportFileChooserDialogue extends JDialog
+ 					 "", 
+ 					 JOptionPane.INFORMATION_MESSAGE);
+ 			 setVisible(true);
++		} catch (IOException e2) {
++			// TODO Auto-generated catch block
++			e2.printStackTrace();
+ 		}
+ 	}
+ 	

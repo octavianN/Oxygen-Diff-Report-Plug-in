@@ -1,0 +1,9 @@
+diff a/src/main/java/com/oxygenxml/diffreport/DiffReportFileChooserDialogue.java b/src/main/java/com/oxygenxml/diffreport/DiffReportFileChooserDialogue.java	(rejected hunks)
+@@ -9,7 +9,6 @@ import java.awt.FlowLayout;
+ import java.awt.GridBagConstraints;
+ import java.awt.GridBagLayout;
+ import java.awt.Insets;
+-import java.awt.Label;
+ import java.awt.Toolkit;
+ import java.awt.event.ActionEvent;
+ import java.awt.event.ActionListener;
