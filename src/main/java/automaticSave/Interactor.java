@@ -1,5 +1,6 @@
 package automaticSave;
 
+import java.util.Vector;
 
 /**
  * The class that helps save the paths after closing the program and then helps loading them 
@@ -10,17 +11,17 @@ package automaticSave;
 public interface Interactor {
 	
 	// getter and setters for the labels
-	public String getThirdLabelField() ;
+	public Vector<String> getThirdLabelField() ;
 
-	public void setThirdLabelField(String thirdLabelField) ;
+	public void setThirdLabelField(Vector<String> thirdLabelField) ;
 	
-	public String getFirstLabelField();
+	public Vector<String> getFirstLabelField();
 	
-	public void setFirstLabelField(String firstLabelField);
+	public void setFirstLabelField(Vector<String> firstLabelField);
 
-	public String getSecondLabelField();
+	public Vector<String> getSecondLabelField();
 
-	public void setSecondLabelField(String secondLabelField);
+	public void setSecondLabelField(Vector<String> secondLabelField);
 	
 	
 	

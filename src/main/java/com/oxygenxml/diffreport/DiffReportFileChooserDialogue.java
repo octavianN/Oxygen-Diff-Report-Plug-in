@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
@@ -40,20 +41,19 @@ import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.text.AbstractDocument.Content;
 
 import org.apache.batik.ext.swing.GridBagConstants;
 
 import automaticSave.ContentPersister;
 import automaticSave.ContentPersisterIMPL;
 import automaticSave.Interactor;
+import constants.ImageConstants;
+import constants.Tags;
 import ro.sync.diff.api.DiffException;
 import ro.sync.diff.api.DiffOptions;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 import ro.sync.ui.Icons;
 import translator.TranslatorImplementation;
-import constants.ImageConstants;
-import constants.Tags;
 
 /**
  * Dialog with three fields. Compare two files and choose where to save the result
@@ -69,9 +69,9 @@ public class DiffReportFileChooserDialogue extends JDialog
    */
 	private static final long serialVersionUID = 8779248380549044360L;
   	private JButton generateDiffButton;
-	private JTextField firstLabelField;
-	private JTextField secondLabelField;
-	private JTextField thirdLabelField;
+	private JComboBox<String> firstComboBoxField;
+	private JComboBox<String> secondComboBoxField;
+	private JComboBox<String> thirdComboBoxField;
 	private String mostRecentlySavedTextField;
 	private ReportGenerator reportGenerator;
 	private int algorithmName;
@@ -135,14 +135,14 @@ public class DiffReportFileChooserDialogue extends JDialog
 	
 	//Getters and Setters
 
-	public String getThirdLabelField() {
-		return thirdLabelField.getText();
+	public Vector<String> getThirdLabelField() {
+		return getListFromComboBox(thirdComboBoxField);
 	}
 
 
 
-	public void setThirdLabelField(String thirdLabelField) {
-		this.thirdLabelField = new JTextField(thirdLabelField);
+	public void setThirdLabelField(Vector<String> thirdLabelField) {
+		this.thirdComboBoxField = new JComboBox<String>(thirdLabelField);
 	}
 	
 	
@@ -151,22 +151,23 @@ public class DiffReportFileChooserDialogue extends JDialog
 	}
 
 
-	public String getFirstLabelField() {
-		return firstLabelField.getText();
+	public Vector<String> getFirstLabelField() {
+		return getListFromComboBox(firstComboBoxField);
 	}
 
-	public void setFirstLabelField(String firstLabelField) {
-		this.firstLabelField = new JTextField(firstLabelField);
+	public void setFirstLabelField(Vector<String> firstLabelField) {
+		this.firstComboBoxField = new JComboBox<String>(firstLabelField);
 	}
 
 	
-	public String getSecondLabelField() {
-		return secondLabelField.getText();
+	public Vector<String> getSecondLabelField() {
+		return getListFromComboBox(secondComboBoxField);
+		
 	}
 
 
-	public void setSecondLabelField(String secondLabelField) {
-		this.secondLabelField = new JTextField(secondLabelField);
+	public void setSecondLabelField(Vector<String> secondLabelField) {
+		this.secondComboBoxField = new JComboBox<String>(secondLabelField);
 	}
 
 
@@ -178,7 +179,25 @@ public class DiffReportFileChooserDialogue extends JDialog
 		return this.reportGenerator;
 	}
 
-
+	/**
+	 * Gets All the elements of a JComboBox and puts them in a Vector.
+	 * @param comboBox
+	 * @return 
+	 */
+	public Vector<String> getListFromComboBox(JComboBox<String> comboBox){
+		Vector<String> vector = new Vector<String>();
+		int size = comboBox.getItemCount();
+		for (int i = 0; i < size; i++) {
+		  String item = comboBox.getItemAt(i);
+		  if(item!=null) {
+			  vector.addElement(item);
+		  }
+		}
+		
+		return vector;
+	}
+	
+	
 	/**
 	 * Builds the Panel that contains the file choosers and
 	 * the one that has the buttons:"Generate Diff" and "Cancel"  
@@ -219,16 +238,20 @@ public class DiffReportFileChooserDialogue extends JDialog
 		JLabel fileTwo_Label = new JLabel(tr.getTraslation(Tags.RIGHT_FILE));
 		JLabel fileThree_Label = new JLabel(tr.getTraslation(Tags.OUTPUT_FILE));
 		
-		firstLabelField = new JTextField(20);
-		secondLabelField = new JTextField(20);
-		thirdLabelField = new JTextField(20);
+		firstComboBoxField = new JComboBox<String>();
+		secondComboBoxField = new JComboBox<String>();
+		thirdComboBoxField = new JComboBox<String>();
 		
 		//loads the paths.
 		loadPathsIfExists();
 		
-		ToolbarButton browseButton1 = createBrowseButton(firstLabelField, true);
-		ToolbarButton browseButton2 = createBrowseButton(secondLabelField, false);
-		ToolbarButton browseButton3 = createBrowseButton(thirdLabelField, false);
+		ToolbarButton browseButton1 = createBrowseButton(firstComboBoxField, true);
+		ToolbarButton browseButton2 = createBrowseButton(secondComboBoxField, false);
+		ToolbarButton browseButton3 = createBrowseButton(thirdComboBoxField, false);
+		
+		firstComboBoxField.setEditable(true);
+		secondComboBoxField.setEditable(true);
+		thirdComboBoxField.setEditable(true);
 				
 		constraints.fill = GridBagConstants.BOTH;
 		constraints.anchor = GridBagConstants.WEST;
@@ -238,11 +261,11 @@ public class DiffReportFileChooserDialogue extends JDialog
 		constraints.insets = new Insets(0, 6, 5, 0);
 
 		constraints.gridy = 0;
-		auxiliaryPanel = createFilePannel(fileOne_Label, firstLabelField, browseButton1, 13);
+		auxiliaryPanel = createFilePannel(fileOne_Label, firstComboBoxField, browseButton1, 13);
 		panel.add(auxiliaryPanel, constraints);
 
 		constraints.gridy ++ ;
-		auxiliaryPanel = createFilePannel(fileTwo_Label, secondLabelField, browseButton2, 10);
+		auxiliaryPanel = createFilePannel(fileTwo_Label, secondComboBoxField, browseButton2, 10);
 		panel.add(auxiliaryPanel, constraints);
 		
 		constraints.gridy ++;
@@ -253,7 +276,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 		
 		constraints.gridy++;
 		constraints.fill = GridBagConstants.BOTH;
-		auxiliaryPanel = createFilePannel(fileThree_Label, thirdLabelField, browseButton3, 17);
+		auxiliaryPanel = createFilePannel(fileThree_Label, thirdComboBoxField, browseButton3, 17);
 		constraints.insets = new Insets(0, 6, 0, 0);
 		panel.add(auxiliaryPanel, constraints);
 
@@ -267,6 +290,9 @@ public class DiffReportFileChooserDialogue extends JDialog
 	private void loadPathsIfExists() {
 		contentPersister = new ContentPersisterIMPL();
 		contentPersister.loadPath(this);
+		firstComboBoxField.setSelectedItem(null);
+		secondComboBoxField.setSelectedItem(null);
+		thirdComboBoxField.setSelectedItem(null);
 		
 	}
 	
@@ -278,7 +304,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 	 * @param ipadxMargin - Distance between some elements
 	 * @return
 	 */
-	private JPanel createFilePannel(JLabel text, JTextField field, JButton button, int ipadxMargin) {
+	private JPanel createFilePannel(JLabel text, JComboBox<String> field, JButton button, int ipadxMargin) {
 		GridBagLayout layout = new GridBagLayout();
 		JPanel panel = new JPanel(layout);
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -378,24 +404,26 @@ public class DiffReportFileChooserDialogue extends JDialog
 	 * @param field -> The field responsible with remembering the Path
 	 * @return the browsing Button for each of the files
 	 */
-	private ToolbarButton createBrowseButton(final JTextField field, boolean firstFile){
+	private ToolbarButton createBrowseButton(final JComboBox<String> field, boolean firstFile){
 		ImageIcon imageIcon = Icons.getIcon(ImageConstants.DOC_BROWSE_BUTTON);
 		AbstractAction browseAction = new AbstractAction("Browse", imageIcon) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(mostRecentlySavedTextField == null) {
 					if(firstFile) {
-						mostRecentlySavedTextField = secondLabelField.getText();
+						mostRecentlySavedTextField = (String)secondComboBoxField.getSelectedItem();
 					} else {
-						mostRecentlySavedTextField = firstLabelField.getText();
+						mostRecentlySavedTextField = (String)firstComboBoxField.getSelectedItem();
 					}
 				}
-				File file ;
-				file = new File(mostRecentlySavedTextField);
-				
+				File file = null ;
+				if(mostRecentlySavedTextField != null) {
+					file = new File(mostRecentlySavedTextField);
+					
+				} 
 				JFileChooser fileChooser;
 				
-				if(!(file.exists())) {
+				if(file == null || !(file.exists())) {
 					fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 				} else {
 					fileChooser = new JFileChooser(file.getParent());
@@ -406,11 +434,15 @@ public class DiffReportFileChooserDialogue extends JDialog
 				int returnValue = fileChooser.showOpenDialog(null);
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					File selectedFile = fileChooser.getSelectedFile();
-					field.setText(selectedFile.toString());
+					if(field.getItemCount() > 10) {
+						field.removeItemAt(0);
+					}
+					field.addItem(selectedFile.toString());
+					field.setSelectedItem(selectedFile.toString());
 					
 				}
 				
-				mostRecentlySavedTextField = field.getText();
+				mostRecentlySavedTextField = (String)field.getSelectedItem();
 			}
 		};
 		
@@ -475,9 +507,9 @@ public class DiffReportFileChooserDialogue extends JDialog
 	 */
 	private void generateDiff() {
 		try {
-			String leftFile = getFirstLabelField();
-			String rightFile = getSecondLabelField();
-			File outputFile = new File(getThirdLabelField());
+			String leftFile = firstComboBoxField.getSelectedItem().toString();
+			String rightFile = secondComboBoxField.getSelectedItem().toString();
+			File outputFile = new File(thirdComboBoxField.getSelectedItem().toString());
 			
 			// If any of the input files does not exist or have an unidentified extension, an exception is thrown
 			if (!new File(leftFile).exists() || !new File(rightFile).exists() || !outputFile.getParentFile().exists()){				
