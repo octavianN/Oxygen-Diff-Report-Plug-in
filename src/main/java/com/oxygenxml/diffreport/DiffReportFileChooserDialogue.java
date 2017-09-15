@@ -56,7 +56,7 @@ import ro.sync.ui.Icons;
 import translator.TranslatorImplementation;
 
 /**
- * Dialog with three fields. Compare two files and choose where to save the result
+ * Dialog with three fields. Compare two files and choose where to save the result.
  * @author Dina_Andrei
  *
  */
@@ -501,9 +501,9 @@ public class DiffReportFileChooserDialogue extends JDialog
 	/**
 	 * Gets the inputs, gives them to the generateHTML function.
 	 * Is activated when the "Generate Diff" Button is pressed
-	 * Upon pressing the swingWorker method execute() sends the
+	 * Upon pressing, the swingWorker method execute() sends the
 	 * process in background. A Process Monitor will appear and
-	 * the html page will pop when the progress bar reaches 100
+	 * the html page will pop when the progress bar reaches 100.
 	 */
 	private void generateDiff() {
 		try {
@@ -520,10 +520,12 @@ public class DiffReportFileChooserDialogue extends JDialog
 						 JOptionPane.INFORMATION_MESSAGE);
 			}
 			//if the user forgot to give the ".html" extension, it is automatically added
-			if(fileName.length() > 4) {
-				if(fileName.substring(fileName.length() - 4) != "html") {
+			if(fileName.length() > 5) {
+				if(fileName.substring(fileName.length() - 5) != ".html") {
 					fileName += ".html";
 				}
+			}else {
+				fileName += ".html";
 			}
 			
 			String leftFile = firstComboBoxField.getSelectedItem().toString();
