@@ -507,16 +507,35 @@ public class DiffReportFileChooserDialogue extends JDialog
 	 */
 	private void generateDiff() {
 		try {
+			//filename of the output file
+			String fileName = thirdComboBoxField.getSelectedItem().toString();
+			
+			//in case the user gives only the name of the file in which the HTML should be saved,
+			//it will be created a file with that name on the desktop
+			if(!fileName.contains(File.separator)) {
+				fileName = FileSystemView.getFileSystemView().getHomeDirectory().toString() + File.separator + fileName;
+				JOptionPane.showMessageDialog(null, 
+						 "Output_File was saved on Desktop: ", 
+						 "", 
+						 JOptionPane.INFORMATION_MESSAGE);
+			}
+			//if the user forgot to give the ".html" extension, it is automatically added
+			if(fileName.length() > 4) {
+				if(fileName.substring(fileName.length() - 4) != "html") {
+					fileName += ".html";
+				}
+			}
+			
 			String leftFile = firstComboBoxField.getSelectedItem().toString();
 			String rightFile = secondComboBoxField.getSelectedItem().toString();
-			File outputFile = new File(thirdComboBoxField.getSelectedItem().toString());
+			File outputFile = new File(fileName);
 			
 			// If any of the input files does not exist or have an unidentified extension, an exception is thrown
-			if (!new File(leftFile).exists() || !new File(rightFile).exists() || !outputFile.getParentFile().exists()){				
+			if (!new File(leftFile).exists() || !new File(rightFile).exists() 
+					|| ( fileName.length() > 5 && !outputFile.getParentFile().exists())){				
 				throw new FileNotFoundException();
 			}
 			
-		
 			outputFile.createNewFile();
 			
 
