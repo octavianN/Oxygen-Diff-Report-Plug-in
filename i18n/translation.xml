@@ -7,6 +7,14 @@
         <language description="Japanese" lang="ja_JP" />
         <language description="Dutch" lang="nl_NL" />
     </languageList>
+    <key value="close">
+        <comment>Label displayed for the close field</comment>
+        <val lang="en_US">Close</val>
+        <val lang="de_DE">de_DE_translation</val>
+        <val lang="fr_FR">fr_FR_translation</val>
+        <val lang="ja_JP">ja_JP_translation</val>
+        <val lang="nl_NL">nl_NL_translation</val>
+    </key>
     <key value="output_file">
         <comment>Label displayed for the output text field</comment>
         <val lang="en_US">Output: </val>

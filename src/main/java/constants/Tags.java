@@ -24,7 +24,7 @@ public class Tags {
 	/**
 	 * Close button name.
 	 */
-	public static final String CLOSE = "CLOSE";
+	public static final String CLOSE = "close";
 	/**
 	 * 
 	 */
