@@ -515,7 +515,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 			if(!fileName.contains(File.separator)) {
 				fileName = FileSystemView.getFileSystemView().getHomeDirectory().toString() + File.separator + fileName;
 				JOptionPane.showMessageDialog(null, 
-						 "Output_File was saved on Desktop: ", 
+						 "Output_File: " + fileName +"\nwas saved on Desktop: ", 
 						 "", 
 						 JOptionPane.INFORMATION_MESSAGE);
 			}
