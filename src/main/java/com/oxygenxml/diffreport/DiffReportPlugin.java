@@ -183,6 +183,7 @@ private StandalonePluginWorkspace pluginWorkspaceAccess;
   				if(e.getActionCommand() != null){
   					//The dialog is created when the Toolbar button is pressed. The singleton is created.
   					DiffReportFileChooserDialogue myDialog = DiffReportFileChooserDialogue.getInstance();
+  					myDialog.setPluginWorkspaceAccess(pluginWorkspaceAccess);
   					if (myDialog.getReportGenerator() == null) {
   						
   						/**

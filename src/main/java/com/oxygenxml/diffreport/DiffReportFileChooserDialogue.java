@@ -51,6 +51,7 @@ import constants.ImageConstants;
 import constants.Tags;
 import ro.sync.diff.api.DiffException;
 import ro.sync.diff.api.DiffOptions;
+import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 import ro.sync.ui.Icons;
 import translator.TranslatorImplementation;
@@ -86,6 +87,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 	 * The Singleton Instance of the object.
 	 */
 	private static volatile DiffReportFileChooserDialogue instance;
+	private StandalonePluginWorkspace pluginWorkspaceAccess;
 
 	/**
 	 * Constructor.
@@ -512,13 +514,14 @@ public class DiffReportFileChooserDialogue extends JDialog
 			
 			//in case the user gives only the name of the file in which the HTML should be saved,
 			//it will be created a file with that name on the desktop
-			if(!fileName.contains(File.separator)) {
-				fileName = FileSystemView.getFileSystemView().getHomeDirectory().toString() + File.separator + fileName;
-				JOptionPane.showMessageDialog(null, 
-						 "Output_File: " + fileName +"\nwas saved on Desktop: ", 
-						 "", 
-						 JOptionPane.INFORMATION_MESSAGE);
-			}
+//			if(!fileName.contains(File.separator)) {
+//				new File(new File(""), fileName);
+//				fileName = FileSystemView.getFileSystemView().getHomeDirectory().toString() + File.separator + fileName;
+//				JOptionPane.showMessageDialog(null, 
+//						 "Output_File: " + fileName +"\nwas saved on Desktop: ", 
+//						 "", 
+//						 JOptionPane.INFORMATION_MESSAGE);
+//			}
 			//if the user forgot to give the ".html" extension, it is automatically added
 			if(fileName.length() > 5) {
 				if(fileName.substring(fileName.length() - 5) != ".html") {
@@ -533,14 +536,24 @@ public class DiffReportFileChooserDialogue extends JDialog
 			File outputFile = new File(fileName);
 			
 			// If any of the input files does not exist or have an unidentified extension, an exception is thrown
-			if (!new File(leftFile).exists() || !new File(rightFile).exists() 
-					|| ( fileName.length() > 5 && !outputFile.getParentFile().exists())){				
-				throw new FileNotFoundException();
+			if (!new File(leftFile).exists()){				
+				throw new FileNotFoundException("Left file '" + leftFile + "' does not exist on disk.");
+			}
+			if (!new File(rightFile).exists()){				
+				throw new FileNotFoundException("Right file '" + rightFile + "' does not exist on disk.");
 			}
 			
-			outputFile.createNewFile();
+			if (outputFile.exists()) {
+			  // Overwrite file
+				int selectedButton = pluginWorkspaceAccess.showConfirmDialog("Overwtite", "Output file already exist on disk: " + outputFile.getAbsolutePath() +"\nDo you want to ovewrrite it?", 
+						new String [] {"Overwrite", "Cancel"}, new int[] {0, 1});
+				if (selectedButton == 1) {
+					return;
+				}
+			} else if (!outputFile.createNewFile()){
+				throw new FileNotFoundException("Output file '" + outputFile + "' cannot be created on disk.");
+			}
 			
-
 			progressMonitor = new ProgressMonitor(this, "Generating Diff", "", 0, 100);
 			//"Generate Button" is pressed -> a new HTMLPageGenerator is created
 			PageGenerator pageGenerator = new HTMLPageGenerator();
@@ -642,7 +655,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 		} catch (FileNotFoundException e1) {
 			//If the input files are not valid prints an error message.
 			 JOptionPane.showMessageDialog(null, 
-					 "The path is not Valid", 
+					 e1.getMessage(), 
 					 "", 
 					 JOptionPane.INFORMATION_MESSAGE);
 			 setVisible(true);
@@ -674,6 +687,10 @@ public class DiffReportFileChooserDialogue extends JDialog
 			}
 		}
     }
+
+	public void setPluginWorkspaceAccess(StandalonePluginWorkspace pluginWorkspaceAccess) {
+		this.pluginWorkspaceAccess = pluginWorkspaceAccess;
+	}
 	
 
 }
