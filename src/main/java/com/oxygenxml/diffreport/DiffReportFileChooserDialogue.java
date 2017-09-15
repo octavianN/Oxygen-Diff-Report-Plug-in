@@ -9,7 +9,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Label;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,13 +42,13 @@ import javax.swing.filechooser.FileSystemView;
 
 import org.apache.batik.ext.swing.GridBagConstants;
 
-import constants.ImageConstants;
-import constants.Labels;
 import ro.sync.diff.api.DiffException;
 import ro.sync.diff.api.DiffOptions;
 import ro.sync.exml.workspace.api.standalone.ui.ToolbarButton;
 import ro.sync.ui.Icons;
 import translator.TranslatorImplementation;
+import constants.ImageConstants;
+import constants.Tags;
 
 /**
  * Dialog with three fields. Compare two files and choose where to save the result
@@ -59,7 +58,11 @@ import translator.TranslatorImplementation;
 public class DiffReportFileChooserDialogue extends JDialog
 											implements PropertyChangeListener{
 	
-	private JButton generateDiffButton;
+	/**
+   * TODO Comment for <code>serialVersionUID</code>
+   */
+  private static final long serialVersionUID = 8779248380549044360L;
+  private JButton generateDiffButton;
 	private JTextField firstLabelField;
 	private JTextField secondLabelField;
 	private JTextField thirdLabelField;
@@ -94,7 +97,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 		this.setPreferredSize(new Dimension(450, 215));
 		this.pack();
 		this.setLocationRelativeTo(null);
-		this.setTitle(Labels.TITLE);
+		this.setTitle(Tags.DIFF_REPORT_GENERATOR);
 		
 		
 	}
@@ -200,9 +203,9 @@ public class DiffReportFileChooserDialogue extends JDialog
 		GridBagConstraints constraints = new GridBagConstraints();
 		
 		TranslatorImplementation tr = new TranslatorImplementation();
-		JLabel fileOne_Label = new JLabel(tr.getTraslation(Labels.LEFT_FILE));
-		JLabel fileTwo_Label = new JLabel(tr.getTraslation(Labels.RIGHT_FILE));
-		JLabel fileThree_Label = new JLabel(tr.getTraslation(Labels.OUTPUT_FILE));
+		JLabel fileOne_Label = new JLabel(tr.getTraslation(Tags.LEFT_FILE));
+		JLabel fileTwo_Label = new JLabel(tr.getTraslation(Tags.RIGHT_FILE));
+		JLabel fileThree_Label = new JLabel(tr.getTraslation(Tags.OUTPUT_FILE));
 		
 		firstLabelField = new JTextField(20);
 		secondLabelField = new JTextField(20);
@@ -301,7 +304,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 		JLabel labelAlgorithm= new JLabel();
 		JComboBox<Integer> algorithmType = new JComboBox<Integer>(types);
 		TranslatorImplementation tr = new TranslatorImplementation();
-		labelAlgorithm.setText(tr.getTraslation(Labels.ALGORITHM_LABEL));
+		labelAlgorithm.setText(tr.getTraslation(Tags.ALGORITHM));
 		
 		// takes the ID's from the combo Box and transforms them into their correlating name. 
 		algorithmType.setRenderer(new DefaultListCellRenderer() {
@@ -393,7 +396,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 		/**
 		 * Generate Diff Button. 
 		 */
-		generateDiffButton = new JButton(tr.getTraslation(Labels.GENERATE_DIFF_BUTTON));
+		generateDiffButton = new JButton(tr.getTraslation(Tags.GENERATE_DIFF));
 		generateDiffButton.setPreferredSize(new Dimension(97, 25));
 		generateDiffButton.addActionListener(new ActionListener() {
 			@Override
@@ -407,7 +410,7 @@ public class DiffReportFileChooserDialogue extends JDialog
 		/**
 		 * Cancel Button.
 		 */
-		JButton cancelButton = new JButton(tr.getTraslation(Labels.CLOSE_BUTTON));
+		JButton cancelButton = new JButton(tr.getTraslation(Tags.CLOSE));
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
