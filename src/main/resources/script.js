@@ -15,11 +15,11 @@
 	var currentDiff = document.getElementsByClassName("CurrentDifference");
 
 	var childrenListHalf;
-	if(childrenList.length % 2 == 1)	
+	if(childrenList.length % 2 == 1){
 		childrenListHalf = (childrenList.length+1)/2;
-	else
+	} else {
 		childrenListHalf = childrenList.length/2;
-
+	}
 
 /*
 	Adding to every span that has the "data-diff-parent-id" attribute
@@ -109,17 +109,14 @@
 	    	}else if(colorForBackgrund == "diffParentTypeIncoming"){
 	    			color = 'rgb('+204+',' +242+','+255+')';
 	    	}
-
 	    	return color;
     }
-
 
     /*
     	@param e -> id of the element
     	-HOOVER effect-
 		Changes the color of the background when the mouse is on the certain element.
 		Also changes the color of the matched neighbour of the element 
-
     */
 	function mouseOverParent(e) {
 
@@ -181,8 +178,6 @@
 	    }
 	}
 
-
-
     /*
     	@param e -> id of the element
     	-HOOVER effect-
@@ -190,7 +185,6 @@
 		Also changes the color of the matched neighbour of the element 
 
     */
-
 	function mouseOverChild(e) {
 	    var list = document.getElementsByClassName("diffEntry");
 	    var i;
@@ -309,12 +303,9 @@
 				parentsList[i].setAttribute("identify1", "0");
 			}
 		}
-
-
 		
 	    var concat = getConcatForParent(id1);
-   
-    	
+	    
     	parentsList[id1].classList.add(concat); 
     	parentsList[id2].classList.add(concat);
     	parentsList[id1].scrollIntoViewIfNeeded();
@@ -338,7 +329,6 @@
 			parentsList[id2].setAttribute("identify1", "0");
 			currentIDParent = -1;
 		}
-		
 	}
 
 	/*
@@ -405,10 +395,8 @@
 
 			if(value2 == e){
 				id2 = i;
-				
 			}
 		}
-
 
 	   	var concat = getConcatForChild(id1);
 
@@ -435,11 +423,7 @@
 			childrenList[id2].setAttribute("identify", "0");
 			currentIDChild = -1;
 		}
-
-
 	}
-
-
 
 	function nextDiff(){
 		if(currentIDParent == -1 || currentIDParent == parentsList.length/2 - 1){
@@ -476,14 +460,19 @@
 	}
 
 	function swapTexts(){
-
-
 		var firstDoc = document.getElementById('swap1');
 		var secondDoc = document.getElementById('swap2');
 		var aux = firstDoc.innerHTML;
 		firstDoc.innerHTML = secondDoc.innerHTML;
 		secondDoc.innerHTML = aux;
 		fillCanvas(null, null);
+        
+        /* Switch titles */
+		var leftTitle = document.getElementsByClassName('NameOfFileLeft')[0];
+		var rightTitle = document.getElementsByClassName('NameOfFileRight')[0];
+        var temp = leftTitle.innerHTML;
+        leftTitle.innerHTML = rightTitle.innerHTML;
+        rightTitle.innerHTML = temp;
 	}
 
 	function fillCanvas(e1,color){
