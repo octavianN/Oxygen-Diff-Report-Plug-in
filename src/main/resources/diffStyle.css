@@ -24,33 +24,33 @@ div.canvasContainer{
 	padding: 0px;
 }
 button.NextButtonChild{
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\DiffNextBlock24.png");
 	border-radius: 50%;
 	background-color: #99CCFF;
+	content: '>>';
 }
 
 button.PreviousButtonChild{
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\DiffPreviousBlock24.png");
 	border-radius: 50%;
 	background-color: #99CCFF;
+	content: '<<';
 }
 
 button.NextButton {
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\DiffNext24.png");
 	border-radius: 50%;
 	background-color: #99CCFF;
+	content: '>';
 }
 
 button.PreviousButton{
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\DiffPrevious24.png");
 	border-radius: 50%;
 	background-color: #99CCFF;
+	content: '<';
 }
 
 button.SwapButton{
-    background-image: url("C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\SVNStartPanelSynchronize24.png");
 	border-radius: 50%;
 	background-color:  #FF8080
+	content: '<->';
 }
 
 
