@@ -4,8 +4,9 @@ package com.oxygenxml.diffreport;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.MalformedURLException;
@@ -13,18 +14,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import org.mozilla.javascript.JavaScriptException;
-
-import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
-import com.oxygenxml.diffreport.parser.XMLMainParser;
-
-import ro.sync.diff.api.DiffContentTypes;
 import ro.sync.diff.api.DiffException;
-import ro.sync.diff.api.DiffOptions;
 import ro.sync.diff.api.Difference;
 import ro.sync.diff.api.DifferencePerformer;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.util.Resource;
+
+import com.oxygenxml.diffreport.generator.HTMLContentGenerator;
+import com.oxygenxml.diffreport.parser.XMLMainParser;
 
 /**
  * Creates the HTML page with the two parsed XML files
@@ -215,13 +212,37 @@ public class HTMLPageGenerator implements PageGenerator {
 			/**
 			 * Add the CSS file.
 			 */
-			BufferedReader cssReader = new BufferedReader(new FileReader(new File(
-					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\diffStyle.css")));
-			 String line;
-			 while ((line = cssReader.readLine()) != null) {
-				 htmlBuilder.append(line + "\n");
-			 }
-			 cssReader.close();
+			InputStream is = Resource.getResourceAsStream("/diffStyle.css");
+	    if (is != null) {
+	      BufferedReader cssReader = null;
+
+	      try {
+	        cssReader = new BufferedReader(new InputStreamReader(is, "ISO-8859-1"));
+	        String line;
+	        while ((line = cssReader.readLine()) != null) {
+	          htmlBuilder.append(line + "\n");
+	        }
+
+	      } catch (Throwable e) {
+	        // on error we simply have no styles... the html
+	        // will look mighty wrong but still function.
+	      } finally {
+	        if (cssReader != null) {
+	          try {
+	            cssReader.close();
+	          } catch (IOException e) {
+	            // Ignore
+	          }
+	        }
+
+	        // Just in case the reader was not created...
+	        try {
+	          is.close();
+	        } catch (IOException e) {
+	          // Ignore
+	        }
+	      }
+	    } 
 			 
 			/**
 			 * Start Table.		
@@ -330,12 +351,39 @@ public class HTMLPageGenerator implements PageGenerator {
 			 * Script.
 			 */
 			htmlBuilder.append("<script>");
-			BufferedReader jsReader = new BufferedReader(new FileReader(new File(
-					"C:\\Users\\intern3\\git\\Oxygen-Diff-Report-Plug-in\\src\\main\\resources\\script.js")));
-			while ((line = jsReader.readLine()) != null) {
-				htmlBuilder.append(line + "\n");
-			}
-			jsReader.close();
+			is = Resource.getResourceAsStream("/script.js");
+      if (is != null) {
+        BufferedReader jsReader = null;
+
+        try {
+          jsReader = new BufferedReader(new InputStreamReader(is, "ISO-8859-1"));
+
+          String line;
+          // Read content
+          while ((line = jsReader.readLine()) != null) {
+            htmlBuilder.append(line + "\n");
+          }
+
+        } catch (Throwable e) {
+          // on error we simply have no styles... the html
+          // will look mighty wrong but still function.
+        } finally {
+          if (jsReader != null) {
+            try {
+              jsReader.close();
+            } catch (IOException e) {
+              // Ignore
+            }
+          }
+
+          // Just in case the reader was not created...
+          try {
+            is.close();
+          } catch (IOException e) {
+            // Ignore
+          }
+        }
+      } 
 			htmlBuilder.append("</script>");
 			
 			/**
